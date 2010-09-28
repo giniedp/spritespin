@@ -21,7 +21,6 @@
  * Requires jQuery 1.4.x or higher
  * Optional jQuery-ui 1.8.x or higher if you want to use a slider
  */
-
 (function($, undefined) {
 
   var methods = {
@@ -38,6 +37,7 @@
         reverse : false,                  // if true animation is played backward
         image   : "images/spritespin.jpg",// stiched source image
         onFrameChanged : undefined,       // called when frame has changed
+        onInitialized  : undefined,       // called when plugin has been initialized
         slider  : undefined,              // jquery-ui slider instance
         interactive : true                // enables mouse interaction
       }
@@ -49,7 +49,8 @@
       return this.each(function(){
         var $this = $(this);
         var data  = $this.data('spritespin');
-    
+        var initialized = false;
+        
         if (!data){
           // Initialize the plugin if it hasn't been initialized yet
           $(this).disableSelection();
@@ -60,6 +61,7 @@
             touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
           });
           data = $this.data('spritespin');
+          initialized = true;
         } else {
           $.extend(data.settings, options);
         }
@@ -88,29 +90,31 @@
           }); 
         }
         
-        // start animation if required
-        if (data.settings.animate){
-          methods.animate.apply($this, 
-            [data.settings.animate, data.settings.loop]);
-        }
-        
         // unbind all events
         $this.unbind('.spritespin');
             
-        // rebind interaction events
-        if (settings.interactive){
+        if (data.touchable && settings.interactive){
+          // rebind touchable device events
+          $this.bind('touchstart.spritespin',    events.onTouchStart);
+          $this.bind('touchend.spritespin',      events.onTouchEnd);
+          $this.bind('touchcancel.spritespin',   events.onTouchEnd);
+          $this.bind('touchmove.spritespin',     events.onTouchMove);
+        } else if (settings.interactive){
+          // rebind interaction events
           $this.bind('mousemove.spritespin',  events.onMouseMove);
           $this.bind('mousedown.spritespin',  events.onMouseDown);
           $this.bind('mouseup.spritespin',    events.onMouseUp);
           $this.bind('mouseleave.spritespin', events.onMouseLeave);
         }
         
-        // rebind touchable device events
-        if (data.touchable && settings.interactive){
-          $this.bind('touchstart.spritespin',    events.onTouchStart);
-          $this.bind('touchend.spritespin',      events.onTouchEnd);
-          $this.bind('touchcancel.spritespin',   events.onTouchEnd);
-          $this.bind('touchmove.spritespin',     events.onTouchMove);
+        // start animation if required
+        if (data.settings.animate){
+          methods.animate.apply($this, [data.settings.animate, data.settings.loop]);
+        }
+        
+        // call custom events
+        if (initialized && data.settings.onInitialized != undefined){
+          data.settings.onInitialized();
         }
       });
     },
@@ -128,24 +132,27 @@
     // respecting the new frame value. Stops a running animation when necessary.
     update : function(frame){
       return this.each(function(){        
-        var $this = $(this);
-        data = $this.data('spritespin');
+        var $this = $(this), 
+        data = $this.data('spritespin'), 
         settings = data.settings;
         
         oldFrame = data.settings.frame;
-         
-        // update and wrap the counter
-        if (typeof(frame) == 'undefined'){
-          step = settings.reverse ? -1 : 1
-          settings.frame = (settings.frame + step) % settings.frames;
-        } else {
-          settings.frame = frame % settings.frames;
-        }
-        while(settings.frame < 0){
-          settings.frame += settings.frames;
-        }
         
+        // update frame counter
+        if (frame == undefined){
+          settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
+        } else {
+          settings.frame = frame;
+        }
+      
         if (oldFrame != settings.frame){
+          // wrap the frame counter. avoid using % operator for speed
+          if (settings.frame >= settings.frames){ 
+            settings.frame -= settings.frames; 
+          } else if (settings.frame < 0){ 
+            settings.frame += settings.frames; 
+          }
+        
           // update background position
           x = -settings.frame * settings.width;
           $this.css({
@@ -200,7 +207,14 @@
           if (animate && data.animation == null){
             // start animation
             data.animation = setInterval(
-              function(){ methods.update.apply($this, []); }, settings.speed);
+              function(){ 
+                try {
+                  methods.update.apply($this, []); 
+                } catch(err){
+                  // this is a hack for Opera Browser
+                }
+                
+              }, settings.speed);
           } else if (!animate && data.animation != null) {
             // stop animation
             clearInterval(data.animation);
@@ -293,9 +307,7 @@
   
   $.fn.spritespin = function(method) {
     if ( methods[method] ) {
-      return methods[method].apply(
-        this, Array.prototype.slice.call(arguments, 1)
-      );
+      return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
     } else if (typeof(method) === 'object' || !method) {
       return methods.init.apply(this, arguments);
     } else {
