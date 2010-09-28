@@ -14,15 +14,36 @@
     <script type="text/javascript">
       $(function(){
         $("#spinner").spritespin({ 
-          width  : 480, 
-          height : 480, 
-          image  : "images/image.jpg", 
-          speed  : 32,
+          width  : 80, 
+          height : 80, 
+          image  : "images/spritespin.jpg", 
+          speed  : 16,
+          frames : 71,
+          frame  : 0,
           slider : $("#slider"),
           //onFrameChanged : function(frame){ console.log(frame); } 
         });
       });
       //$("#spinner").spin360("update");
-    </script
+    </script>
+    
+    <div id="spinner1" style = "margin-top: 100px;"/>
+    <script type="text/javascript">
+      $(function(){
+        $("#spinner1").spritespin({ 
+          width  : 80, 
+          height : 80, 
+          image  : "images/spritespin.jpg", 
+          speed  : 16,
+          frames : 71,
+          frame  : 0,
+          animate : true,
+          loop : true,
+          //onFrameChanged : function(frame){ console.log(frame); } 
+        });
+      });
+      //$("#spinner").spin360("update");
+    </script>
+    
   </body>
 </html>
