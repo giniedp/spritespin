@@ -1,34 +1,23 @@
-/* Copyright (c) 2010 Alexander Gräfenstein
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * Requires jQuery 1.4.x or higher
- * Optional jQuery-ui 1.8.x or higher if you want to use a slider
- */
 (function($, undefined) {
 
+  $.fn.spritespin = function(method) {
+    if ( methods[method] ) {
+      return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
+    } else if (typeof(method) === 'object' || !method) {
+      return methods.init.apply(this, arguments);
+    } else {
+      $.error( 'Method ' +  method + ' does not exist on jQuery.spritespin' );
+    }
+  };
+  
   var methods = {
     init : function(options){
       // Default settings
       var settings = {
         width   : 640,                    // width of a single frame
         height  : 480,                    // height of a single frame
+        offsetX : 0,
+        offsetY : 0,
         frames  : 36,                     // number of frames
         frame   : 0,                      // initial frame number
         animate : false,                  // run animation when after initialize
@@ -67,13 +56,14 @@
         }
         
         // style the wrapper container
-        x = -data.settings.frame * data.settings.width;
+        x = data.settings.offsetX - data.settings.frame * data.settings.width;
+        y = -data.settings.offsetY;
         $this.css({
           width      : data.settings.width + "px",
           height     : data.settings.height + "px",
           "background-image"    : "url('" + data.settings.image + "')",
           "background-repeat"   : "no-repeat",
-          "background-position" : x + "px 0px"
+          "background-position" : [x, "px ", y, "px"].join("")
         });
         
         // hook the jquery-ui slider
@@ -95,16 +85,16 @@
             
         if (data.touchable && settings.interactive){
           // rebind touchable device events
-          $this.bind('touchstart.spritespin',    events.onTouchStart);
-          $this.bind('touchend.spritespin',      events.onTouchEnd);
-          $this.bind('touchcancel.spritespin',   events.onTouchEnd);
-          $this.bind('touchmove.spritespin',     events.onTouchMove);
+          $this.bind('touchstart.spritespin',    events.onStartDrag);
+          $this.bind('touchend.spritespin',      events.onStopDrag);
+          $this.bind('touchcancel.spritespin',   events.onStopDrag);
+          $this.bind('touchmove.spritespin',     events.onDrag);
         } else if (settings.interactive){
           // rebind interaction events
-          $this.bind('mousemove.spritespin',  events.onMouseMove);
-          $this.bind('mousedown.spritespin',  events.onMouseDown);
-          $this.bind('mouseup.spritespin',    events.onMouseUp);
-          $this.bind('mouseleave.spritespin', events.onMouseLeave);
+          $this.bind('mousedown.spritespin',  events.onStartDrag);
+          $this.bind('mouseup.spritespin',    events.onStopDrag);
+          $this.bind('mouseleave.spritespin', events.onStopDrag);
+          $this.bind('mousemove.spritespin',  events.onDrag);
         }
         
         // start animation if required
@@ -126,10 +116,11 @@
         $this.removeData('spritespin');
       });
     },
-    // Updates a single frame to the specified value. If no value is given this
-    // will increment the current frame counter. Wraps the framecounter if it 
-    // has exceeded the total number of frames. Positions the background image 
-    // respecting the new frame value. Stops a running animation when necessary.
+    // Updates a single frame to the specified frame number. If no value is 
+    // given this will increment the current frame counter. 
+    // Wraps the framecounter if it has exceeded the total number of frames. 
+    // Positions the background image respecting the new frame value. 
+    // Stops a running animation when necessary.
     update : function(frame){
       return this.each(function(){        
         var $this = $(this), 
@@ -154,9 +145,10 @@
           }
         
           // update background position
-          x = -settings.frame * settings.width;
+          x = settings.offsetX - settings.frame * settings.width;
+          y = -settings.offsetY;
           $this.css({
-            "background-position" : x + "px 0px"
+            "background-position" : [x, "px ", y, "px"].join("")
           });
           
           // stop animation if we are back at frame 0
@@ -176,7 +168,7 @@
         }
       });
     },
-    // Starts or stops the animation depend on the animate paramter
+    // Starts or stops the animation depend on the animate paramter.
     // In case when animation is already running pass "false" to stop.
     // In case when animation is not running pass "true" to start.
     // To keep animation running forever pass "true" for the loop parameter.
@@ -211,9 +203,8 @@
                 try {
                   methods.update.apply($this, []); 
                 } catch(err){
-                  // this is a hack for Opera Browser
+                  // The try catch block is a hack for Opera Browser
                 }
-                
               }, settings.speed);
           } else if (!animate && data.animation != null) {
             // stop animation
@@ -223,6 +214,7 @@
         });
       }
     },
+    // Gets and sets the current frame number
     frame : function(frame){
       if (frame == undefined){
         return $(this).data('spritespin').settings.frame;
@@ -232,6 +224,7 @@
         });        
       }
     },
+    // Gets and sets the loop indicator
     loop : function(value){
       if (value == undefined){
         return $(this).data('spritespin').settings.loop;
@@ -246,72 +239,38 @@
   };
   
   var events = {
-    onMouseDown : function(){
-      var $this = $(this);
-      data = $this.data('spritespin');
+    onStartDrag : function(e){
+      var $this = $(this), data = $this.data('spritespin');
       data.dragging = true;
+      return false;
     },
-    onMouseUp : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
+    onStopDrag : function(e){
+      var $this = $(this), data = $this.data('spritespin');
+      data.oldMouseX = undefined;
       data.dragging = false;
+      return false;
     },
-    onMouseLeave : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
-      data.dragging = false;
-    },
-    onMouseMove : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
+
+    onDrag : function(e){
+      var $this = $(this), data = $this.data('spritespin');
       
-      if (data.dragging && typeof(data.oldMouseX) != "undefined"){
+      if (data.dragging && data.oldMouseX != undefined){
         d = data.oldMouseX - e.pageX;
-        if (d > 0) {
-          methods.update.apply($this, [data.settings.frame + 1]);
-        } else if (d < 0) {
-          methods.update.apply($this, [data.settings.frame - 1]);
+        frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
+        if (d != 0) {
+          methods.update.apply($this, [frame]);
         }
         methods.animate.apply($(this), [false]); // stop animation
       }
-      data.oldMouseX = e.pageX;
-      data.oldMouseY = e.pageY;
-    },
-    onTouchStart : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
-      methods.animate.apply($(this), [false]);
-      data.dragging = true;
-    },
-    onTouchMove : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
-      
-      if (data.dragging && typeof(data.oldMouseX) != "undefined"){
-        d = data.oldMouseX - e.pageX;
-        if (d > 0) {
-          methods.update.apply($this, [data.settings.frame + 1]);
-        } else if (d < 0) {
-          methods.update.apply($this, [data.settings.frame - 1]);
-        }
+      if (data.touchable){
+        data.oldMouseX = e.touches[0].clientX;
+        data.oldMouseY = e.touches[0].clientY;        
+      } else {
+        data.oldMouseX = e.pageX;
+        data.oldMouseY = e.pageY;        
       }
-      data.oldMouseX = e.touches[0].clientX;
-      data.oldMouseY = e.touches[0].clientY;
+
+      return false;
     },
-    onTouchEnd : function(e){
-      var $this = $(this);
-      data = $this.data('spritespin');
-      data.dragging = false;
-    },
-  };
-  
-  $.fn.spritespin = function(method) {
-    if ( methods[method] ) {
-      return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
-    } else if (typeof(method) === 'object' || !method) {
-      return methods.init.apply(this, arguments);
-    } else {
-      $.error( 'Method ' +  method + ' does not exist on jQuery.spritespin' );
-    }
   };
 })(jQuery);

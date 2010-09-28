@@ -61,14 +61,7 @@ Loop
 * **$("#spritespin").spritepin("loop")** Gets a value whether the animation loops or not.
 * **$("#spritespin").spritepin("loop", <boolean>)** Sets a value whether the animation loops or not.
 
-Related work
-=====
-Same functionality is provided by the reel plugin http://jquery.vostrel.cz/reel
-However, this does not perform well in firefox. Since firefox is one of the
-widely used browsers i wrote the plugin from scratch. Unfortunately this plugin
-also has its drawbacks, see known issues.
-
 Known Issues
 =====
-* Opera browser plays only the half of the animation. Still working on that.
-* Chrome browser performs bad during animation. Working on that too.
+* Chrome browser performs bad when large frames are used.
+* Touch devices do not work correctly. Still working on this.
