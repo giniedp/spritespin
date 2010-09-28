@@ -14,13 +14,10 @@ to control the animation by using a slider.
 
 Usage
 =====
-Create a container on your site where you want the animation to show up
-
-  <div id="spritespin"/>
-  
-In your javascript fire the plugin on that container
-
-  $("#spritespin").spritespin([options]);
+Create a container on your site where you want the animation to show up:
+    <div id="spritespin"/>
+In your javascript fire the plugin on that container:
+    $("#spritespin").spritespin([options]);
   
 Options
 =====
