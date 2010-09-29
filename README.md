@@ -18,50 +18,5 @@ Create a container on your site where you want the animation to show up:
     <div id="spritespin"/>
 In your javascript fire the plugin on that container:
     $("#spritespin").spritespin([options]);
-  
-Options
-=====
-* **width** The width of a single frame. Default is 640.
-* **height** The height of a single frame. Default is 480.
-* **frames** Total number of frames. Default os 36.
-* **frame** Initial frame number. Default is 0.
-* **animate** If true, starts the animation after initialize. Default is false.
-* **loop** If true, always repeats the animation.
-* **speed** Time in miliseconds between updates. Default is 32 (8 Frames per second).
-* **reverse** If true, plays the animation backward. Default is false.
-* **image** Path to the sprite image. Default is "images/spritespin.jpg"
-* **onFrameChanged** Event that is called when the framenumber has changed. Default is undefined.
-* **slider** Instance of a jQuery-ui Slider.Default is undefined.
-* **interactive** If true, enables mouse interaction. This allows to "drag" the animation. Default is true.
 
-Api
-=====
-After a container has been initialized with the plugin, there are some methods
-available on that container.
-
-Update
------
-* **$("#spritespin").spritepin("update")** Updates the player. Frame number will be incremented.
-* **$("#spritespin").spritepin("update", <number>)** Updates the player to the specified frame number.
-
-Animate
------
-* **$("#spritespin").spritepin("animate")** Returns true if animation is running, otherwise false.
-* **$("#spritespin").spritepin("animate", true)** Starts the animation if animation is running.
-* **$("#spritespin").spritepin("animate", false)** Stops the animation if animation is running.
-* **$("#spritespin").spritepin("animate", "toggle")** Toggles the animation
-
-Frame
------
-* **$("#spritespin").spritepin("frame")** Returns the current framenumber.
-* **$("#spritespin").spritepin("frame", <number>)** Same as update.
-
-Loop
------
-* **$("#spritespin").spritepin("loop")** Gets a value whether the animation loops or not.
-* **$("#spritespin").spritepin("loop", <boolean>)** Sets a value whether the animation loops or not.
-
-Known Issues
-=====
-* Chrome browser performs bad when large frames are used.
-* Touch devices do not work correctly. Still working on this.
+For more information visit http://giniedp.github.com/spritespin/
