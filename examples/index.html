@@ -7,45 +7,71 @@
     <script src="javascripts/jquery-ui-1.8.4.all.min.js" type="text/javascript"></script>
     <script src="../src/jquery.spritespin.js" type="text/javascript"></script>
     <link href="stylesheets/jquery-ui-1.8.4.all.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+      .preload {
+        padding     : 10px;
+        margin      : 20px;
+        border      : 1px solid;
+        background-color: rgba(204,204,204,0.65);
+      }
+    </style>
   </head>
   <body>
-    <div id="spinner"/>
-    <div id="slider"/>
+    
+    <div id="camera-unstitched-slider-"></div>
+    <div id="camera-unstitched"></div>
+    
     <script type="text/javascript">
       $(function(){
-        $("#spinner").spritespin({ 
-          width  : 24, 
-          height : 32, 
-          offsetY: 96,
-          image  : "images/characters.png", 
-          speed  : 120,
-          frames : 3,
+        $("#camera-unstitched").spritespin({ 
+          width  : 640, 
+          height : 426, 
+          image  : [
+          "images/camera/aaa002-casio_zoom_001.jpg",
+          "images/camera/aaa002-casio_zoom_002.jpg",
+          "images/camera/aaa002-casio_zoom_003.jpg",
+          "images/camera/aaa002-casio_zoom_004.jpg",
+          "images/camera/aaa002-casio_zoom_005.jpg",
+          "images/camera/aaa002-casio_zoom_006.jpg",
+          "images/camera/aaa002-casio_zoom_007.jpg",
+          "images/camera/aaa002-casio_zoom_008.jpg",
+          "images/camera/aaa002-casio_zoom_009.jpg",
+          "images/camera/aaa002-casio_zoom_010.jpg",
+          "images/camera/aaa002-casio_zoom_011.jpg",
+          "images/camera/aaa002-casio_zoom_012.jpg",
+          "images/camera/aaa002-casio_zoom_013.jpg",
+          "images/camera/aaa002-casio_zoom_014.jpg",
+          "images/camera/aaa002-casio_zoom_015.jpg",
+          "images/camera/aaa002-casio_zoom_016.jpg",
+          "images/camera/aaa002-casio_zoom_017.jpg",
+          "images/camera/aaa002-casio_zoom_018.jpg",
+          "images/camera/aaa002-casio_zoom_019.jpg",
+          "images/camera/aaa002-casio_zoom_020.jpg",
+          "images/camera/aaa002-casio_zoom_021.jpg",
+          "images/camera/aaa002-casio_zoom_022.jpg",
+          "images/camera/aaa002-casio_zoom_023.jpg",
+          "images/camera/aaa002-casio_zoom_024.jpg",
+          "images/camera/aaa002-casio_zoom_025.jpg",
+          "images/camera/aaa002-casio_zoom_026.jpg",
+          "images/camera/aaa002-casio_zoom_027.jpg",
+          "images/camera/aaa002-casio_zoom_028.jpg",
+          "images/camera/aaa002-casio_zoom_029.jpg",
+          "images/camera/aaa002-casio_zoom_030.jpg",
+          "images/camera/aaa002-casio_zoom_031.jpg",
+          "images/camera/aaa002-casio_zoom_032.jpg",
+          "images/camera/aaa002-casio_zoom_033.jpg",
+          "images/camera/aaa002-casio_zoom_034.jpg",
+          "images/camera/aaa002-casio_zoom_035.jpg",
+          "images/camera/aaa002-casio_zoom_036.jpg"
+          ], 
+          speed  :40,
           frame  : 0,
-          //slider : $("#slider"),
-          interactive: false,
+          slider : $("#camera-unstitched-slider"),
+          interactive: true,
           animate : true,
-          loop    : true,
-          //onFrameChanged : function(frame){ console.log(frame); } 
+          loop    : true
         });
       });
-    </script>
-    
-    <div id="spinner1" style = "margin-top: 300px;"/>
-    <script type="text/javascript">
-      //$(function(){
-      //  $("#spinner1").spritespin({ 
-      //    width  : 80, 
-      //    height : 80, 
-      //    image  : "images/spritespin.jpg", 
-      //    speed  : 16,
-      //    frames : 71,
-      //    frame  : 0,
-      //    animate : true,
-      //    loop : false,
-      //    interactive: true,
-      //    //onFrameChanged : function(frame){ console.log(frame); } 
-      //  });
-      //});
     </script>
   </body>
 </html>

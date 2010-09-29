@@ -9,26 +9,28 @@
       $.error( 'Method ' +  method + ' does not exist on jQuery.spritespin' );
     }
   };
-  
+
   var methods = {
     init : function(options){
       // Default settings
       var settings = {
-        width   : 640,                    // width of a single frame
-        height  : 480,                    // height of a single frame
-        offsetX : 0,
-        offsetY : 0,
-        frames  : 36,                     // number of frames
-        frame   : 0,                      // initial frame number
-        animate : false,                  // run animation when after initialize
-        loop    : false,                  // repeat animation in a loop
-        speed   : 36,                     // time between updates
-        reverse : false,                  // if true animation is played backward
-        image   : "images/spritespin.jpg",// stiched source image
-        onFrameChanged : undefined,       // called when frame has changed
-        onInitialized  : undefined,       // called when plugin has been initialized
-        slider  : undefined,              // jquery-ui slider instance
-        interactive : true                // enables mouse interaction
+        width          : 640,                    // Width of a single frame
+        height         : 480,                    // Height of a single frame
+        offsetX        : 0,                      // Position offset in x direction
+        offsetY        : 0,                      // Position offset in y direction
+        frames         : 36,                     // Number of frames
+        frame          : 0,                      // Initial frame number
+        animate        : false,                  // Run animation when after initialize
+        loop           : false,                  // Repeat animation in a loop
+        speed          : 36,                     // Time between updates
+        reverse        : false,                  // If true animation is played backward
+        image          : "images/spritespin.jpg",// Stiched source image
+        onFrameChanged : undefined,              // Called when frame has changed
+        onInitialized  : undefined,              // Called when plugin has been initialized
+        slider         : undefined,              // jQuery-ui slider instance
+        behavior       : "interactive",          // Enables mouse interaction
+        preloadText    : "Loading",               // Text to appear when images are preloaded
+        preloadBackground : "none"
       }
       
       //extending options
@@ -38,7 +40,6 @@
       return this.each(function(){
         var $this = $(this);
         var data  = $this.data('spritespin');
-        var initialized = false;
         
         if (!data){
           // Initialize the plugin if it hasn't been initialized yet
@@ -50,61 +51,16 @@
             touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
           });
           data = $this.data('spritespin');
-          initialized = true;
+          
+          helper.reconfiger($this, data);
+          
+          if (data.settings.onInitialized != undefined){
+            data.settings.onInitialized();
+          }
         } else {
+          // reconfiger the plugin if it is already initialized
           $.extend(data.settings, options);
-        }
-        
-        // style the wrapper container
-        x = data.settings.offsetX - data.settings.frame * data.settings.width;
-        y = -data.settings.offsetY;
-        $this.css({
-          width      : data.settings.width + "px",
-          height     : data.settings.height + "px",
-          "background-image"    : "url('" + data.settings.image + "')",
-          "background-repeat"   : "no-repeat",
-          "background-position" : [x, "px ", y, "px"].join("")
-        });
-        
-        // hook the jquery-ui slider
-        if (data.settings.slider != undefined){
-          data.settings.slider.slider({
-            value   : data.settings.frame,
-            min     : 0,
-            max     : (data.settings.frames) - 1,
-            step    : 1,
-            slide   : function(event, ui) {
-              methods.animate.apply($this, [false]);    // stop animation
-              methods.update.apply($this, [ui.value]);  // update to frame
-            },
-          }); 
-        }
-        
-        // unbind all events
-        $this.unbind('.spritespin');
-            
-        if (data.touchable && settings.interactive){
-          // rebind touchable device events
-          $this.bind('touchstart.spritespin',    events.onStartDrag);
-          $this.bind('touchend.spritespin',      events.onStopDrag);
-          $this.bind('touchcancel.spritespin',   events.onStopDrag);
-          $this.bind('touchmove.spritespin',     events.onDrag);
-        } else if (settings.interactive){
-          // rebind interaction events
-          $this.bind('mousedown.spritespin',  events.onStartDrag);
-          $this.bind('mouseup.spritespin',    events.onStopDrag);
-          $this.bind('mouseleave.spritespin', events.onStopDrag);
-          $this.bind('mousemove.spritespin',  events.onDrag);
-        }
-        
-        // start animation if required
-        if (data.settings.animate){
-          methods.animate.apply($this, [data.settings.animate, data.settings.loop]);
-        }
-        
-        // call custom events
-        if (initialized && data.settings.onInitialized != undefined){
-          data.settings.onInitialized();
+          helper.reconfiger($this, data);
         }
       });
     },
@@ -121,12 +77,13 @@
     // Wraps the framecounter if it has exceeded the total number of frames. 
     // Positions the background image respecting the new frame value. 
     // Stops a running animation when necessary.
-    update : function(frame){
+    update : function(frame, reverse){
       return this.each(function(){        
         var $this = $(this), 
         data = $this.data('spritespin'), 
         settings = data.settings;
-        
+        settings.reverse = ((reverse != undefined) && reverse);
+
         oldFrame = data.settings.frame;
         
         // update frame counter
@@ -135,21 +92,10 @@
         } else {
           settings.frame = frame;
         }
-      
-        if (oldFrame != settings.frame){
-          // wrap the frame counter. avoid using % operator for speed
-          if (settings.frame >= settings.frames){ 
-            settings.frame -= settings.frames; 
-          } else if (settings.frame < 0){ 
-            settings.frame += settings.frames; 
-          }
         
-          // update background position
-          x = settings.offsetX - settings.frame * settings.width;
-          y = -settings.offsetY;
-          $this.css({
-            "background-position" : [x, "px ", y, "px"].join("")
-          });
+        if (oldFrame != settings.frame){
+          settings.frame = helper.wrapValue(settings.frame, 0, settings.frames);
+          helper.updateBackground($this, data);
           
           // stop animation if we are back at frame 0
           if (settings.frame == 0 && !settings.loop){
@@ -238,39 +184,160 @@
     },
   };
   
-  var events = {
-    onStartDrag : function(e){
-      var $this = $(this), data = $this.data('spritespin');
-      data.dragging = true;
-      return false;
+  var behavior = {
+    none : {
+      onStartDrag : function(e){
+        return false;
+      },
+      onStopDrag : function(e){
+        return false;
+      },
+      onDrag : function(e){
+        return false;
+      }
     },
-    onStopDrag : function(e){
-      var $this = $(this), data = $this.data('spritespin');
-      data.oldMouseX = undefined;
-      data.dragging = false;
-      return false;
-    },
-
-    onDrag : function(e){
-      var $this = $(this), data = $this.data('spritespin');
-      
-      if (data.dragging && data.oldMouseX != undefined){
-        d = data.oldMouseX - e.pageX;
-        frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
-        if (d != 0) {
-          methods.update.apply($this, [frame]);
+    interactive : {
+      onStartDrag : function(e){
+        var $this = $(this), data = $this.data('spritespin');
+        data.dragging = true;
+        return false;
+      },
+      onStopDrag : function(e){
+        var $this = $(this), data = $this.data('spritespin');
+        data.oldMouseX = undefined;
+        data.dragging = false;
+        return false;
+      },
+      onDrag : function(e){
+        var $this = $(this), data = $this.data('spritespin');
+        
+        if (data.dragging && data.oldMouseX != undefined){
+          d = data.oldMouseX - e.pageX;
+          frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
+          if (d != 0) {
+            methods.update.apply($this, [frame]);
+          }
+          methods.animate.apply($(this), [false]); // stop animation
         }
-        methods.animate.apply($(this), [false]); // stop animation
+        if (data.touchable){
+          data.oldMouseX = e.touches[0].clientX;
+          data.oldMouseY = e.touches[0].clientY;        
+        } else {
+          data.oldMouseX = e.pageX;
+          data.oldMouseY = e.pageY;        
+        }
+      
+        return false;
       }
-      if (data.touchable){
-        data.oldMouseX = e.touches[0].clientX;
-        data.oldMouseY = e.touches[0].clientY;        
+    }
+  };
+  
+  var helper = {
+    reconfiger : function(instance, data){
+      helper.blankBackground(instance, data);
+      helper.preloadImages(instance, data, function(){
+        if (data.settings.animate){
+          helper.updateBackground(instance, data);
+          helper.hookSlider(instance, data);
+          helper.rebindEvents(instance, data);
+          methods.animate.apply(instance, [data.settings.animate, data.settings.loop]);
+        }
+      });
+    },
+    wrapValue : function(value, min, max){
+      while (value >= max){ 
+        value -= max; 
+      } 
+      while (value < min){ 
+        value += max; 
+      }
+      return value;
+    },
+    blankBackground : function(instance, data){
+      instance.css({
+        width      : [data.settings.width, "px"].join(""),
+        height     : [data.settings.height, "px"].join(""),
+        "background-image"    : "none",
+        "background-repeat"   : "no-repeat",
+        "background-position" : "0px 0px"
+      });
+    },
+    updateBackground : function(instance, data){
+      var image = data.settings.image;
+      var x = data.settings.offsetX;
+      var y = -data.settings.offsetY;
+      
+      if (typeof(data.settings.image) == "string"){ 
+        x -= (data.settings.frame * data.settings.width);
       } else {
-        data.oldMouseX = e.pageX;
-        data.oldMouseY = e.pageY;        
+        image = data.settings.image[data.settings.frame];
       }
 
-      return false;
+      instance.css({
+        width      : [data.settings.width, "px"].join(""),
+        height     : [data.settings.height, "px"].join(""),
+        "background-image"    : ["url('", image, "')"].join(""),
+        "background-repeat"   : "no-repeat",
+        "background-position" : [x, "px ", y, "px"].join("")
+      });
     },
+    hookSlider : function(instance, data){
+      if (data.settings.slider != undefined){
+        data.settings.slider.slider({
+          value   : data.settings.frame,
+          min     : 0,
+          max     : (data.settings.frames) - 1,
+          step    : 1,
+          slide   : function(event, ui) {
+            methods.animate.apply(instance, [false]);    // stop animation
+            methods.update.apply(instance, [ui.value]);  // update to frame
+          },
+        }); 
+      }
+    },
+    rebindEvents : function(instance, data){
+      // unbind all events
+      instance.unbind('.spritespin');
+      
+      if (data.touchable){
+        // rebind touchable device events
+        instance.bind('touchstart.spritespin',    behavior[data.settings.behavior].onStartDrag);
+        instance.bind('touchend.spritespin',      behavior[data.settings.behavior].onStopDrag);
+        instance.bind('touchcancel.spritespin',   behavior[data.settings.behavior].onStopDrag);
+        instance.bind('touchmove.spritespin',     behavior[data.settings.behavior].onDrag);
+      } else {
+        // rebind mouse events
+        instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].onStartDrag);
+        instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].onStopDrag);
+        instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].onStopDrag);
+        instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].onDrag);
+      }
+    },
+    preloadImages : function(instance, data, callback) {
+      var preload = $('<div class="preload"/>');
+      if (instance.find(".preload").length == 0){
+        instance.append(preload);
+      }
+      preload.html("Loading");
+      
+      var i = 0;
+      var total = 1;
+      var images = [data.settings.image];
+      
+      if (typeof(data.settings.image) == "object"){
+        total = data.settings.image.length;
+        images = data.settings.image;
+      }
+      
+      imageObj = new Image();
+      imageObj.onload = function(){
+        instance.find(".preload").detach();
+        callback.apply([instance, data]);
+      }
+      
+      for(i = 0; i < total; i++){
+        imageObj.src=images[i];
+      }
+    }
   };
 })(jQuery);
