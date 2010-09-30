@@ -79,6 +79,26 @@
         $this.removeData('spritespin');
       });
     },
+    // Updates a single frame to the specified frame number. If no value is 
+    // given this will increment the current frame counter.
+    // Triggers the onFrame event
+    update : function(frame, reverse){
+      return this.each(function(){
+        var $this = $(this);
+        data = $this.data('spritespin');
+        settings = data.settings;
+        settings.reverse = ((reverse != undefined) && reverse);
+        
+        // update frame counter
+        if (frame == undefined){
+          settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
+        } else {
+          settings.frame = frame;
+        }
+        settings.frame = helper.wrapValue(settings.frame, 0, settings.frames);
+        data.target.trigger("onFrame", data);
+      });
+    },
     // Starts or stops the animation depend on the animate paramter.
     // In case when animation is already running pass "false" to stop.
     // In case when animation is not running pass "true" to start.
@@ -112,7 +132,7 @@
             data.animation = setInterval(
               function(){ 
                 try {
-                  helper.update(data); 
+                  methods.update.apply($this, []); 
                 } catch(err){
                   // The try catch block is a hack for Opera Browser
                 }
@@ -132,7 +152,7 @@
         return $(this).data('spritespin').settings.frame;
       } else {
         return this.each(function(){
-          helper.update($(this).data('spritespin'), frame);
+          methods.update.apply($(this), [frame]);
         });        
       }
     },
@@ -183,7 +203,7 @@
           d = data.oldMouseX - e.pageX;
           frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
           if (d != 0) {
-            helper.update(data, frame);
+            methods.update.apply($this, [frame]);
           }
           methods.animate.apply($(this), [false]); // stop animation
         }
@@ -235,13 +255,14 @@
         "background-position" : "0px 0px"
       });
     },
-    updateBackground : function(instance, data){
+    updateBackground : function(instance){
+      var data = instance.data("spritespin");
       var image = data.settings.image;
       var x = data.settings.offsetX;
       var y = -data.settings.offsetY;
       
       if (typeof(data.settings.image) == "string"){ 
-        if (data.settings.frameWidth != undefined){
+        if (data.settings.frameStep != undefined){
           x -= (data.settings.frame * data.settings.frameStep);
         } else {
           x -= (data.settings.frame * data.settings.width);
@@ -342,22 +363,6 @@
       for(i = 0; i < total; i++){
         imageObj.src=images[i];
       }
-    },
-    // Updates a single frame to the specified frame number. If no value is 
-    // given this will increment the current frame counter.
-    // Triggers the onFrame event
-    update : function(data, frame, reverse){
-      settings = data.settings;
-      settings.reverse = ((reverse != undefined) && reverse);
-      
-      // update frame counter
-      if (frame == undefined){
-        settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
-      } else {
-        settings.frame = frame;
-      }
-      settings.frame = helper.wrapValue(settings.frame, 0, settings.frames);
-      data.target.trigger("onFrame", data);
     },
   };
 })(jQuery);
