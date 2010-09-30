@@ -14,23 +14,34 @@
     init : function(options){
       // Default settings
       var settings = {
-        width          : 640,                    // Width of a single frame
-        height         : 480,                    // Height of a single frame
-        offsetX        : 0,                      // Position offset in x direction
-        offsetY        : 0,                      // Position offset in y direction
-        frames         : 36,                     // Number of frames
-        frame          : 0,                      // Initial frame number
-        animate        : false,                  // Run animation when after initialize
-        loop           : false,                  // Repeat animation in a loop
-        speed          : 36,                     // Time between updates
-        reverse        : false,                  // If true animation is played backward
-        image          : "images/spritespin.jpg",// Stiched source image
-        onFrameChanged : undefined,              // Called when frame has changed
-        onInitialized  : undefined,              // Called when plugin has been initialized
-        slider         : undefined,              // jQuery-ui slider instance
-        behavior       : "interactive",          // Enables mouse interaction
-        preloadText    : "Loading",               // Text to appear when images are preloaded
-        preloadBackground : "none"
+        // dimensions
+        offsetX           : 0,                      // X offset where the frame image starts
+        offsetY           : 0,                      // Y offset where the frame image starts
+        width             : undefined,              // Window width (or frame width)
+        height            : undefined,              // Window height (or frame height)
+        frameStep         : undefined,              // Width of a single frame or step to the next frame
+        frames            : 36,                     // Number of frames
+        frame             : 0,                      // Initial frame number
+        
+        // animation & update
+        animate           : false,                  // Run animation when after initialize
+        loop              : false,                  // Repeat animation in a loop
+        loopFrame         : 0,
+        speed             : 36,                     // Time between updates
+        reverse           : false,                  // If true animation is played backward
+
+        // interaction
+        slider            : undefined,              // jQuery-ui slider instance
+        behavior          : "interactive",          // Enables mouse interaction
+        
+        // appearance               
+        image             : "images/spritespin.jpg",// Stiched source image
+        preloadText       : "Loading",              // Text to appear when images are preloaded
+        preloadBackground : undefined,
+        
+        // events
+        onFrameChange     : undefined,
+        onLoad            : undefined
       }
       
       //extending options
@@ -43,20 +54,16 @@
         
         if (!data){
           // Initialize the plugin if it hasn't been initialized yet
-          $(this).disableSelection();
-          $(this).data('spritespin', {
+          //$this.disableSelection();
+          $this.attr("unselectable", "on");
+          $this.data('spritespin', {
             target    : $this,
             settings  : settings,
             animation : null,
             touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
           });
           data = $this.data('spritespin');
-          
           helper.reconfiger($this, data);
-          
-          if (data.settings.onInitialized != undefined){
-            data.settings.onInitialized();
-          }
         } else {
           // reconfiger the plugin if it is already initialized
           $.extend(data.settings, options);
@@ -70,48 +77,6 @@
         data = $this.data('spritespin');
         $this.unbind('.spritespin');
         $this.removeData('spritespin');
-      });
-    },
-    // Updates a single frame to the specified frame number. If no value is 
-    // given this will increment the current frame counter. 
-    // Wraps the framecounter if it has exceeded the total number of frames. 
-    // Positions the background image respecting the new frame value. 
-    // Stops a running animation when necessary.
-    update : function(frame, reverse){
-      return this.each(function(){        
-        var $this = $(this), 
-        data = $this.data('spritespin'), 
-        settings = data.settings;
-        settings.reverse = ((reverse != undefined) && reverse);
-
-        oldFrame = data.settings.frame;
-        
-        // update frame counter
-        if (frame == undefined){
-          settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
-        } else {
-          settings.frame = frame;
-        }
-        
-        if (oldFrame != settings.frame){
-          settings.frame = helper.wrapValue(settings.frame, 0, settings.frames);
-          helper.updateBackground($this, data);
-          
-          // stop animation if we are back at frame 0
-          if (settings.frame == 0 && !settings.loop){
-            methods.animate.apply($this, [false]);
-          }
-          
-          // update the jquery-ui slider
-          if (settings.slider != undefined){
-            settings.slider.slider("value", settings.frame);
-          }
-          
-          // callback to custom function
-          if (settings.onFrameChanged != undefined){
-            settings.onFrameChanged.apply($this, [settings.frame]);
-          }
-        }
       });
     },
     // Starts or stops the animation depend on the animate paramter.
@@ -147,7 +112,7 @@
             data.animation = setInterval(
               function(){ 
                 try {
-                  methods.update.apply($this, []); 
+                  helper.update(data); 
                 } catch(err){
                   // The try catch block is a hack for Opera Browser
                 }
@@ -160,17 +125,20 @@
         });
       }
     },
-    // Gets and sets the current frame number
+    // Gets the current framenumber when no parameters are passed or
+    // updates the player to the sepcified framenumber.
     frame : function(frame){
       if (frame == undefined){
         return $(this).data('spritespin').settings.frame;
       } else {
         return this.each(function(){
-          methods.update.apply($(this), [frame]);
+          helper.update($(this).data('spritespin'), frame);
         });        
       }
     },
-    // Gets and sets the loop indicator
+    // Gets a value indication whether the animation is looped or not when
+    // no parameters are passed. Otherwise sets the loop setting and starts
+    // the animation when settings.animate is set to true
     loop : function(value){
       if (value == undefined){
         return $(this).data('spritespin').settings.loop;
@@ -215,7 +183,7 @@
           d = data.oldMouseX - e.pageX;
           frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
           if (d != 0) {
-            methods.update.apply($this, [frame]);
+            helper.update(data, frame);
           }
           methods.animate.apply($(this), [false]); // stop animation
         }
@@ -236,12 +204,13 @@
     reconfiger : function(instance, data){
       helper.blankBackground(instance, data);
       helper.preloadImages(instance, data, function(){
+        helper.updateBackground(instance, data);
+        helper.hookSlider(instance, data);
+        helper.rebindEvents(instance, data);
         if (data.settings.animate){
-          helper.updateBackground(instance, data);
-          helper.hookSlider(instance, data);
-          helper.rebindEvents(instance, data);
           methods.animate.apply(instance, [data.settings.animate, data.settings.loop]);
         }
+        instance.trigger("onLoad", data);
       });
     },
     wrapValue : function(value, min, max){
@@ -254,11 +223,15 @@
       return value;
     },
     blankBackground : function(instance, data){
+      image = "none";
+      if (data.settings.preloadBackground != undefined){
+        image = ["url('", data.settings.preloadBackground, "')"].join("");
+      }
       instance.css({
         width      : [data.settings.width, "px"].join(""),
         height     : [data.settings.height, "px"].join(""),
-        "background-image"    : "none",
-        "background-repeat"   : "no-repeat",
+        "background-image"    : image,
+        "background-repeat"   : "repeat-x",
         "background-position" : "0px 0px"
       });
     },
@@ -268,7 +241,11 @@
       var y = -data.settings.offsetY;
       
       if (typeof(data.settings.image) == "string"){ 
-        x -= (data.settings.frame * data.settings.width);
+        if (data.settings.frameWidth != undefined){
+          x -= (data.settings.frame * data.settings.frameStep);
+        } else {
+          x -= (data.settings.frame * data.settings.width);
+        }
       } else {
         image = data.settings.image[data.settings.frame];
       }
@@ -277,7 +254,7 @@
         width      : [data.settings.width, "px"].join(""),
         height     : [data.settings.height, "px"].join(""),
         "background-image"    : ["url('", image, "')"].join(""),
-        "background-repeat"   : "no-repeat",
+        "background-repeat"   : "repeat-x",
         "background-position" : [x, "px ", y, "px"].join("")
       });
     },
@@ -290,7 +267,7 @@
           step    : 1,
           slide   : function(event, ui) {
             methods.animate.apply(instance, [false]);    // stop animation
-            methods.update.apply(instance, [ui.value]);  // update to frame
+            methods.frame.apply(instance, [ui.value]);  // update to frame
           },
         }); 
       }
@@ -312,6 +289,33 @@
         instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].onStopDrag);
         instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].onDrag);
       }
+      // disable selection
+	    instance.bind("mousedown.spritespin selectstart.spritespin",
+	    		function( event ) { event.preventDefault(); }
+	    );
+	    
+	    instance.bind("onFrame.spritespin", function(event, data){
+	      helper.updateBackground(data.target, data);
+        
+        // stop animation if we are back at frame 0
+        if (data.settings.frame == data.settings.loopFrame && !data.settings.loop){
+          methods.animate.apply(data.target, [false]);
+        }
+        
+        // update the jquery-ui slider
+        if (data.settings.slider != undefined){
+          data.settings.slider.slider("value", data.settings.frame);
+        }
+	    });
+	    
+	    // bind custom events
+	    if (data.settings.onFrame != undefined){
+	      instance.bind("onFrame.spritespin", data.settings.onFrame);
+	    }
+	    
+	    if (data.settings.onLoad != undefined){
+	      instance.bind("onLoad.spritespin", data.settings.onLoad);
+	    }
     },
     preloadImages : function(instance, data, callback) {
       var preload = $('<div class="preload"/>');
@@ -338,6 +342,22 @@
       for(i = 0; i < total; i++){
         imageObj.src=images[i];
       }
-    }
+    },
+    // Updates a single frame to the specified frame number. If no value is 
+    // given this will increment the current frame counter.
+    // Triggers the onFrame event
+    update : function(data, frame, reverse){
+      settings = data.settings;
+      settings.reverse = ((reverse != undefined) && reverse);
+      
+      // update frame counter
+      if (frame == undefined){
+        settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
+      } else {
+        settings.frame = frame;
+      }
+      settings.frame = helper.wrapValue(settings.frame, 0, settings.frames);
+      data.target.trigger("onFrame", data);
+    },
   };
 })(jQuery);
