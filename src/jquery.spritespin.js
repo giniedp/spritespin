@@ -24,15 +24,16 @@
         frame             : 0,                      // Initial frame number
         
         // animation & update
-        animate           : false,                  // Run animation when after initialize
+        animate           : true,                   // Run animation when after initialize
         loop              : false,                  // Repeat animation in a loop
         loopFrame         : 0,
-        speed             : 36,                     // Time between updates
+        frameTime         : 36,                     // Time between updates
         reverse           : false,                  // If true animation is played backward
-
+        sense             : 1,
+        
         // interaction
         slider            : undefined,              // jQuery-ui slider instance
-        behavior          : "interactive",          // Enables mouse interaction
+        behavior          : "drag",                 // Enables mouse interaction
         
         // appearance               
         image             : "images/spritespin.jpg",// Stiched source image
@@ -40,7 +41,7 @@
         preloadBackground : undefined,
         
         // events
-        onFrameChange     : undefined,
+        onFrame           : undefined,
         onLoad            : undefined
       }
       
@@ -53,15 +54,19 @@
         var data  = $this.data('spritespin');
         
         if (!data){
-          // Initialize the plugin if it hasn't been initialized yet
-          //$this.disableSelection();
+          // disable selection
           $this.attr("unselectable", "on");
+          
+          // Initialize the plugin if it hasn't been initialized yet
           $this.data('spritespin', {
             target    : $this,
             settings  : settings,
             animation : null,
-            touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
+            touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent),
+            frameTime : settings.frameTime,
           });
+
+          // run configuration
           data = $this.data('spritespin');
           helper.reconfiger($this, data);
         } else {
@@ -87,7 +92,10 @@
         var $this = $(this);
         data = $this.data('spritespin');
         settings = data.settings;
-        settings.reverse = ((reverse != undefined) && reverse);
+        
+        if (reverse != undefined){
+          settings.reverse = reverse;
+        }
         
         // update frame counter
         if (frame == undefined){
@@ -136,7 +144,7 @@
                 } catch(err){
                   // The try catch block is a hack for Opera Browser
                 }
-              }, settings.speed);
+              }, data.frameTime);
           } else if (!animate && data.animation != null) {
             // stop animation
             clearInterval(data.animation);
@@ -170,54 +178,6 @@
         }); 
       }
     },
-  };
-  
-  var behavior = {
-    none : {
-      onStartDrag : function(e){
-        return false;
-      },
-      onStopDrag : function(e){
-        return false;
-      },
-      onDrag : function(e){
-        return false;
-      }
-    },
-    interactive : {
-      onStartDrag : function(e){
-        var $this = $(this), data = $this.data('spritespin');
-        data.dragging = true;
-        return false;
-      },
-      onStopDrag : function(e){
-        var $this = $(this), data = $this.data('spritespin');
-        data.oldMouseX = undefined;
-        data.dragging = false;
-        return false;
-      },
-      onDrag : function(e){
-        var $this = $(this), data = $this.data('spritespin');
-        
-        if (data.dragging && data.oldMouseX != undefined){
-          d = data.oldMouseX - e.pageX;
-          frame = data.settings.frame + (d > 0 ? 1 : (d < 0 ? -1 : 0));
-          if (d != 0) {
-            methods.update.apply($this, [frame]);
-          }
-          methods.animate.apply($(this), [false]); // stop animation
-        }
-        if (data.touchable){
-          data.oldMouseX = e.touches[0].clientX;
-          data.oldMouseY = e.touches[0].clientY;        
-        } else {
-          data.oldMouseX = e.pageX;
-          data.oldMouseY = e.pageY;        
-        }
-      
-        return false;
-      }
-    }
   };
   
   var helper = {
@@ -296,20 +256,21 @@
     rebindEvents : function(instance, data){
       // unbind all events
       instance.unbind('.spritespin');
-      
+
+      // rebind interaction events
       if (data.touchable){
-        // rebind touchable device events
-        instance.bind('touchstart.spritespin',    behavior[data.settings.behavior].onStartDrag);
-        instance.bind('touchend.spritespin',      behavior[data.settings.behavior].onStopDrag);
-        instance.bind('touchcancel.spritespin',   behavior[data.settings.behavior].onStopDrag);
-        instance.bind('touchmove.spritespin',     behavior[data.settings.behavior].onDrag);
-      } else {
-        // rebind mouse events
-        instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].onStartDrag);
-        instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].onStopDrag);
-        instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].onStopDrag);
-        instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].onDrag);
+        instance.bind('touchstart.spritespin', behavior[data.settings.behavior].mousedown);
+        instance.bind('touchmove.spritespin',  behavior[data.settings.behavior].mousemove);
+        instance.bind('touchend.spritespin',   behavior[data.settings.behavior].mouseup); 
       }
+      instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].mousedown);
+      instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].mousemove);
+      instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].mouseup);
+      instance.bind('mouseenter.spritespin',  behavior[data.settings.behavior].mouseenter);
+      instance.bind('mouseover.spritespin',  behavior[data.settings.behavior].mouseover);
+      instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].mouseleave);
+      instance.bind('onFrame.spritespin', behavior[data.settings.behavior].onFrame);
+        
       // disable selection
 	    instance.bind("mousedown.spritespin selectstart.spritespin",
 	    		function( event ) { event.preventDefault(); }
@@ -355,14 +316,176 @@
       }
       
       imageObj = new Image();
-      imageObj.onload = function(){
-        instance.find(".preload").detach();
-        callback.apply([instance, data]);
-      }
       
       for(i = 0; i < total; i++){
+        if (i == (total - 1)){
+          imageObj.onload = function(){
+            instance.find(".preload").detach();
+            callback.apply([instance, data]);
+          }
+        }
         imageObj.src=images[i];
       }
+    },
+  };
+  
+  
+  var behavior = {
+    helper : {
+      storePoints : function(e, data){
+        data.oldX = data.currentX;
+        data.oldY = data.currentY;
+        data.currentX = (data.touchable ? e.touches[0].clientX : e.clientX);
+        data.currentY = (data.touchable ? e.touches[0].clientY : e.clientY);
+        
+        if (data.startX == undefined || data.startY == undefined){
+          data.startX = data.currentX;
+          data.startY = data.currentY;
+          data.clickframe = data.settings.frame;
+        }
+        
+        if (data.oldX == undefined || data.oldY == undefined){
+          data.oldX = data.currentX;
+          data.oldY = data.currentY;
+        }
+        
+        data.dX = data.currentX - data.startX;
+        data.dY = data.currentY - data.startY;
+        
+        data.ddX = data.currentX - data.oldX;
+        data.ddY = data.currentY - data.oldY;
+        return false;
+      },
+      resetPoints : function(e, data){
+        data.startX = undefined;
+        data.startY = undefined;
+        data.currentX = undefined;
+        data.currentY = undefined;
+        data.oldX = undefined;
+        data.oldY = undefined;
+        data.dX = 0;
+        data.dY = 0;
+        data.ddX = 0;
+        data.ddY = 0;
+      },
+      clamp : function(value, min, max){ 
+        return (value > max ? max : (value < min ? min : value));
+      }
+    },
+    
+    none : {
+      mousedown  : function(e){ return false; },
+      mousemove  : function(e){ return false; },
+      mouseup    : function(e){ return false; },
+      
+      mouseenter : function(e){ return false; },
+      mouseover  : function(e){ return false; },
+      mouseleave : function(e){ return false; },
+      
+      onFrame : function(e, frame){ return false; }
+    },
+    spin : {
+      mousedown  : function(e){
+        var $this = $(this), data = $this.data('spritespin');
+        behavior.helper.storePoints(e, data);
+        data.onDrag = true;
+        return false; 
+      },
+      mousemove  : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        if (data.onDrag){
+          // perform default drag behavior
+          behavior.helper.storePoints(e, data);
+          d = data.dX / data.settings.width;
+          dFrame = d * data.settings.frames * data.settings.sense;
+          frame = Math.round(data.clickframe + dFrame);
+          
+          methods.update.apply($this, [frame]);     // update to frame
+          methods.animate.apply($this, [false]);  // stop animation
+          
+          // calculate framtetime for spinwheel
+          if (data.ddX != 0){
+            d = data.ddX / data.settings.width;
+            dFrame = d * data.settings.frames * data.settings.sense;
+            data.frameTime = (data.settings.frameTime / dFrame);
+            data.settings.reverse = (data.ddX < 0);
+          }
+        }
+        return false;  
+      },
+      mouseup    : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        if (data.onDrag){
+          data.onDrag = false;
+          $(this).spritespin("animate", true);
+        }
+        return false; 
+      },
+
+      mouseenter : function(e){ return false; },
+      mouseover  : function(e){ return false; },
+      mouseleave : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        if (data.onDrag){
+          data.onDrag = false;
+          $(this).spritespin("animate", true);
+        }
+        return false; 
+      },
+      onFrame : function(e, data){
+        if (data.ddX != 0){
+          data.frameTime = data.frameTime + 1;
+        
+          $(this).spritespin("animate", false);
+          if (data.frameTime < 62){
+            $(this).spritespin("animate", true);
+          }  
+        } else {
+          $(this).spritespin("animate", false);
+        }
+        return false; 
+      }
+    },
+    drag : {
+      mousedown  : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        behavior.helper.storePoints(e, data);
+        data.onDrag = true;
+        data.cachedAnimate = $this.spritespin("animate");
+        return false; 
+      },
+      mousemove  : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        if (data.onDrag){
+          behavior.helper.storePoints(e, data);
+          d = data.dX / data.settings.width;
+          dFrame = d * data.settings.frames * data.settings.sense;
+          frame = Math.round(data.clickframe + dFrame);
+          
+          methods.update.apply($this, [frame]);     // update to frame
+          methods.animate.apply($(this), [false]);  // stop animation
+        }
+        return false; 
+      },
+      mouseup    : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        behavior.helper.resetPoints(e, data);
+        data.onDrag = false;
+        methods.animate.apply($(this), [data.cachedAnimate]);
+        return false; 
+      },
+      
+      mouseenter : function(e){ return false; },
+      mouseover  : function(e){ return false; },
+      mouseleave : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        behavior.helper.resetPoints(e, data);
+        data.onDrag = false;
+        methods.animate.apply($(this), [data.cachedAnimate]);
+        return false; 
+      },
+      
+      onFrame : function(e, frame){ return false; }
     },
   };
 })(jQuery);
