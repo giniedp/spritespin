@@ -26,10 +26,10 @@
         // animation & update
         animate           : true,                   // Run animation when after initialize
         loop              : false,                  // Repeat animation in a loop
-        loopFrame         : 0,
+        loopFrame         : 0,                      // Indicates the loop start frame
         frameTime         : 36,                     // Time between updates
         reverse           : false,                  // If true animation is played backward
-        sense             : 1,
+        sense             : 1,                      // Interaction sensitivity used by behavior implementations
         
         // interaction
         slider            : undefined,              // jQuery-ui slider instance
@@ -38,11 +38,11 @@
         // appearance               
         image             : "images/spritespin.jpg",// Stiched source image
         preloadText       : "Loading",              // Text to appear when images are preloaded
-        preloadBackground : undefined,
+        preloadBackground : undefined,              // Background image to display on load
         
         // events
-        onFrame           : undefined,
-        onLoad            : undefined
+        onFrame           : undefined,              // Occurs whe frame has been updated
+        onLoad            : undefined               // Occurs when images are loaded
       }
       
       //extending options
@@ -62,7 +62,6 @@
             target    : $this,
             settings  : settings,
             animation : null,
-            touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent),
             frameTime : settings.frameTime,
           });
 
@@ -335,8 +334,14 @@
       storePoints : function(e, data){
         data.oldX = data.currentX;
         data.oldY = data.currentY;
-        data.currentX = (data.touchable ? e.touches[0].clientX : e.clientX);
-        data.currentY = (data.touchable ? e.touches[0].clientY : e.clientY);
+        
+        if (e.touches != undefined && e.touches.length > 0){
+          data.currentX = e.touches[0].clientX;
+          data.currentY = e.touches[0].clientY;
+        } else {
+          data.currentX = e.clientX;
+          data.currentY = e.clientY;
+        }
         
         if (data.startX == undefined || data.startY == undefined){
           data.startX = data.currentX;
