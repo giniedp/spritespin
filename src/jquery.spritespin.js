@@ -258,17 +258,23 @@
 
       // rebind interaction events
       if (data.touchable){
-        instance.bind('touchstart.spritespin', behavior[data.settings.behavior].mousedown);
-        instance.bind('touchmove.spritespin',  behavior[data.settings.behavior].mousemove);
-        instance.bind('touchend.spritespin',   behavior[data.settings.behavior].mouseup); 
+        instance.bind('touchstart.spritespin',  behavior[data.settings.behavior].mousedown);
+        instance.bind('touchmove.spritespin',   behavior[data.settings.behavior].mousemove);
+        instance.bind('touchend.spritespin',    behavior[data.settings.behavior].mouseup); 
+        instance.bind('touchcancel.spritespin', behavior[data.settings.behavior].mouseleave);
+        instance.bind('click.spritespin',         behavior.prevent); 
+        instance.bind('gesturestart.spritespin',  behavior.prevent); 
+        instance.bind('gesturechange.spritespin', behavior.prevent); 
+        instance.bind('gestureend.spritespin',    behavior.prevent); 
       }
       instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].mousedown);
       instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].mousemove);
       instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].mouseup);
-      instance.bind('mouseenter.spritespin',  behavior[data.settings.behavior].mouseenter);
+      instance.bind('mouseenter.spritespin', behavior[data.settings.behavior].mouseenter);
       instance.bind('mouseover.spritespin',  behavior[data.settings.behavior].mouseover);
       instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].mouseleave);
-      instance.bind('onFrame.spritespin', behavior[data.settings.behavior].onFrame);
+      instance.bind('dblclick.spritespin',   behavior[data.settings.behavior].dblclick);
+      instance.bind('onFrame.spritespin',    behavior[data.settings.behavior].onFrame);
         
       // disable selection
 	    instance.bind("mousedown.spritespin selectstart.spritespin",
@@ -330,6 +336,11 @@
   
   
   var behavior = {
+    prevent : function(e){
+      e.cancelable && e.preventDefault();
+      return false;
+    },
+    
     helper : {
       storePoints : function(e, data){
         data.oldX = data.currentX;
@@ -386,6 +397,7 @@
       mouseenter : function(e){ return false; },
       mouseover  : function(e){ return false; },
       mouseleave : function(e){ return false; },
+      dblclick   : function(e){ return false; },
       
       onFrame : function(e, frame){ return false; }
     },
@@ -406,7 +418,7 @@
           frame = Math.round(data.clickframe + dFrame);
           
           methods.update.apply($this, [frame]);     // update to frame
-          methods.animate.apply($this, [false]);  // stop animation
+          methods.animate.apply($this, [false]);    // stop animation
           
           // calculate framtetime for spinwheel
           if (data.ddX != 0){
@@ -422,7 +434,7 @@
         var $this = $(this), data = $this.data('spritespin');
         if (data.onDrag){
           data.onDrag = false;
-          $(this).spritespin("animate", true);
+          $this.spritespin("animate", true);
         }
         return false; 
       },
@@ -433,8 +445,12 @@
         var $this = $(this), data = $this.data('spritespin');
         if (data.onDrag){
           data.onDrag = false;
-          $(this).spritespin("animate", true);
+          $this.spritespin("animate", $this.spritespin("animate"));
         }
+        return false; 
+      },
+      dblclick   : function(e){ 
+        $(this).spritespin("animate", "toggle");
         return false; 
       },
       onFrame : function(e, data){
@@ -489,7 +505,12 @@
         methods.animate.apply($(this), [data.cachedAnimate]);
         return false; 
       },
-      
+      dblclick   : function(e){ 
+        var $this = $(this), data = $this.data('spritespin');
+        $this.spritespin("animate", "toggle");
+        data.cachedAnimate = $this.spritespin("animate");
+        return false; 
+      },
       onFrame : function(e, frame){ return false; }
     },
   };
