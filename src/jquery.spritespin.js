@@ -63,6 +63,7 @@
             settings  : settings,
             animation : null,
             frameTime : settings.frameTime,
+            touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent),
           });
 
           // run configuration
@@ -257,6 +258,15 @@
       instance.unbind('.spritespin');
 
       // rebind interaction events
+      instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].mousedown);
+      instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].mousemove);
+      instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].mouseup);
+      instance.bind('mouseenter.spritespin', behavior[data.settings.behavior].mouseenter);
+      instance.bind('mouseover.spritespin',  behavior[data.settings.behavior].mouseover);
+      instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].mouseleave);
+      instance.bind('dblclick.spritespin',   behavior[data.settings.behavior].dblclick);
+      instance.bind('onFrame.spritespin',    behavior[data.settings.behavior].onFrame);
+
       if (data.touchable){
         instance.bind('touchstart.spritespin',  behavior[data.settings.behavior].mousedown);
         instance.bind('touchmove.spritespin',   behavior[data.settings.behavior].mousemove);
@@ -267,15 +277,7 @@
         instance.bind('gesturechange.spritespin', behavior.prevent); 
         instance.bind('gestureend.spritespin',    behavior.prevent); 
       }
-      instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].mousedown);
-      instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].mousemove);
-      instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].mouseup);
-      instance.bind('mouseenter.spritespin', behavior[data.settings.behavior].mouseenter);
-      instance.bind('mouseover.spritespin',  behavior[data.settings.behavior].mouseover);
-      instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].mouseleave);
-      instance.bind('dblclick.spritespin',   behavior[data.settings.behavior].dblclick);
-      instance.bind('onFrame.spritespin',    behavior[data.settings.behavior].onFrame);
-        
+              
       // disable selection
 	    instance.bind("mousedown.spritespin selectstart.spritespin",
 	    		function( event ) { event.preventDefault(); }
@@ -340,9 +342,14 @@
       e.cancelable && e.preventDefault();
       return false;
     },
-    
     helper : {
       storePoints : function(e, data){
+        if (e.touches == undefined && e.originalEvent != undefined){
+          // jQuery Event normalization does not preserve the event.touches
+          // we just try to restore it
+          e.touches = e.originalEvent.touches;
+        }
+        
         data.oldX = data.currentX;
         data.oldY = data.currentY;
         
@@ -477,7 +484,7 @@
       },
       mousemove  : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
-        if (data.onDrag){
+        //if (data.onDrag){
           behavior.helper.storePoints(e, data);
           d = data.dX / data.settings.width;
           dFrame = d * data.settings.frames * data.settings.sense;
@@ -485,7 +492,7 @@
           
           methods.update.apply($this, [frame]);     // update to frame
           methods.animate.apply($(this), [false]);  // stop animation
-        }
+        //}
         return false; 
       },
       mouseup    : function(e){ 
