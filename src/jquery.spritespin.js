@@ -11,6 +11,13 @@
   };
 
   var methods = {
+    log : function(text){
+      $("#debug").append("<li>" + text + "</li>");
+      if ($("#debug").children().length > 1){
+        $("#debug").children().first().detach();
+      }
+    },
+    
     init : function(options){
       // Default settings
       var settings = {
@@ -479,12 +486,11 @@
         var $this = $(this), data = $this.data('spritespin');
         behavior.helper.storePoints(e, data);
         data.onDrag = true;
-        data.cachedAnimate = $this.spritespin("animate");
         return false; 
       },
       mousemove  : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
-        //if (data.onDrag){
+        if (data.onDrag){
           behavior.helper.storePoints(e, data);
           d = data.dX / data.settings.width;
           dFrame = d * data.settings.frames * data.settings.sense;
@@ -492,14 +498,13 @@
           
           methods.update.apply($this, [frame]);     // update to frame
           methods.animate.apply($(this), [false]);  // stop animation
-        //}
+        }
         return false; 
       },
       mouseup    : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
         behavior.helper.resetPoints(e, data);
         data.onDrag = false;
-        methods.animate.apply($(this), [data.cachedAnimate]);
         return false; 
       },
       
@@ -509,16 +514,16 @@
         var $this = $(this), data = $this.data('spritespin');
         behavior.helper.resetPoints(e, data);
         data.onDrag = false;
-        methods.animate.apply($(this), [data.cachedAnimate]);
         return false; 
       },
       dblclick   : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
         $this.spritespin("animate", "toggle");
-        data.cachedAnimate = $this.spritespin("animate");
         return false; 
       },
-      onFrame : function(e, frame){ return false; }
+      onFrame : function(e, frame){ 
+        return false; 
+      }
     },
   };
 })(jQuery);
