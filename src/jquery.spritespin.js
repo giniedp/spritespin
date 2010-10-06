@@ -318,31 +318,68 @@
       if (instance.find(".preload").length == 0){
         instance.append(preload);
       }
-      preload.html("Loading");
-      
-      var i = 0;
-      var total = 1;
-      var images = [data.settings.image];
-      
-      if (typeof(data.settings.image) == "object"){
-        total = data.settings.image.length;
-        images = data.settings.image;
-      }
-      
-      imageObj = new Image();
-      
-      for(i = 0; i < total; i++){
-        if (i == (total - 1)){
-          imageObj.onload = function(){
-            instance.find(".preload").detach();
-            callback.apply([instance, data]);
-          }
-        }
-        imageObj.src=images[i];
-      }
+      preload.hide().html("Loading").fadeIn(500);
+      preloader = new ImagePreloader(data.settings.image, function(){
+         instance.find(".preload").fadeOut(500, function(){
+           $(this).detach();
+         });
+         callback.apply([instance, data]);
+      });
     },
   };
   
+  function ImagePreloader(images, callback){
+    this.callback = callback;
+
+    if (typeof(images) == "string"){
+      images = [images];
+    }
+    
+    this.nLoaded = 0;
+    this.nProcessed = 0;
+    this.aImages = new Array;
+    this.nImages = images.length;
+
+    for ( var i = 0; i < images.length; i++ ) {
+      this.preload(images[i]); 
+    }
+  }
+  ImagePreloader.prototype.preload = function(image){
+     // create new Image object and add to array
+     var oImage = new Image;
+     this.aImages.push(oImage);
+  
+     // set up event handlers for the Image object
+     oImage.onload = ImagePreloader.prototype.onload;
+     oImage.onerror = ImagePreloader.prototype.onerror;
+     oImage.onabort = ImagePreloader.prototype.onabort;
+  
+     // assign pointer back to this.
+     oImage.oImagePreloader = this;
+     oImage.bLoaded = false;
+  
+     // assign the .src property of the Image object
+     oImage.src = image;
+  }
+  ImagePreloader.prototype.onComplete = function(){
+    this.nProcessed++;
+    if ( this.nProcessed == this.nImages ){
+      this.callback(this.aImages, this.nLoaded);
+    }
+  }
+  ImagePreloader.prototype.onload = function(){
+    this.bLoaded = true;
+    this.oImagePreloader.nLoaded++;
+    this.oImagePreloader.onComplete();
+  }
+  ImagePreloader.prototype.onerror = function(){
+    this.bError = true;
+    this.oImagePreloader.onComplete();
+  }
+  ImagePreloader.prototype.onabort = function(){
+    this.bAbort = true;
+    this.oImagePreloader.onComplete();
+  }
   
   var behavior = {
     prevent : function(e){
