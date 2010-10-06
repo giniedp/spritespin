@@ -39,6 +39,7 @@
         image             : "images/spritespin.jpg",// Stiched source image
         preloadText       : "Loading",              // Text to appear when images are preloaded
         preloadBackground : undefined,              // Background image to display on load
+        preloadCSS        : undefined,
         
         // events
         onFrame           : undefined,              // Occurs whe frame has been updated
@@ -307,12 +308,20 @@
       if (instance.find(".preload").length == 0){
         instance.append(preload);
       }
-      preload.hide().html("Loading").fadeIn(500);
-      preloader = new ImagePreloader(data.settings.image, function(){
-         instance.find(".preload").fadeOut(500, function(){
-           $(this).detach();
-         });
-         callback.apply([instance, data]);
+      
+      css = (data.settings.preloadCSS || {});
+      preload.css(
+        $.extend({
+          width : data.settings.width,
+          height: data.settings.height}, css));
+          
+      preload.hide().html(data.settings.preloadText).fadeIn(250, function(){
+        new ImagePreloader(data.settings.image, function(){
+          instance.find(".preload").fadeOut(250, function(){
+            $(this).detach();
+          });
+          callback.apply([instance, data]);
+        });
       });
     }
   };
