@@ -15,12 +15,15 @@
       // Default settings
       var settings = {
         // dimensions
-        offsetX           : 0,                      // X offset where the frame image starts
-        offsetY           : 0,                      // Y offset where the frame image starts
         width             : undefined,              // Window width (or frame width)
         height            : undefined,              // Window height (or frame height)
+        offsetX           : 0,                      // Offset in X direction from the left image border to the first frames left border
+        offsetY           : 0,                      // Offset in Y direction from the top image border to the first frames top border
+        frameStepX        : undefined,              // Distance in X direction to the next frame if it differs from window width 
+        frameStepY        : undefined,              // Distance in Y direction to the next frame if it differs from window height
         frameStep         : undefined,              // Width of a single frame or step to the next frame
-        frames            : 36,                     // Number of frames
+        framesX           : undefined,              // Number of frames in a single row
+        frames            : 36,                     // Total number of frames
         frame             : 0,                      // Initial frame number
         
         // animation & update
@@ -38,6 +41,7 @@
         // appearance               
         image             : "images/spritespin.jpg",// Stiched source image
         preloadText       : "Loading",              // Text to appear when images are preloaded
+        preloadHtml       : "loading",              // Html to appear when images are preloaded
         preloadBackground : undefined,              // Background image to display on load
         preloadCSS        : undefined,
         
@@ -201,7 +205,7 @@
     },
     blankBackground : function(instance, data){
       image = "none";
-      if (data.settings.preloadBackground != undefined){
+      if (typeof(data.settings.preloadBackground) == "string"){
         image = ["url('", data.settings.preloadBackground, "')"].join("");
       }
       instance.css({
@@ -219,12 +223,16 @@
       var y = -data.settings.offsetY;
       
       if (typeof(data.settings.image) == "string"){ 
-        if (data.settings.frameStep != undefined){
-          x -= (data.settings.frame * data.settings.frameStep);
-        } else {
-          x -= (data.settings.frame * data.settings.width);
-        }
+        var stepX = (data.settings.frameStepX != undefined ? data.settings.frameStepX : data.settings.width);
+        var stepY = (data.settings.frameStepY != undefined ? data.settings.frameStepY : data.settings.height);
+        var numFramesX = (data.settings.framesX != undefined ? data.settings.framesX : data.settings.frames);
+        var numFramesY = (numFramesX == data.settings.frames ? 1 : data.settings.framesY);
+        var frameX = (data.settings.frame % numFramesX);
+        var frameY = (data.settings.frame / numFramesX)|0;
+        x -= (frameX * stepX);
+        y -= (frameY * stepY);
       } else {
+        // we expect an array in this case
         image = data.settings.image[data.settings.frame];
       }
 
