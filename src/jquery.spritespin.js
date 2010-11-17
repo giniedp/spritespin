@@ -25,6 +25,8 @@
         framesX           : undefined,              // Number of frames in a single row
         frames            : 36,                     // Total number of frames
         frame             : 0,                      // Initial frame number
+        resolutionX       : undefined,              // The spritesheet resolution in X direction
+        resolutionY       : undefined,              // The spritesheet resolution in Y direction
         
         // animation & update
         animate           : true,                   // Run animation when after initialize
@@ -236,13 +238,23 @@
         image = data.settings.image[data.settings.frame];
       }
 
-      instance.css({
+      var css = {
         width      : [data.settings.width, "px"].join(""),
         height     : [data.settings.height, "px"].join(""),
         "background-image"    : ["url('", image, "')"].join(""),
         "background-repeat"   : "repeat-x",
         "background-position" : [x, "px ", y, "px"].join("")
-      });
+      }
+      // Spritesheets may easily exceed the maximum image size for iphones.
+      // In this case the browser will scale down the image automaticly and
+      // this will break the logic how spritespin works.
+      // Here we set the webkit css attribute to display the background in its
+      // original dimension even if it has been scaled down.
+      if (data.settings.resolutionX != undefined && 
+          data.settings.resolutionY != undefined){
+        css["-webkit-background-size"] = [data.settings.resolutionX, "px ", data.settings.resolutionY, "px"].join("");
+      }
+      instance.css(css);
     },
     hookSlider : function(instance, data){
       if (data.settings.slider != undefined){
