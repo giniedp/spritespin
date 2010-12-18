@@ -79,7 +79,15 @@
         } else {
           // reconfiger the plugin if it is already initialized
           $.extend(data.settings, options);
-          helper.reconfiger($this, data);
+          data.frameTime = data.settings.frameTime; // override cached frameTime
+          
+          if (options.image != null && options.image != undefined){
+            // when images are passed, need to reconfiger the plugin
+            helper.reconfiger($this, data);
+          } else {
+            // otherwise just reanimate spritespin
+            methods.animate.apply($this, [data.settings.animate, data.settings.loop]);            
+          }
         }
       });
     },
@@ -142,7 +150,12 @@
             settings.animate = animate;
           }
           
-          if (animate && data.animation == null){
+          if (data.animation != null){
+            clearInterval(data.animation);
+            data.animation = null;
+          }
+          
+          if (settings.animate){
             // start animation
             data.animation = setInterval(
               function(){ 
@@ -152,10 +165,6 @@
                   // The try catch block is a hack for Opera Browser
                 }
               }, data.frameTime);
-          } else if (!animate && data.animation != null) {
-            // stop animation
-            clearInterval(data.animation);
-            data.animation = null;
           }  
         });
       }
