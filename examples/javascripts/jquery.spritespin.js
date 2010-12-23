@@ -283,21 +283,27 @@
       // unbind all events
       instance.unbind('.spritespin');
 
+      // use custom or build in behavior
+      var currentBehavior = data.settings.behavior;
+      if (typeof(data.settings.behavior) == "string"){
+        currentBehavior = behavior[data.settings.behavior];
+      }
+      
       // rebind interaction events
-      instance.bind('mousedown.spritespin',  behavior[data.settings.behavior].mousedown);
-      instance.bind('mousemove.spritespin',  behavior[data.settings.behavior].mousemove);
-      instance.bind('mouseup.spritespin',    behavior[data.settings.behavior].mouseup);
-      instance.bind('mouseenter.spritespin', behavior[data.settings.behavior].mouseenter);
-      instance.bind('mouseover.spritespin',  behavior[data.settings.behavior].mouseover);
-      instance.bind('mouseleave.spritespin', behavior[data.settings.behavior].mouseleave);
-      instance.bind('dblclick.spritespin',   behavior[data.settings.behavior].dblclick);
-      instance.bind('onFrame.spritespin',    behavior[data.settings.behavior].onFrame);
+      instance.bind('mousedown.spritespin',  currentBehavior.mousedown);
+      instance.bind('mousemove.spritespin',  currentBehavior.mousemove);
+      instance.bind('mouseup.spritespin',    currentBehavior.mouseup);
+      instance.bind('mouseenter.spritespin', currentBehavior.mouseenter);
+      instance.bind('mouseover.spritespin',  currentBehavior.mouseover);
+      instance.bind('mouseleave.spritespin', currentBehavior.mouseleave);
+      instance.bind('dblclick.spritespin',   currentBehavior.dblclick);
+      instance.bind('onFrame.spritespin',    currentBehavior.onFrame);
 
       if (data.touchable){
-        instance.bind('touchstart.spritespin',  behavior[data.settings.behavior].mousedown);
-        instance.bind('touchmove.spritespin',   behavior[data.settings.behavior].mousemove);
-        instance.bind('touchend.spritespin',    behavior[data.settings.behavior].mouseup); 
-        instance.bind('touchcancel.spritespin', behavior[data.settings.behavior].mouseleave);
+        instance.bind('touchstart.spritespin',  currentBehavior.mousedown);
+        instance.bind('touchmove.spritespin',   currentBehavior.mousemove);
+        instance.bind('touchend.spritespin',    currentBehavior.mouseup); 
+        instance.bind('touchcancel.spritespin', currentBehavior.mouseleave);
         instance.bind('click.spritespin',         behavior.prevent); 
         instance.bind('gesturestart.spritespin',  behavior.prevent); 
         instance.bind('gesturechange.spritespin', behavior.prevent); 
