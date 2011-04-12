@@ -42,7 +42,6 @@
         
         // appearance               
         image             : "images/spritespin.jpg",// Stiched source image
-        preloadText       : "Loading",              // Text to appear when images are preloaded
         preloadHtml       : "loading",              // Html to appear when images are preloaded
         preloadBackground : undefined,              // Background image to display on load
         preloadCSS        : undefined,
@@ -50,7 +49,7 @@
         // events
         onFrame           : undefined,              // Occurs whe frame has been updated
         onLoad            : undefined               // Occurs when images are loaded
-      }
+      };
       
       // extending options
       options = (options || {});
@@ -64,13 +63,24 @@
           // disable selection
           $this.attr("unselectable", "on");
           
+          var imageElement = $this.find("img");
+          if (imageElement.length == 0){
+            imageElement = $("<img src=''/>");
+            $this.append(imageElement);
+          }
+          
+          $this.css({
+            overflow : "hidden"
+          });
+          
           // Initialize the plugin if it hasn't been initialized yet
           $this.data('spritespin', {
-            target    : $this,
-            settings  : settings,
-            animation : null,
-            frameTime : settings.frameTime,
-            touchable : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
+            target       : $this,
+            settings     : settings,
+            animation    : null,
+            frameTime    : settings.frameTime,
+            imageElement : imageElement,
+            touchable    : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
           });
 
           // run configuration
@@ -197,6 +207,62 @@
   };
   
   var helper = {
+    storePoints : function(e, data){
+      if (e.touches == undefined && e.originalEvent != undefined){
+        // jQuery Event normalization does not preserve the event.touches
+        // we just try to restore it
+        e.touches = e.originalEvent.touches;
+      }
+      
+      data.oldX = data.currentX;
+      data.oldY = data.currentY;
+      
+      if (e.touches != undefined && e.touches.length > 0){
+        data.currentX = e.touches[0].clientX;
+        data.currentY = e.touches[0].clientY;
+      } else {
+        data.currentX = e.clientX;
+        data.currentY = e.clientY;
+      }
+      
+      if (data.startX == undefined || data.startY == undefined){
+        data.startX = data.currentX;
+        data.startY = data.currentY;
+        data.clickframe = data.settings.frame;
+      }
+      
+      if (data.oldX == undefined || data.oldY == undefined){
+        data.oldX = data.currentX;
+        data.oldY = data.currentY;
+      }
+      
+      data.dX = data.currentX - data.startX;
+      data.dY = data.currentY - data.startY;
+      
+      data.ddX = data.currentX - data.oldX;
+      data.ddY = data.currentY - data.oldY;
+      return false;
+    },
+    resetPoints : function(e, data){
+      data.startX = undefined;
+      data.startY = undefined;
+      data.currentX = undefined;
+      data.currentY = undefined;
+      data.oldX = undefined;
+      data.oldY = undefined;
+      data.dX = 0;
+      data.dY = 0;
+      data.ddX = 0;
+      data.ddY = 0;
+    },
+    clamp : function(value, min, max){ 
+      return (value > max ? max : (value < min ? min : value));
+    },
+    wrapValue : function(value, min, max){
+      while (value >= max){ value -= max; } 
+      while (value < min){ value += max; }
+      return value;
+    },
     reconfiger : function(instance, data){
       helper.blankBackground(instance, data);
       helper.preloadImages(instance, data, function(){
@@ -208,11 +274,6 @@
         }
         instance.trigger("onLoad", data);
       });
-    },
-    wrapValue : function(value, min, max){
-      while (value >= max){ value -= max; } 
-      while (value < min){ value += max; }
-      return value;
     },
     blankBackground : function(instance, data){
       image = "none";
@@ -226,6 +287,8 @@
         "background-repeat"   : "repeat-x",
         "background-position" : "0px 0px"
       });
+      
+      data.imageElement.hide();
     },
     updateBackground : function(instance){
       var data = instance.data("spritespin");
@@ -233,11 +296,11 @@
       var x = data.settings.offsetX;
       var y = -data.settings.offsetY;
       
-      if (typeof(data.settings.image) == "string"){ 
-        var stepX = (data.settings.frameStepX != undefined ? data.settings.frameStepX : data.settings.width);
-        var stepY = (data.settings.frameStepY != undefined ? data.settings.frameStepY : data.settings.height);
-        var numFramesX = (data.settings.framesX != undefined ? data.settings.framesX : data.settings.frames);
-        var numFramesY = (numFramesX == data.settings.frames ? 1 : data.settings.framesY);
+      if (typeof(data.settings.image) === "string"){ 
+        var stepX = (data.settings.frameStepX || data.settings.width);
+        var stepY = (data.settings.frameStepY || data.settings.height);
+        var numFramesX = (data.settings.framesX || data.settings.frames);
+        var numFramesY = (numFramesX === data.settings.frames ? 1 : data.settings.framesY);
         var frameX = (data.settings.frame % numFramesX);
         var frameY = (data.settings.frame / numFramesX)|0;
         x -= (frameX * stepX);
@@ -247,23 +310,35 @@
         image = data.settings.image[data.settings.frame];
       }
 
-      var css = {
-        width      : [data.settings.width, "px"].join(""),
-        height     : [data.settings.height, "px"].join(""),
-        "background-image"    : ["url('", image, "')"].join(""),
-        "background-repeat"   : "repeat-x",
-        "background-position" : [x, "px ", y, "px"].join("")
+      if (data.imageElement){
+        var css = {
+          position   : "relative",
+          top        : y,
+          left       : x        
+        };
+        if (data.settings.resolutionX && data.settings.resolutionY){
+          css.width = data.settings.resolutionX;
+          css.height = data.settings.resolutionY;
+        }
+        data.imageElement.attr("src", image).css(css).show();      
+      } else {
+        var css = {
+          width      : [data.settings.width, "px"].join(""),
+          height     : [data.settings.height, "px"].join(""),
+          "background-image"    : ["url('", image, "')"].join(""),
+          "background-repeat"   : "repeat-x",
+          "background-position" : [x, "px ", y, "px"].join("")
+        };
+        // Spritesheets may easily exceed the maximum image size for iphones.
+        // In this case the browser will scale down the image automaticly and
+        // this will break the logic how spritespin works.
+        // Here we set the webkit css attribute to display the background in its
+        // original dimension even if it has been scaled down.
+        if (data.settings.resolutionX && data.settings.resolutionY) {
+          css["-webkit-background-size"] = [data.settings.resolutionX, "px ", data.settings.resolutionY, "px"].join("");
+        }
+        instance.css(css);
       }
-      // Spritesheets may easily exceed the maximum image size for iphones.
-      // In this case the browser will scale down the image automaticly and
-      // this will break the logic how spritespin works.
-      // Here we set the webkit css attribute to display the background in its
-      // original dimension even if it has been scaled down.
-      if (data.settings.resolutionX != undefined && 
-          data.settings.resolutionY != undefined){
-        css["-webkit-background-size"] = [data.settings.resolutionX, "px ", data.settings.resolutionY, "px"].join("");
-      }
-      instance.css(css);
     },
     hookSlider : function(instance, data){
       if (data.settings.slider != undefined){
@@ -274,7 +349,7 @@
           step    : 1,
           slide   : function(event, ui) {
             methods.animate.apply(instance, [false]);    // stop animation
-            methods.frame.apply(instance, [ui.value]);  // update to frame
+            methods.frame.apply(instance, [ui.value]);   // update to frame
           }
         }); 
       }
@@ -287,6 +362,13 @@
       var currentBehavior = data.settings.behavior;
       if (typeof(data.settings.behavior) == "string"){
         currentBehavior = behavior[data.settings.behavior];
+      }
+      
+      var prevent = function(e){
+        if (e.cancelable){
+          e.preventDefault();
+        }
+        return false;
       }
       
       // rebind interaction events
@@ -304,37 +386,34 @@
         instance.bind('touchmove.spritespin',   currentBehavior.mousemove);
         instance.bind('touchend.spritespin',    currentBehavior.mouseup); 
         instance.bind('touchcancel.spritespin', currentBehavior.mouseleave);
-        instance.bind('click.spritespin',         behavior.prevent); 
-        instance.bind('gesturestart.spritespin',  behavior.prevent); 
-        instance.bind('gesturechange.spritespin', behavior.prevent); 
-        instance.bind('gestureend.spritespin',    behavior.prevent); 
+        instance.bind('click.spritespin',         prevent); 
+        instance.bind('gesturestart.spritespin',  prevent); 
+        instance.bind('gesturechange.spritespin', prevent); 
+        instance.bind('gestureend.spritespin',    prevent); 
       }
               
       // disable selection
-	    instance.bind("mousedown.spritespin selectstart.spritespin",
-	    		function( event ) { event.preventDefault(); }
-	    );
+	    instance.bind("mousedown.spritespin selectstart.spritespin", prevent);
 	    
 	    instance.bind("onFrame.spritespin", function(event, data){
 	      helper.updateBackground(data.target, data);
         
         // stop animation if we are back at looFrame
-        if (data.settings.frame == data.settings.loopFrame && !data.settings.loop){
+        if (data.settings.frame === data.settings.loopFrame && !data.settings.loop){
           methods.animate.apply(data.target, [false]);
         }
         
         // update the jquery-ui slider
-        if (data.settings.slider != undefined){
+        if (data.settings.slider){
           data.settings.slider.slider("value", data.settings.frame);
         }
 	    });
 	    
 	    // bind custom events
-	    if (data.settings.onFrame != undefined){
+	    if (typeof(data.settings.onFrame) === "function"){
 	      instance.bind("onFrame.spritespin", data.settings.onFrame);
 	    }
-	    
-	    if (data.settings.onLoad != undefined){
+	    if (typeof(data.settings.onLoad) === "function"){
 	      instance.bind("onLoad.spritespin", data.settings.onLoad);
 	    }
     },
@@ -348,131 +427,72 @@
       preload.css(
         $.extend({
           width : data.settings.width,
-          height: data.settings.height}, css));
-          
-      preload.hide().html(data.settings.preloadText).fadeIn(250, function(){
-        new ImagePreloader(data.settings.image, function(){
-          instance.find(".preload").fadeOut(250, function(){
-            $(this).detach();
+          height: data.settings.height}, css))  
+        .hide()
+        .html(data.settings.preloadHtml)
+        .fadeIn(250,
+          function(){
+            new SpriteLoader(data.settings.image, function(){
+              instance.find(".preload").fadeOut(250, function(){
+                $(this).detach();
+              });
+            callback.apply(instance, [instance, data]);
           });
-          callback.apply([instance, data]);
         });
-      });
     }
   };
   
-  function ImagePreloader(images, callback){
-    this.callback = callback;
-
-    if (typeof(images) == "string"){
-      images = [images];
-    }
+  function SpriteLoader(images, callback){
+    if (typeof(images) === "string"){ images = [images]; }
     
-    this.nLoaded = 0;
-    this.nProcessed = 0;
-    this.aImages = new Array;
-    this.nImages = images.length;
-
-    for ( var i = 0; i < images.length; i++ ) {
+    this.callback = callback;
+    this.numLoaded = 0;
+    this.numErrors = 0;
+    this.numAborts = 0;
+    this.numProcessed = 0;
+    this.numImages = images.length;
+    this.images = [];
+    var i = 0;
+    for (i = 0; i < images.length; i++ ) {
       this.preload(images[i]); 
     }
   }
-  ImagePreloader.prototype.preload = function(image){
+  SpriteLoader.prototype.preload = function(imageUrl){
      // create new Image object and add to array
-     var oImage = new Image;
-     this.aImages.push(oImage);
+     var image = new Image();
+     this.images.push(image);
   
      // set up event handlers for the Image object
-     oImage.onload = ImagePreloader.prototype.onload;
-     oImage.onerror = ImagePreloader.prototype.onerror;
-     oImage.onabort = ImagePreloader.prototype.onabort;
+     image.onload = SpriteLoader.prototype.onload;
+     image.onerror = SpriteLoader.prototype.onerror;
+     image.onabort = SpriteLoader.prototype.onabort;
   
      // assign pointer back to this.
-     oImage.oImagePreloader = this;
-     oImage.bLoaded = false;
+     image.preloader = this;
   
-     // assign the .src property of the Image object
-     oImage.src = image;
-  }
-  ImagePreloader.prototype.onComplete = function(){
-    this.nProcessed++;
-    if ( this.nProcessed == this.nImages ){
-      this.callback(this.aImages, this.nLoaded);
+     // assign the .src property of the Image object to start loading
+     image.src = imageUrl;
+  };
+  SpriteLoader.prototype.onProcessed = function(){
+    this.numProcessed++;
+    if ( this.numProcessed === this.numImages ){
+      this.callback(this.images, this.numLoaded);
     }
-  }
-  ImagePreloader.prototype.onload = function(){
-    this.bLoaded = true;
-    this.oImagePreloader.nLoaded++;
-    this.oImagePreloader.onComplete();
-  }
-  ImagePreloader.prototype.onerror = function(){
-    this.bError = true;
-    this.oImagePreloader.onComplete();
-  }
-  ImagePreloader.prototype.onabort = function(){
-    this.bAbort = true;
-    this.oImagePreloader.onComplete();
-  }
+  };
+  SpriteLoader.prototype.onload = function(){
+    this.preloader.numLoaded++;
+    this.preloader.onProcessed();
+  };
+  SpriteLoader.prototype.onerror = function(){
+    this.preloader.numErrors++;
+    this.preloader.onProcessed();
+  };
+  SpriteLoader.prototype.onabort = function(){
+    this.preloader.numAborts++;
+    this.preloader.onProcessed();
+  };
   
-  var behavior = {
-    prevent : function(e){
-      e.cancelable && e.preventDefault();
-      return false;
-    },
-    helper : {
-      storePoints : function(e, data){
-        if (e.touches == undefined && e.originalEvent != undefined){
-          // jQuery Event normalization does not preserve the event.touches
-          // we just try to restore it
-          e.touches = e.originalEvent.touches;
-        }
-        
-        data.oldX = data.currentX;
-        data.oldY = data.currentY;
-        
-        if (e.touches != undefined && e.touches.length > 0){
-          data.currentX = e.touches[0].clientX;
-          data.currentY = e.touches[0].clientY;
-        } else {
-          data.currentX = e.clientX;
-          data.currentY = e.clientY;
-        }
-        
-        if (data.startX == undefined || data.startY == undefined){
-          data.startX = data.currentX;
-          data.startY = data.currentY;
-          data.clickframe = data.settings.frame;
-        }
-        
-        if (data.oldX == undefined || data.oldY == undefined){
-          data.oldX = data.currentX;
-          data.oldY = data.currentY;
-        }
-        
-        data.dX = data.currentX - data.startX;
-        data.dY = data.currentY - data.startY;
-        
-        data.ddX = data.currentX - data.oldX;
-        data.ddY = data.currentY - data.oldY;
-        return false;
-      },
-      resetPoints : function(e, data){
-        data.startX = undefined;
-        data.startY = undefined;
-        data.currentX = undefined;
-        data.currentY = undefined;
-        data.oldX = undefined;
-        data.oldY = undefined;
-        data.dX = 0;
-        data.dY = 0;
-        data.ddX = 0;
-        data.ddY = 0;
-      },
-      clamp : function(value, min, max){ 
-        return (value > max ? max : (value < min ? min : value));
-      }
-    },
-    
+  var behavior = {    
     none : {
       mousedown  : function(e){ return false; },
       mousemove  : function(e){ return false; },
@@ -488,7 +508,7 @@
     spin : {
       mousedown  : function(e){
         var $this = $(this), data = $this.data('spritespin');
-        behavior.helper.storePoints(e, data);
+        helper.storePoints(e, data);
         data.onDrag = true;
         return false; 
       },
@@ -496,7 +516,7 @@
         var $this = $(this), data = $this.data('spritespin');
         if (data.onDrag){
           // perform default drag behavior
-          behavior.helper.storePoints(e, data);
+          helper.storePoints(e, data);
           d = data.dX / data.settings.width;
           dFrame = d * data.settings.frames * data.settings.sense;
           frame = Math.round(data.clickframe + dFrame);
@@ -554,14 +574,14 @@
     drag : {
       mousedown  : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
-        behavior.helper.storePoints(e, data);
+        helper.storePoints(e, data);
         data.onDrag = true;
         return false; 
       },
       mousemove  : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
         if (data.onDrag){
-          behavior.helper.storePoints(e, data);
+          helper.storePoints(e, data);
           d = data.dX / data.settings.width;
           dFrame = d * data.settings.frames * data.settings.sense;
           frame = Math.round(data.clickframe + dFrame);
@@ -573,7 +593,7 @@
       },
       mouseup    : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
-        behavior.helper.resetPoints(e, data);
+        helper.resetPoints(e, data);
         data.onDrag = false;
         return false; 
       },
@@ -582,7 +602,7 @@
       mouseover  : function(e){ return false; },
       mouseleave : function(e){ 
         var $this = $(this), data = $this.data('spritespin');
-        behavior.helper.resetPoints(e, data);
+        helper.resetPoints(e, data);
         data.onDrag = false;
         return false; 
       },
