@@ -322,7 +322,11 @@
           css.width = data.settings.resolutionX;
           css.height = data.settings.resolutionY;
         }
-        data.imageElement.attr("src", image).css(css).show();      
+        data.imageElement.attr("src", image).css(css).show();
+        instance.css({
+          width      : [data.settings.width, "px"].join(""),
+          height     : [data.settings.height, "px"].join("")          
+        });
       } else {
         css = {
           width      : [data.settings.width, "px"].join(""),
