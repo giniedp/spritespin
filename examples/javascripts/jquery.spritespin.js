@@ -42,13 +42,14 @@
         
         // appearance               
         image             : "images/spritespin.jpg",// Stiched source image
-        preloadHtml       : "loading",              // Html to appear when images are preloaded
+        preloadHtml       : " ",                    // Html to appear when images are preloaded
         preloadBackground : undefined,              // Background image to display on load
         preloadCSS        : undefined,
         
         // events
         onFrame           : undefined,              // Occurs whe frame has been updated
-        onLoad            : undefined               // Occurs when images are loaded
+        onLoad            : undefined,              // Occurs when images are loaded
+        touchable         : undefined               // Tells spritespin that it is running on a touchable device
       };
       
       // extending options
@@ -64,14 +65,13 @@
           $this.attr("unselectable", "on");
           
           var imageElement = $this.find("img");
-          if (imageElement.length == 0){
+          if (imageElement.length === 0){
             imageElement = $("<img src=''/>");
             $this.append(imageElement);
           }
           
-          $this.css({
-            overflow : "hidden"
-          });
+          $this.css({ overflow : "hidden" });
+          imageElement.hide();
           
           // Initialize the plugin if it hasn't been initialized yet
           $this.data('spritespin', {
@@ -80,7 +80,7 @@
             animation    : null,
             frameTime    : settings.frameTime,
             imageElement : imageElement,
-            touchable    : (/iphone|ipod|ipad|android/i).test(navigator.userAgent)
+            touchable    : (settings.touchable || (/iphone|ipod|ipad|android/i).test(navigator.userAgent))
           });
 
           // run configuration
@@ -91,7 +91,7 @@
           $.extend(data.settings, options);
           data.frameTime = data.settings.frameTime; // override cached frameTime
           
-          if (options.image != null && options.image != undefined){
+          if (options.image !== null && options.image !== undefined){
             // when images are passed, need to reconfiger the plugin
             helper.reconfiger($this, data);
           } else {
@@ -118,12 +118,12 @@
         data = $this.data('spritespin');
         settings = data.settings;
         
-        if (reverse != undefined){
+        if (reverse !== undefined){
           settings.reverse = reverse;
         }
         
         // update frame counter
-        if (frame == undefined){
+        if (frame === undefined){
           settings.frame = (settings.frame + (settings.reverse ? -1 : 1));
         } else {
           settings.frame = frame;
@@ -139,8 +139,8 @@
     // To detect whether the animation is running or not, do not pass any
     // parameters.
     animate : function(animate, loop){
-      if (animate == undefined){
-        return $(this).data('spritespin').animation != null;
+      if (animate === undefined){
+        return $(this).data('spritespin').animation !== null;
       } else {
         return this.each(function(){
           var $this = $(this);
@@ -148,19 +148,19 @@
           settings = data.settings;
           
           // check the loop variable and update settings
-          if (typeof(loop) == "boolean"){
+          if (typeof(loop) === "boolean"){
             settings.loop = loop;
           }
           
           // toggle and update animation settings
-          if (animate == "toggle"){
-            animate = !settings.animate
+          if (animate === "toggle"){
+            animate = !settings.animate;
             settings.animate = animate;
           } else {
             settings.animate = animate;
           }
           
-          if (data.animation != null){
+          if (data.animation !== null){
             clearInterval(data.animation);
             data.animation = null;
           }
@@ -182,7 +182,7 @@
     // Gets the current framenumber when no parameter is passed or
     // updates the spinner to the sepcified frame.
     frame : function(frame){
-      if (frame == undefined){
+      if (frame === undefined){
         return $(this).data('spritespin').settings.frame;
       } else {
         return this.each(function(){
@@ -194,7 +194,7 @@
     // Starts the animation when settings.animate is set to true passed value
     // is defined
     loop : function(value){
-      if (value == undefined){
+      if (value === undefined){
         return $(this).data('spritespin').settings.loop;
       } else {
         return this.each(function(){
@@ -208,7 +208,7 @@
   
   var helper = {
     storePoints : function(e, data){
-      if (e.touches == undefined && e.originalEvent != undefined){
+      if (e.touches === undefined && e.originalEvent !== undefined){
         // jQuery Event normalization does not preserve the event.touches
         // we just try to restore it
         e.touches = e.originalEvent.touches;
@@ -217,7 +217,7 @@
       data.oldX = data.currentX;
       data.oldY = data.currentY;
       
-      if (e.touches != undefined && e.touches.length > 0){
+      if (e.touches !== undefined && e.touches.length > 0){
         data.currentX = e.touches[0].clientX;
         data.currentY = e.touches[0].clientY;
       } else {
@@ -225,13 +225,13 @@
         data.currentY = e.clientY;
       }
       
-      if (data.startX == undefined || data.startY == undefined){
+      if (data.startX === undefined || data.startY === undefined){
         data.startX = data.currentX;
         data.startY = data.currentY;
         data.clickframe = data.settings.frame;
       }
       
-      if (data.oldX == undefined || data.oldY == undefined){
+      if (data.oldX === undefined || data.oldY === undefined){
         data.oldX = data.currentX;
         data.oldY = data.currentY;
       }
@@ -277,7 +277,7 @@
     },
     blankBackground : function(instance, data){
       image = "none";
-      if (typeof(data.settings.preloadBackground) == "string"){
+      if (typeof(data.settings.preloadBackground) === "string"){
         image = ["url('", data.settings.preloadBackground, "')"].join("");
       }
       instance.css({
@@ -310,8 +310,9 @@
         image = data.settings.image[data.settings.frame];
       }
 
+      var css = {};
       if (data.imageElement){
-        var css = {
+        css = {
           position   : "relative",
           top        : y,
           left       : x        
@@ -322,7 +323,7 @@
         }
         data.imageElement.attr("src", image).css(css).show();      
       } else {
-        var css = {
+        css = {
           width      : [data.settings.width, "px"].join(""),
           height     : [data.settings.height, "px"].join(""),
           "background-image"    : ["url('", image, "')"].join(""),
@@ -341,7 +342,7 @@
       }
     },
     hookSlider : function(instance, data){
-      if (data.settings.slider != undefined){
+      if (data.settings.slider !== undefined){
         data.settings.slider.slider({
           value   : data.settings.frame,
           min     : 0,
@@ -360,7 +361,7 @@
 
       // use custom or build in behavior
       var currentBehavior = data.settings.behavior;
-      if (typeof(data.settings.behavior) == "string"){
+      if (typeof(data.settings.behavior) === "string"){
         currentBehavior = behavior[data.settings.behavior];
       }
       
@@ -419,7 +420,7 @@
     },
     preloadImages : function(instance, data, callback) {
       var preload = $('<div class="preload"/>');
-      if (instance.find(".preload").length == 0){
+      if (instance.find(".preload").length === 0){
         instance.append(preload);
       }
       
@@ -525,7 +526,7 @@
           methods.animate.apply($this, [false]);    // stop animation
           
           // calculate framtetime for spinwheel
-          if (data.ddX != 0){
+          if (data.ddX !== 0){
             d = data.ddX / data.settings.width;
             dFrame = d * data.settings.frames * data.settings.sense;
             data.frameTime = (data.settings.frameTime / dFrame);
@@ -558,7 +559,7 @@
         return false; 
       },
       onFrame : function(e, data){
-        if (data.ddX != 0){
+        if (data.ddX !== 0){
           data.frameTime = data.frameTime + 1;
         
           $(this).spritespin("animate", false);
