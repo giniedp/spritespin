@@ -324,8 +324,11 @@
         }
         data.imageElement.attr("src", image).css(css).show();
         instance.css({
-          width      : [data.settings.width, "px"].join(""),
-          height     : [data.settings.height, "px"].join("")          
+          position   : "relative",
+          top        : 0,
+          left       : 0,
+          width      : data.settings.width,
+          height     : data.settings.height
         });
       } else {
         css = {
