@@ -49,7 +49,8 @@
         // events
         onFrame           : undefined,              // Occurs whe frame has been updated
         onLoad            : undefined,              // Occurs when images are loaded
-        touchable         : undefined               // Tells spritespin that it is running on a touchable device
+        touchable         : undefined,              // Tells spritespin that it is running on a touchable device
+        panorama          : false
       };
       
       // extending options
@@ -61,17 +62,17 @@
         var data  = $this.data('spritespin');
         
         if (!data){
-          // disable selection
-          $this.attr("unselectable", "on");
-          
-          var imageElement = $this.find("img");
-          if (imageElement.length === 0){
-            imageElement = $("<img src=''/>");
-            $this.append(imageElement);
+          // disable selection & hide overflow
+          $this.attr("unselectable", "on").css({ overflow : "hidden" }).html("");
+
+          if (!settings.panorama){
+            var imageElement = $this.find("img");
+            if (imageElement.length === 0){
+              imageElement = $("<img src=''/>");
+              $this.append(imageElement);
+            }
+            imageElement.hide();            
           }
-          
-          $this.css({ overflow : "hidden" });
-          imageElement.hide();
           
           // Initialize the plugin if it hasn't been initialized yet
           $this.data('spritespin', {
@@ -288,7 +289,7 @@
         "background-position" : "0px 0px"
       });
       
-      data.imageElement.hide();
+      $(data.imageElement).hide();
     },
     updateBackground : function(instance){
       var data = instance.data("spritespin");
