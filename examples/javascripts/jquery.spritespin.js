@@ -1,4 +1,4 @@
-(function($, undefined) {
+(function( $ ) {
 
   $.fn.spritespin = function(method) {
     if ( methods[method] ) {
@@ -65,8 +65,9 @@
           // disable selection & hide overflow
           $this.attr("unselectable", "on").css({ overflow : "hidden" }).html("");
 
+          var imageElement;
           if (!settings.panorama){
-            var imageElement = $this.find("img");
+            imageElement = $this.find("img");
             if (imageElement.length === 0){
               imageElement = $("<img src=''/>");
               $this.append(imageElement);
@@ -97,7 +98,7 @@
             helper.reconfiger($this, data);
           } else {
             // otherwise just reanimate spritespin
-            methods.animate.apply($this, [data.settings.animate, data.settings.loop]);            
+            $this.spritespin("animate", data.settings.animate, data.settings.loop);
           }
         }
       });
@@ -115,6 +116,7 @@
     // Triggers the onFrame event
     update : function(frame, reverse){
       return this.each(function(){
+        //console.log("XX");
         var $this = $(this);
         data = $this.data('spritespin');
         settings = data.settings;
@@ -171,7 +173,7 @@
             data.animation = setInterval(
               function(){ 
                 try {
-                  methods.update.apply($this, []); 
+                  $this.spritespin("update");
                 } catch(err){
                   // The try catch block is a hack for Opera Browser
                 }
@@ -187,7 +189,7 @@
         return $(this).data('spritespin').settings.frame;
       } else {
         return this.each(function(){
-          methods.update.apply($(this), [frame]);
+          $(this).spritespin("update", frame);
         });        
       }
     },
@@ -201,7 +203,7 @@
         return this.each(function(){
           var $this = $(this);
           data = $this.data('spritespin');
-          methods.animate.apply($(this), [data.settings.animate, value]);
+          $this.spritespin("animate", data.settings.animate, value);
         }); 
       }
     }
@@ -378,7 +380,7 @@
           e.preventDefault();
         }
         return false;
-      }
+      };
       
       // rebind interaction events
       instance.bind('mousedown.spritespin',  currentBehavior.mousedown);
@@ -441,7 +443,7 @@
         .html(data.settings.preloadHtml)
         .fadeIn(250,
           function(){
-            new SpriteLoader(data.settings.image, function(){
+            var loader = new SpriteLoader(data.settings.image, function(){
               instance.find(".preload").fadeOut(250, function(){
                 $(this).detach();
               });
