@@ -101,6 +101,9 @@
       preloadHtml       : " ",                    // Html to appear when images are preloaded
       preloadBackground : undefined,              // Background image to display on load
       preloadCSS        : undefined,
+			fadeFrames        : 0,                      // Enables and disables smooth transitions between frames
+			fadeInTime        : 0,                      // 
+			fadeOutTime       : 120,                    // 
       
       // events
       onFrame           : undefined,              // Occurs whe frame has been updated
@@ -121,14 +124,21 @@
         // disable selection & hide overflow
         $this.attr("unselectable", "on").css({ overflow : "hidden" }).html("");
   
-        var imageElement;
+        var imageElement, imageElements;
         if (!settings.panorama){
           imageElement = $this.find("img");
           if (imageElement.length === 0){
             imageElement = $("<img src=''/>");
             $this.append(imageElement);
           }
-          imageElement.hide();            
+
+					var i;
+					for (i = 1; i < settings.fadeFrames; i ++){
+						$this.append("<img src=''/>");
+					}
+					
+					imageElements = $this.find("img");
+					imageElements.hide();
         }
         
         // Initialize the plugin if it hasn't been initialized yet
@@ -138,6 +148,8 @@
           animation    : null,
           frameTime    : settings.frameTime,
           imageElement : imageElement,
+					imageElements: imageElements,
+					imageIndex   : 0,
           touchable    : (settings.touchable || (/iphone|ipod|ipad|android/i).test(window.navigator.userAgent))
         });
   
@@ -379,15 +391,14 @@
     var css = {};
     if (data.imageElement){
       css = {
-        position   : "relative",
-        top        : y,
-        left       : x        
+        position   : "absolute",
+        top        : "0px",
+        left       : "0px"        
       };
       if (data.settings.resolutionX && data.settings.resolutionY){
         css.width = data.settings.resolutionX;
         css.height = data.settings.resolutionY;
       }
-      data.imageElement.attr("src", image).css(css).show();
       instance.css({
         position   : "relative",
         top        : 0,
@@ -395,6 +406,28 @@
         width      : data.settings.width,
         height     : data.settings.height
       });
+
+			if (data.imageElements.length === 1){
+				data.imageElement.attr("src", image).css(css).show();
+			} else {
+				var max = data.imageElements.length - 1;
+				var index = helper.wrapValue(data.imageIndex, 0, max);
+				var prevIndex = helper.wrapValue(data.imageIndex + 1, 0, max);
+				data.imageIndex = helper.wrapValue(data.imageIndex - 1, 0, max);
+				
+				if (data.settings.fadeOutTime > 0){
+					$(data.imageElements[prevIndex]).fadeOut(data.settings.fadeOutTime);
+				} else {
+					$(data.imageElements[prevIndex]).hide();
+				}
+				
+				if (data.settings.fadeInTime > 0){
+					$(data.imageElements[index]).attr("src", image).css(css).fadeIn(data.settings.fadeInTime);
+				} else {
+					$(data.imageElements[index]).attr("src", image).css(css).show();
+				}
+			}
+			
     } else {
       css = {
         width      : [data.settings.width, "px"].join(""),
@@ -614,7 +647,7 @@
         var dFrame = d * data.settings.frames * data.settings.sense;
         var frame = Math.round(data.clickframe + dFrame);
         
-        methods.update.apply($this, [frame]);     // update to frame
+        methods.update.apply($this, [frame]);   // update to frame
         methods.animate.apply($this, [false]);  // stop animation
       }
       return false; 
