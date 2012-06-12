@@ -40,7 +40,19 @@
       data.images[data.oldFrame].animate({ opacity : data.opacity }, data.speed);
       data.oldFrame = data.frame;
       data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
+    } else {
+      //console.log(data.dX);
+      data.stage.css({
+        "left" : data.offsets[data.frame] + data.dX
+      });
     }
   };
   
+  Module.resetInput = function(data){
+    if (!data.onDrag){
+      data.stage.animate({
+        "left" : data.offsets[data.frame]
+      });
+    }
+  };
 }(jQuery, window));

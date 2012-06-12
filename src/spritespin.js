@@ -115,14 +115,18 @@
     data.ddX = 0;
     data.ddY = 0;
     data.ddW = 0;
+    
+    if (typeof(data.module.resetInput) === "function"){
+      data.module.resetInput(data);
+    }
   };
   
   Spin.clamp = function(value, min, max){ 
     return (value > max ? max : (value < min ? min : value));
   };
   
-  Spin.wrapValue = function(value, min, max){
-    while (value >= max){ value -= max; } 
+  Spin.wrap = function(value, min, max){
+    while (value > max){ value -= max; } 
     while (value < min){ value += max; }
     return value;
   };
@@ -227,11 +231,6 @@
 	  
 	  target.bind("onFrame.spritespin", function(event, data){
 	    Spin.draw(data);
-      
-      // stop animation if we are back at looFrame
-      if (data.frame === data.loopFrame && !data.loop){
-        api.animate.apply(data.target, [false]);
-      }
 	  });
 	  
 	  // bind custom events
@@ -307,6 +306,8 @@
       var data  = $this.data('spritespin');
       
       if (!data){
+        // spritespin is not initialized
+        
         var images = $this.find("img");
         var i = 0;
         if (images.length > 0){
@@ -345,11 +346,10 @@
         $this.data('spritespin', settings);
         SpriteSpin.reload(settings, true);
       } else {
-        // reload the plugin if it is already initialized
+        // spritespin is initialized.
         $.extend(data, options);
-        data.frameTime = data.settings.frameTime; // override cached frameTime
-        
-        if (options.image !== null && options.image !== undefined){
+
+        if (options.image){
           // when images are passed, need to reload the plugin
           SpriteSpin.reload(data);
         } else {
@@ -376,7 +376,7 @@
       var $this = $(this);
       var data = $this.data('spritespin');
       
-      if (reverse !== undefined){
+      if (typeof(reverse) === "boolean"){
         data.reverse = reverse;
       }
       
@@ -386,8 +386,19 @@
       } else {
         data.frame = frame;
       }
-      data.frame = Spin.wrapValue(data.frame, 0, data.frames);
+      
+      // wrap value to fit in range [0, data.frames]
+      if (data.loop || (data.animation !== null)){
+        data.frame = Spin.wrap(data.frame, 0, data.frames - 1);
+      } else {
+        data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
+      }
 
+      // stop animation if the loopFrame is reached
+      if (!data.loop && (data.animation !== null) && (data.frame === data.loopFrame)){
+        api.animate.apply(data.target, [false]);
+      }
+      
       data.target.trigger("onFrame", data);
     });
   };
@@ -410,30 +421,28 @@
       if (typeof(loop) === "boolean"){
         data.loop = loop;
       }
-      
       // toggle and update animation settings
       if (animate === "toggle"){
-        animate = !data.animate;
-        data.animate = animate;
-      } else {
+        data.animate = !data.animate;
+      }
+      //
+      if (typeof(animate) === "boolean"){
         data.animate = animate;
       }
-      
+      // stop the running animation
       if (data.animation !== null){
         window.clearInterval(data.animation);
         data.animation = null;
       }
-      
+      // start animation
       if (data.animate){
-        // start animation
-        data.animation = window.setInterval(
-          function(){ 
-            try {
-              $this.spritespin("update");
-            } catch(err){
-              // The try catch block is a hack for Opera Browser
-            }
-          }, data.frameTime);
+        data.animation = window.setInterval(function(){ 
+          try { 
+            $this.spritespin("update"); 
+          } catch(err){
+            // The try catch block is a hack for Opera Browser
+          }
+        }, data.frameTime);
       }  
     });
   };
@@ -458,11 +467,26 @@
     }
     return this.each(function(){
       var $this = $(this);
-      var data = $this.data('spritespin');
-      $this.spritespin("animate", data.animate, value);
+      $this.spritespin("animate", $this.data('spritespin').animate, value);
     }); 
   };
 
+  api.next = function(){
+    return this.each(function(){
+      var $this = $(this);
+      var data = $this.data('spritespin');
+      $this.spritespin("frame", data.frame + (data.reverse ? -1 : 1));
+    }); 
+  };
+  
+  api.prev = function(){
+    return this.each(function(){
+      var $this = $(this);
+      var data = $this.data('spritespin');
+      $this.spritespin("frame", data.frame - (data.reverse ? -1 : 1));
+    });
+  };
+  
   Spin.behaviors.none = {
     name : "none",
     mousedown  : function(e){ return false; },
@@ -673,16 +697,56 @@
 (function($, window, Spin){
   Spin.behaviors.swipe = {
     name : "swipe",
-    mousedown  : function(e){ return false; },
-    mousemove  : function(e){ return false; },
-    mouseup    : function(e){ return false; },
+    mousedown  : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      Spin.updateInput(e, data);
+      data.onDrag = true;
+      return false; 
+    },
+    mousemove  : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      if (data.onDrag){
+        Spin.updateInput(e, data);
+        
+        var frame = data.frame;
+        
+        if (data.dX > data.width * 0.25){
+          frame = data.frame - 1;       
+          data.onDrag = false;
+        }
+        if (data.dX < -data.width * 0.25){
+          frame = data.frame + 1;
+          data.onDrag = false;
+        }
+        
+        $this.spritespin("update", frame);  // update to frame
+        $this.spritespin("animate", false); // stop animation
+      }
+      return false; 
+    },
+    mouseup    : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      data.onDrag = false;
+      Spin.resetInput(data);
+      return false; 
+    },
     
     mouseenter : function(e){ return false; },
     mouseover  : function(e){ return false; },
-    mouseleave : function(e){ return false; },
-    dblclick   : function(e){ return false; },
-    
-    onFrame : function(e, frame){ return false; }
+    mouseleave : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      data.onDrag = false;
+      Spin.resetInput(data);
+      return false; 
+    },
+    dblclick   : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      $this.spritespin("animate", "toggle");
+      return false; 
+    },
+    onFrame : function(e, frame){ 
+      return false; 
+    }
   };  
 })(jQuery, window, window.SpriteSpin);
 
@@ -835,9 +899,21 @@
       data.images[data.oldFrame].animate({ opacity : data.opacity }, data.speed);
       data.oldFrame = data.frame;
       data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
+    } else {
+      //console.log(data.dX);
+      data.stage.css({
+        "left" : data.offsets[data.frame] + data.dX
+      });
     }
   };
   
+  Module.resetInput = function(data){
+    if (!data.onDrag){
+      data.stage.animate({
+        "left" : data.offsets[data.frame]
+      });
+    }
+  };
 }(jQuery, window));
 
 (function($, window) {

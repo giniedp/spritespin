@@ -11,7 +11,8 @@
       width     : options.width,
       height    : options.height,
       frames    : spins.length,
-      behavior  : "click",
+      frameTime : 1000,
+      behavior  : "swipe",
       module    : "gallery"
     }).bind("onFrame", function(e, data){
       $this.find(".slider").slider("value", data.frame);
@@ -32,7 +33,7 @@
     });
     $this.find(".btn-zoom").click(function(){
       var d = spin.data("spritespin");
-      var img = $($this.find(".originals *")[d.frame]);
+      var img = $($this.find(".originals *")[d.frame]).clone();
       $.fancybox({ content: img });
       return false;
     });
