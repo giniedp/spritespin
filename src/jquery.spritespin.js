@@ -125,7 +125,7 @@
         $this.attr("unselectable", "on").css({ overflow : "hidden" }).html("");
   
         var imageElement, imageElements;
-        if (!settings.panorama){
+        if (!settings.panorama && settings.fadeFrames > 0){
           imageElement = $this.find("img");
           if (imageElement.length === 0){
             imageElement = $("<img src=''/>");
@@ -406,7 +406,7 @@
         width      : data.settings.width,
         height     : data.settings.height
       });
-
+ 
 			if (data.imageElements.length === 1){
 				data.imageElement.attr("src", image).css(css).show();
 			} else {
