@@ -83,7 +83,7 @@
   };
   
   Spin.reload = function(data, andInit){
-    if (andInit){
+    if (andInit && data.module.initialize){
       data.module.initialize(data);
     }
     
@@ -97,9 +97,13 @@
   
   Spin.preloadImages = function(data, callback) {
     data.preload.fadeIn(250, function(){
-      new SpriteLoader(data.image, function(){
+      new SpriteLoader(data.source, function(loader){
         data.preload.fadeOut(250);
         data.stage.show();
+        if (data.canvas){
+          data.canvas.show();
+        }
+        data.images = loader.images;
         callback.apply(data.target, [data]);
       });
     });
@@ -123,15 +127,27 @@
       position : "absolute"  
     };
     $.extend(css, data.preloadCSS || {});
-    data.preload.hide().css(css).html(data.preloadHtml || "");
+    data.preload.css(css).html(data.preloadHtml || "").hide();
     
-    data.stage.hide().css({
+    data.stage.css({
       width    : w, 
       height   : h,
       top      : "0px", 
       left     : "0px",
       position : "absolute"
-    });
+    }).hide();
+    
+    if (data.canvas){
+      data.canvas[0].width = data.width;
+      data.canvas[0].height = data.height;      
+      data.canvas.css({
+        width    : w, 
+        height   : h,
+        top      : "0px", 
+        left     : "0px",
+        position : "absolute"
+      }).hide();
+    }
   };
   
   Spin.draw = function(data){
@@ -183,6 +199,9 @@
 	  target.bind("onFrame.spritespin", function(event, data){
 	    Spin.draw(data);
 	  });
+	  target.bind("onLoad.spritespin", function(event, data){
+	    data.target.spritespin("animate", data.animate, data.loop);
+	  });
 	  
 	  // bind custom events
 	  if (typeof(data.onFrame) === "function"){
@@ -210,37 +229,23 @@
       // dimensions
       width             : undefined,              // Window width (or frame width)
       height            : undefined,              // Window height (or frame height)
-      //offsetX           : 0,                      // Offset in X direction from the left image border to the first frames left border
-      //offsetY           : 0,                      // Offset in Y direction from the top image border to the first frames top border
-      //frameStepX        : undefined,              // Distance in X direction to the next frame if it differs from window width 
-      //frameStepY        : undefined,              // Distance in Y direction to the next frame if it differs from window height
-      //frameStep         : undefined,              // Width of a single frame or step to the next frame
-      //framesX           : undefined,              // Number of frames in a single row
       frames            : 36,                     // Total number of frames
       frame             : 0,                      // Initial frame number
-      //resolutionX       : undefined,              // The spritesheet resolution in X direction
-      //resolutionY       : undefined,              // The spritesheet resolution in Y direction
       
       // animation & update
       animate           : true,                   // Run animation when after initialize
       loop              : false,                  // Repeat animation in a loop
       loopFrame         : 0,                      // Indicates the loop start frame
       frameTime         : 36,                     // Time between updates
+      frameWrap         : true,
       reverse           : false,                  // If true animation is played backward
       sense             : 1,                      // Interaction sensitivity used by behavior implementations
       orientation       : "horizontal",
       
-      // interaction
-      //behavior          : "drag",                 // Enables mouse interaction
-      
       // appearance               
-      image             : undefined,              // Stiched source image
-      preloadHtml       : " ",                    // Html to appear when images are preloaded
-      preloadBackground : undefined,              // Background image to display on load
+      source            : undefined,              // Stiched source image
+      preloadHtml       : undefined,              // Html to appear when images are preloaded
       preloadCSS        : undefined,
-			fadeFrames        : 0,                      // Enables and disables smooth transitions between frames
-			fadeInTime        : 0,                      // 
-			fadeOutTime       : 120,                    // 
       
       // events
       onFrame           : undefined,              // Occurs whe frame has been updated
@@ -262,23 +267,38 @@
         var images = $this.find("img");
         var i = 0;
         if (images.length > 0){
-          settings.image = [];
+          settings.source = [];
           for(i = 0; i < images.length; i += 1){
-            settings.image.push($(images[i]).attr("src"));
+            settings.source.push($(images[i]).attr("src"));
           }
+        }
+        
+        if (typeof(settings.source) === "string"){
+          settings.source = [settings.source];
         }
         
         // disable selection & hide overflow
         $this.attr("unselectable", "on").css({ 
           overflow : "hidden", 
           position : "relative"
-        }).html("");
+        });
         
         // build inner html
-        $this.html("");
+        $this.empty();
         $this.append($("<div class='spritespin-stage'/>"));
         $this.append($("<div class='spritespin-preload'/>"));
-                
+        $this.addClass("spritespin-instance");
+        
+        if (settings.enableCanvas){
+          var canvas = $("<canvas class='spritespin-canvas'/>")[0];
+          var supported = !!(canvas.getContext && canvas.getContext('2d'));
+          if (supported){
+            settings.canvas = $(canvas);
+            settings.context = canvas.getContext("2d");
+            $this.append(settings.canvas);
+          }
+        }
+
         // resolve module
         if (typeof(settings.module) === "string"){
           settings.module = SpriteSpin.modules[settings.module];
@@ -300,7 +320,7 @@
         // spritespin is initialized.
         $.extend(data, options);
 
-        if (options.image){
+        if (options.source){
           // when images are passed, need to reload the plugin
           SpriteSpin.reload(data);
         } else {
@@ -322,14 +342,10 @@
   // Updates a single frame to the specified frame number. If no value is 
   // given this will increment the current frame counter.
   // Triggers the onFrame event
-  api.update = function(frame, reverse){
+  api.update = function(frame){
     return this.each(function(){
       var $this = $(this);
       var data = $this.data('spritespin');
-      
-      if (typeof(reverse) === "boolean"){
-        data.reverse = reverse;
-      }
       
       // update frame counter
       if (frame === undefined){
@@ -338,8 +354,9 @@
         data.frame = frame;
       }
       
-      // wrap value to fit in range [0, data.frames]
-      if (data.loop || (data.animation !== null)){
+      // wrap/clamp the frame value to fit in range [0, data.frames]
+      if ((data.animation !== null) && data.loop || 
+          (data.animation == null) && data.frameWrap){
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
@@ -392,6 +409,8 @@
             $this.spritespin("update"); 
           } catch(err){
             // The try catch block is a hack for Opera Browser
+            // Opera sometimes rises an exception here and
+            // stops performing the script
           }
         }, data.frameTime);
       }  
@@ -440,16 +459,16 @@
   
   Spin.behaviors.none = {
     name : "none",
-    mousedown  : function(e){ return false; },
-    mousemove  : function(e){ return false; },
-    mouseup    : function(e){ return false; },
+    mousedown  : $.noop,
+    mousemove  : $.noop,
+    mouseup    : $.noop,
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
-    mouseleave : function(e){ return false; },
-    dblclick   : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
+    mouseleave : $.noop,
+    dblclick   : $.noop,
     
-    onFrame : function(e, frame){ return false; }
+    onFrame : $.noop
   };
   
 }(jQuery, window));

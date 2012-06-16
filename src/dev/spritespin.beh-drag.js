@@ -5,7 +5,6 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       data.onDrag = true;
-      return false; 
     },
     mousemove  : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -14,34 +13,25 @@
         var d = data.dX / data.width;
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
-        
-        api.update.apply($this, [frame]);   // update to frame
-        api.animate.apply($this, [false]);  // stop animation
+
+        $this.spritespin("update", frame);  // update to frame
+        $this.spritespin("animate", false);  // stop animation
       }
-      return false; 
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-      return false; 
     },
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-      return false; 
     },
-    dblclick   : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      $this.spritespin("animate", "toggle");
-      return false; 
-    },
-    onFrame : function(e, frame){ 
-      return false; 
-    }
+    dblclick   : $.noop,
+    onFrame    : $.noop
   };  
 })(jQuery, window, window.SpriteSpin);

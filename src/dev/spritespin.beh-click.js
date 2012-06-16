@@ -1,23 +1,26 @@
 (function($, window, Spin){
   Spin.behaviors.click = {
     name : "click",
-    mousedown  : function(e){ return false; },
-    mousemove  : function(e){ return false; },
+    mousedown  : $.noop,
+    mousemove  : $.noop,
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
+      $this.spritespin("animate", false); // stop animation
       if (data.currentX > data.width / 2){
         $this.spritespin("frame", data.frame + 1);
+        data.reverse = false;
       } else {
         $this.spritespin("frame", data.frame - 1);
+        data.reverse = true;
       }
     },
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
-    mouseleave : function(e){ return false; },
-    dblclick   : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
+    mouseleave : $.noop,
+    dblclick   : $.noop,
     
-    onFrame : function(e, frame){ return false; }
+    onFrame : $.noop
   };
 })(jQuery, window, window.SpriteSpin);

@@ -5,7 +5,6 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       data.onDrag = true;
-      return false; 
     },
     mousemove  : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -27,7 +26,6 @@
           data.reverse = (data.ddX < 0);
         }
       }
-      return false;  
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -35,24 +33,19 @@
         data.onDrag = false;
         $this.spritespin("animate", true);
       }
-      return false; 
     },
   
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       if (data.onDrag){
         data.onDrag = false;
         $this.spritespin("animate", $this.spritespin("animate"));
       }
-      return false; 
     },
-    dblclick   : function(e){ 
-      $(this).spritespin("animate", "toggle");
-      return false; 
-    },
-    onFrame : function(e, data){
+    dblclick   : $.noop,
+    onFrame    : function(e, data){
       if (data.ddX !== 0){
         data.frameTime = data.frameTime + 1;
       
@@ -63,7 +56,6 @@
       } else {
         $(this).spritespin("animate", false);
       }
-      return false; 
     }
   };
 })(jQuery, window, window.SpriteSpin);

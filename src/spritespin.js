@@ -132,7 +132,7 @@
   };
   
   Spin.reload = function(data, andInit){
-    if (andInit){
+    if (andInit && data.module.initialize){
       data.module.initialize(data);
     }
     
@@ -146,9 +146,13 @@
   
   Spin.preloadImages = function(data, callback) {
     data.preload.fadeIn(250, function(){
-      new SpriteLoader(data.image, function(){
+      new SpriteLoader(data.source, function(loader){
         data.preload.fadeOut(250);
         data.stage.show();
+        if (data.canvas){
+          data.canvas.show();
+        }
+        data.images = loader.images;
         callback.apply(data.target, [data]);
       });
     });
@@ -172,15 +176,27 @@
       position : "absolute"  
     };
     $.extend(css, data.preloadCSS || {});
-    data.preload.hide().css(css).html(data.preloadHtml || "");
+    data.preload.css(css).html(data.preloadHtml || "").hide();
     
-    data.stage.hide().css({
+    data.stage.css({
       width    : w, 
       height   : h,
       top      : "0px", 
       left     : "0px",
       position : "absolute"
-    });
+    }).hide();
+    
+    if (data.canvas){
+      data.canvas[0].width = data.width;
+      data.canvas[0].height = data.height;      
+      data.canvas.css({
+        width    : w, 
+        height   : h,
+        top      : "0px", 
+        left     : "0px",
+        position : "absolute"
+      }).hide();
+    }
   };
   
   Spin.draw = function(data){
@@ -232,6 +248,9 @@
 	  target.bind("onFrame.spritespin", function(event, data){
 	    Spin.draw(data);
 	  });
+	  target.bind("onLoad.spritespin", function(event, data){
+	    data.target.spritespin("animate", data.animate, data.loop);
+	  });
 	  
 	  // bind custom events
 	  if (typeof(data.onFrame) === "function"){
@@ -259,37 +278,23 @@
       // dimensions
       width             : undefined,              // Window width (or frame width)
       height            : undefined,              // Window height (or frame height)
-      //offsetX           : 0,                      // Offset in X direction from the left image border to the first frames left border
-      //offsetY           : 0,                      // Offset in Y direction from the top image border to the first frames top border
-      //frameStepX        : undefined,              // Distance in X direction to the next frame if it differs from window width 
-      //frameStepY        : undefined,              // Distance in Y direction to the next frame if it differs from window height
-      //frameStep         : undefined,              // Width of a single frame or step to the next frame
-      //framesX           : undefined,              // Number of frames in a single row
       frames            : 36,                     // Total number of frames
       frame             : 0,                      // Initial frame number
-      //resolutionX       : undefined,              // The spritesheet resolution in X direction
-      //resolutionY       : undefined,              // The spritesheet resolution in Y direction
       
       // animation & update
       animate           : true,                   // Run animation when after initialize
       loop              : false,                  // Repeat animation in a loop
       loopFrame         : 0,                      // Indicates the loop start frame
       frameTime         : 36,                     // Time between updates
+      frameWrap         : true,
       reverse           : false,                  // If true animation is played backward
       sense             : 1,                      // Interaction sensitivity used by behavior implementations
       orientation       : "horizontal",
       
-      // interaction
-      //behavior          : "drag",                 // Enables mouse interaction
-      
       // appearance               
-      image             : undefined,              // Stiched source image
-      preloadHtml       : " ",                    // Html to appear when images are preloaded
-      preloadBackground : undefined,              // Background image to display on load
+      source            : undefined,              // Stiched source image
+      preloadHtml       : undefined,              // Html to appear when images are preloaded
       preloadCSS        : undefined,
-			fadeFrames        : 0,                      // Enables and disables smooth transitions between frames
-			fadeInTime        : 0,                      // 
-			fadeOutTime       : 120,                    // 
       
       // events
       onFrame           : undefined,              // Occurs whe frame has been updated
@@ -311,23 +316,38 @@
         var images = $this.find("img");
         var i = 0;
         if (images.length > 0){
-          settings.image = [];
+          settings.source = [];
           for(i = 0; i < images.length; i += 1){
-            settings.image.push($(images[i]).attr("src"));
+            settings.source.push($(images[i]).attr("src"));
           }
+        }
+        
+        if (typeof(settings.source) === "string"){
+          settings.source = [settings.source];
         }
         
         // disable selection & hide overflow
         $this.attr("unselectable", "on").css({ 
           overflow : "hidden", 
           position : "relative"
-        }).html("");
+        });
         
         // build inner html
-        $this.html("");
+        $this.empty();
         $this.append($("<div class='spritespin-stage'/>"));
         $this.append($("<div class='spritespin-preload'/>"));
-                
+        $this.addClass("spritespin-instance");
+        
+        if (settings.enableCanvas){
+          var canvas = $("<canvas class='spritespin-canvas'/>")[0];
+          var supported = !!(canvas.getContext && canvas.getContext('2d'));
+          if (supported){
+            settings.canvas = $(canvas);
+            settings.context = canvas.getContext("2d");
+            $this.append(settings.canvas);
+          }
+        }
+
         // resolve module
         if (typeof(settings.module) === "string"){
           settings.module = SpriteSpin.modules[settings.module];
@@ -349,7 +369,7 @@
         // spritespin is initialized.
         $.extend(data, options);
 
-        if (options.image){
+        if (options.source){
           // when images are passed, need to reload the plugin
           SpriteSpin.reload(data);
         } else {
@@ -371,14 +391,10 @@
   // Updates a single frame to the specified frame number. If no value is 
   // given this will increment the current frame counter.
   // Triggers the onFrame event
-  api.update = function(frame, reverse){
+  api.update = function(frame){
     return this.each(function(){
       var $this = $(this);
       var data = $this.data('spritespin');
-      
-      if (typeof(reverse) === "boolean"){
-        data.reverse = reverse;
-      }
       
       // update frame counter
       if (frame === undefined){
@@ -387,8 +403,9 @@
         data.frame = frame;
       }
       
-      // wrap value to fit in range [0, data.frames]
-      if (data.loop || (data.animation !== null)){
+      // wrap/clamp the frame value to fit in range [0, data.frames]
+      if ((data.animation !== null) && data.loop || 
+          (data.animation == null) && data.frameWrap){
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
@@ -441,6 +458,8 @@
             $this.spritespin("update"); 
           } catch(err){
             // The try catch block is a hack for Opera Browser
+            // Opera sometimes rises an exception here and
+            // stops performing the script
           }
         }, data.frameTime);
       }  
@@ -489,16 +508,16 @@
   
   Spin.behaviors.none = {
     name : "none",
-    mousedown  : function(e){ return false; },
-    mousemove  : function(e){ return false; },
-    mouseup    : function(e){ return false; },
+    mousedown  : $.noop,
+    mousemove  : $.noop,
+    mouseup    : $.noop,
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
-    mouseleave : function(e){ return false; },
-    dblclick   : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
+    mouseleave : $.noop,
+    dblclick   : $.noop,
     
-    onFrame : function(e, frame){ return false; }
+    onFrame : $.noop
   };
   
 }(jQuery, window));
@@ -555,24 +574,27 @@
 (function($, window, Spin){
   Spin.behaviors.click = {
     name : "click",
-    mousedown  : function(e){ return false; },
-    mousemove  : function(e){ return false; },
+    mousedown  : $.noop,
+    mousemove  : $.noop,
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
+      $this.spritespin("animate", false); // stop animation
       if (data.currentX > data.width / 2){
         $this.spritespin("frame", data.frame + 1);
+        data.reverse = false;
       } else {
         $this.spritespin("frame", data.frame - 1);
+        data.reverse = true;
       }
     },
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
-    mouseleave : function(e){ return false; },
-    dblclick   : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
+    mouseleave : $.noop,
+    dblclick   : $.noop,
     
-    onFrame : function(e, frame){ return false; }
+    onFrame : $.noop
   };
 })(jQuery, window, window.SpriteSpin);
 
@@ -583,7 +605,6 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       data.onDrag = true;
-      return false; 
     },
     mousemove  : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -592,36 +613,74 @@
         var d = data.dX / data.width;
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
-        
-        api.update.apply($this, [frame]);   // update to frame
-        api.animate.apply($this, [false]);  // stop animation
+
+        $this.spritespin("update", frame);  // update to frame
+        $this.spritespin("animate", false);  // stop animation
       }
-      return false; 
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-      return false; 
     },
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-      return false; 
     },
-    dblclick   : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      $this.spritespin("animate", "toggle");
-      return false; 
-    },
-    onFrame : function(e, frame){ 
-      return false; 
-    }
+    dblclick   : $.noop,
+    onFrame    : $.noop
   };  
+})(jQuery, window, window.SpriteSpin);
+
+(function($, window, Spin){
+  Spin.behaviors.hold = {
+    name : "hold",
+    mousedown  : function(e){
+      var $this = $(this), data = $this.data('spritespin');
+      Spin.updateInput(e, data);
+      data.onDrag = true;
+      $this.spritespin("animate", true);
+    },
+    mousemove  : function(e){
+      var $this = $(this), data = $this.data('spritespin');
+      
+      if (data.onDrag){
+        Spin.updateInput(e, data);
+        
+        var o = data.target.offset();
+        var h = (data.width / 2);
+        var d = (data.currentX - o.left - h) / h;
+        data.reverse = d < 0;
+        d = d < 0 ? -d : d;
+        data.frameTime = 80 * (1 - d) + 20;        
+      }
+    },
+    mouseup    : function(e){ 
+      var $this = $(this), data = $this.data('spritespin');
+      Spin.resetInput(data);
+      data.onDrag = false;
+      $this.spritespin("animate", false);
+    },
+    
+    mouseenter : $.noop,
+    mouseover  : $.noop,
+    mouseleave : function(e){
+      var $this = $(this), data = $this.data('spritespin');
+      Spin.resetInput(data);
+      data.onDrag = false;
+      $this.spritespin("animate", false);
+    },
+    dblclick   : $.noop,
+    
+    onFrame : function(e){
+      var $this = $(this), data = $this.data('spritespin');
+      $this.spritespin("animate", true);
+    }
+  };
 })(jQuery, window, window.SpriteSpin);
 
 (function($, window, Spin){
@@ -631,7 +690,6 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       data.onDrag = true;
-      return false; 
     },
     mousemove  : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -653,7 +711,6 @@
           data.reverse = (data.ddX < 0);
         }
       }
-      return false;  
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -661,24 +718,19 @@
         data.onDrag = false;
         $this.spritespin("animate", true);
       }
-      return false; 
     },
   
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       if (data.onDrag){
         data.onDrag = false;
         $this.spritespin("animate", $this.spritespin("animate"));
       }
-      return false; 
     },
-    dblclick   : function(e){ 
-      $(this).spritespin("animate", "toggle");
-      return false; 
-    },
-    onFrame : function(e, data){
+    dblclick   : $.noop,
+    onFrame    : function(e, data){
       if (data.ddX !== 0){
         data.frameTime = data.frameTime + 1;
       
@@ -689,7 +741,6 @@
       } else {
         $(this).spritespin("animate", false);
       }
-      return false; 
     }
   };
 })(jQuery, window, window.SpriteSpin);
@@ -701,7 +752,6 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       data.onDrag = true;
-      return false; 
     },
     mousemove  : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
@@ -722,31 +772,22 @@
         $this.spritespin("update", frame);  // update to frame
         $this.spritespin("animate", false); // stop animation
       }
-      return false; 
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       data.onDrag = false;
       Spin.resetInput(data);
-      return false; 
     },
     
-    mouseenter : function(e){ return false; },
-    mouseover  : function(e){ return false; },
+    mouseenter : $.noop,
+    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       data.onDrag = false;
       Spin.resetInput(data);
-      return false; 
     },
-    dblclick   : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      $this.spritespin("animate", "toggle");
-      return false; 
-    },
-    onFrame : function(e, frame){ 
-      return false; 
-    }
+    dblclick   : $.noop,
+    onFrame    : $.noop
   };  
 })(jQuery, window, window.SpriteSpin);
 
@@ -757,105 +798,69 @@
   
   Module.defaults = {};
 
-  Module.initialize = function(data){
-    imageElement = data.target.find("img");
-    if (imageElement.length === 0){
-      imageElement = $("<img src=''/>");
-      data.target.append(imageElement);
-    }
-    
-    var i;
-    for (i = 1; i < data.fadeFrames; i ++){
-    	data.target.append("<img src=''/>");
-    }
-    
-    imageElements = data.target.find("img");
-    imageElements.hide();    
-  };
-  
   Module.reload = function(data){
-    
-  };
-  
-  Module.draw = function(data){
-    var image = data.image;
-    var x = data.offsetX;
-    var y = -data.offsetY;
-    
-    if (typeof(data.image) === "string"){ 
-      var stepX = (data.frameStepX || data.width);
-      var stepY = (data.frameStepY || data.height);
-      var numFramesX = (data.framesX || data.frames);
-      var frameX = (data.frame % numFramesX);
-      var frameY = (data.frame / numFramesX)|0;
-      x -= (frameX * stepX);
-      y -= (frameY * stepY);
-    } else {
-      // we expect an array in this case
-      image = data.image[data.frame];
-    }
-  
-    var css = {};
-    if (data.imageElement){
-      css = {
-        position   : "absolute",
-        top        : "0px",
-        left       : "0px"        
-      };
-      if (data.resolutionX && data.resolutionY){
-        css.width = data.resolutionX;
-        css.height = data.resolutionY;
-      }
-      instance.css({
-        position   : "relative",
-        top        : 0,
-        left       : 0,
-        width      : data.width,
-        height     : data.height
-      });
+    // clear the stage
+    data.stage.empty();
+    // precalculate and cache options for this module
+    var opts = data.modopts = {
+      gridsheet : (data.images.length == 1),
+      resX      : (data.resolutionX || data.images[0].width),
+      resY      : (data.resolutionY || data.images[0].height),
+      offX      : (data.offsetX || 0),
+      offY      : (data.offsetY || 0),
+      stepX     : (data.stepX || data.width),
+      stepY     : (data.stepY || data.height),
+      numFramesX: (data.framesX || data.frames),
+      oldFrame  : data.frame
+    };
 
-			if (data.imageElements.length === 1){
-				data.imageElement.attr("src", image).css(css).show();
-			} else {
-				var max = data.imageElements.length - 1;
-				var index = helper.wrapValue(data.imageIndex, 0, max);
-				var prevIndex = helper.wrapValue(data.imageIndex + 1, 0, max);
-				data.imageIndex = helper.wrapValue(data.imageIndex - 1, 0, max);
-				
-				if (data.fadeOutTime > 0){
-					$(data.imageElements[prevIndex]).fadeOut(data.fadeOutTime);
-				} else {
-					$(data.imageElements[prevIndex]).hide();
-				}
-				
-				if (data.fadeInTime > 0){
-					$(data.imageElements[index]).attr("src", image).css(css).fadeIn(data.fadeInTime);
-				} else {
-					$(data.imageElements[index]).attr("src", image).css(css).show();
-				}
-			}
-			
-    } else {
-      css = {
-        width      : [data.width, "px"].join(""),
-        height     : [data.height, "px"].join(""),
-        "background-image"    : ["url('", image, "')"].join(""),
-        "background-repeat"   : "repeat-x",
-        "background-position" : [x, "px ", y, "px"].join("")
-      };
-      // Spritesheets may easily exceed the maximum image size for iphones.
-      // In this case the browser will scale down the image automaticly and
-      // this will break the logic how spritespin works.
-      // Here we set the webkit css attribute to display the background in its
-      // original dimension even if it has been scaled down.
-      if (data.resolutionX && data.resolutionY) {
-        css["-webkit-background-size"] = [data.resolutionX, "px ", data.resolutionY, "px"].join("");
+    if (!opts.gridsheet && !data.canvas){
+      for(var i = 0; i < data.images.length; i+= 1){
+        var img = $(data.images[i]).hide();
+        data.stage.append(img);
+      }      
+    }
+    Module.draw(data);
+  };
+  
+  Module.draw = function(data){      
+    var opts = data.modopts;
+    if (!opts.gridsheet){
+      if (data.canvas){
+        data.context.drawImage(data.images[data.frame], 0, 0);
+      } else {
+        $(data.images[opts.oldFrame]).hide();
+        $(data.images[data.frame]).show();
+        opts.oldFrame = data.frame;        
       }
-      instance.css(css);
+    } else {
+      var image = data.source[0];
+      var frameX = (data.frame % opts.numFramesX);
+      var frameY = (data.frame / opts.numFramesX)|0;
+      var x = opts.offX + frameX * opts.stepX;
+      var y = opts.offY + frameY * opts.stepY;
+
+      if (data.canvas){
+        data.context.drawImage(data.images[0], x, y, data.width, data.height, 0, 0, data.width, data.height);
+      } else {
+        data.stage.css({
+          width      : [data.width, "px"].join(""),
+          height     : [data.height, "px"].join(""),
+          "background-image"    : ["url('", image, "')"].join(""),
+          "background-repeat"   : "repeat-x",
+          "background-position" : [-x, "px ", -y, "px"].join(""),
+          // Spritesheets may easily exceed the maximum image size for iphones.
+          // In this case the browser will scale down the image automaticly and
+          // this will break the logic how spritespin works.
+          // Here we set the webkit css attribute to display the background in its
+          // original dimension even if it has been scaled down.
+          "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
+        });          
+      }
     }
   };
   
-}(jQuery, window));
+}(window.jQuery, window));
 
 (function($, window) {
   
@@ -876,8 +881,8 @@
     data.oldFrame = 0;
     
     var size = 0;
-    for(var i = 0; i < data.image.length; i+= 1){
-      var img = $("<img src='" + data.image[i] + "'/>");
+    for(var i = 0; i < data.source.length; i+= 1){
+      var img = $("<img src='" + data.source[i] + "'/>");
       data.stage.append(img);
       data.images.push(img);
       data.offsets.push(-size + (data.width - img[0].width) / 2);
@@ -918,17 +923,33 @@
 
 (function($, window) {
   
-  var Module = window.SpriteSpin360 = {};
-
+  var Module = window.SpriteSpinPanorama = {};
+  window.SpriteSpin.modules["panorama"] = Module;
+  
   Module.defaults = {};
-    
-  Module.initialize = function(){
-    
+
+  Module.reload = function(data){
+    data.stage.empty();             // clear the stage
+    var opts = data.modopts = {};   // precalculate and cache options for this module
+    opts.resX = (data.resolutionX || data.images[0].width);
+    opts.resY = (data.resolutionY || data.images[0].height);
+    opts.frames = (data.frames || opts.resX);
+    Module.draw(data);
   };
   
-  Module.reconfiger = function(){
-    
+  Module.draw = function(data){      
+    var opts = data.modopts;
+    var x = (data.frame % opts.frames);
+    var y = 0;
+    data.stage.css({
+      width      : [data.width, "px"].join(""),
+      height     : [data.height, "px"].join(""),
+      "background-image"        : ["url('", data.source[0], "')"].join(""),
+      "background-repeat"       : "repeat-x",
+      "background-position"     : [-x, "px ", -y, "px"].join(""),
+      "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
+    });
   };
   
-}(jQuery, window));
+}(window.jQuery, window));
 
