@@ -12,12 +12,21 @@
         Spin.updateInput(e, data);
         
         var frame = data.frame;
+        var snap = data.snap || 0.25;
+        var d, s;
         
-        if (data.dX > data.width * 0.25){
+        if (data.orientation == "horizontal"){
+          d = data.dX; 
+          s = data.width * snap;
+        } else {
+          d = data.dY; 
+          s = data.height * snap;
+        }
+        
+        if (d > s){
           frame = data.frame - 1;       
           data.onDrag = false;
-        }
-        if (data.dX < -data.width * 0.25){
+        } else if (d < -s){
           frame = data.frame + 1;
           data.onDrag = false;
         }

@@ -14,8 +14,15 @@
         Spin.updateInput(e, data);
         
         var o = data.target.offset();
-        var h = (data.width / 2);
-        var d = (data.currentX - o.left - h) / h;
+        var h, d;
+        if (data.orientation == "horizontal"){
+          h = (data.width / 2);
+          d = (data.currentX - o.left - h) / h;
+        } else {
+          h = (data.height / 2);
+          d = (data.currentY - o.top - h) / h;
+        }
+
         data.reverse = d < 0;
         d = d < 0 ? -d : d;
         data.frameTime = 80 * (1 - d) + 20;        

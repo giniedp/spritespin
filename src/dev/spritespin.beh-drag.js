@@ -10,7 +10,14 @@
       var $this = $(this), data = $this.data('spritespin');
       if (data.onDrag){
         Spin.updateInput(e, data);
-        var d = data.dX / data.width;
+        
+        var d;
+        if (data.orientation == "horizontal"){
+          d = data.dX / data.width;
+        } else {
+          d = data.dY / data.height;
+        }
+      
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
 

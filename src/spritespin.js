@@ -580,7 +580,19 @@
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       $this.spritespin("animate", false); // stop animation
-      if (data.currentX > data.width / 2){
+
+      var o = data.target.offset();
+      var h, p;
+
+      if (data.orientation == "horizontal"){
+        h = data.width / 2;
+        p = data.currentX - o.left;
+      } else {
+        h = data.height / 2;
+        p = data.currentY - o.top;        
+      }
+      
+      if (p > h){
         $this.spritespin("frame", data.frame + 1);
         data.reverse = false;
       } else {
@@ -610,7 +622,14 @@
       var $this = $(this), data = $this.data('spritespin');
       if (data.onDrag){
         Spin.updateInput(e, data);
-        var d = data.dX / data.width;
+        
+        var d;
+        if (data.orientation == "horizontal"){
+          d = data.dX / data.width;
+        } else {
+          d = data.dY / data.height;
+        }
+      
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
 
@@ -652,8 +671,15 @@
         Spin.updateInput(e, data);
         
         var o = data.target.offset();
-        var h = (data.width / 2);
-        var d = (data.currentX - o.left - h) / h;
+        var h, d;
+        if (data.orientation == "horizontal"){
+          h = (data.width / 2);
+          d = (data.currentX - o.left - h) / h;
+        } else {
+          h = (data.height / 2);
+          d = (data.currentY - o.top - h) / h;
+        }
+
         data.reverse = d < 0;
         d = d < 0 ? -d : d;
         data.frameTime = 80 * (1 - d) + 20;        
@@ -759,12 +785,21 @@
         Spin.updateInput(e, data);
         
         var frame = data.frame;
+        var snap = data.snap || 0.25;
+        var d, s;
         
-        if (data.dX > data.width * 0.25){
+        if (data.orientation == "horizontal"){
+          d = data.dX; 
+          s = data.width * snap;
+        } else {
+          d = data.dY; 
+          s = data.height * snap;
+        }
+        
+        if (d > s){
           frame = data.frame - 1;       
           data.onDrag = false;
-        }
-        if (data.dX < -data.width * 0.25){
+        } else if (d < -s){
           frame = data.frame + 1;
           data.onDrag = false;
         }
@@ -933,19 +968,31 @@
     var opts = data.modopts = {};   // precalculate and cache options for this module
     opts.resX = (data.resolutionX || data.images[0].width);
     opts.resY = (data.resolutionY || data.images[0].height);
-    opts.frames = (data.frames || opts.resX);
+    if (data.orientation == "horizontal"){
+      opts.frames = (data.frames || opts.resX);
+    } else {
+      opts.frames = (data.frames || opts.resY);
+    }
+    
     Module.draw(data);
   };
   
   Module.draw = function(data){      
     var opts = data.modopts;
-    var x = (data.frame % opts.frames);
-    var y = 0;
+    var x, y;
+    if (data.orientation == "horizontal"){
+      x = (data.frame % opts.frames);
+      y = 0;      
+    } else {
+      x = 0;
+      y = (data.frame % opts.frames);
+    }
+    
     data.stage.css({
       width      : [data.width, "px"].join(""),
       height     : [data.height, "px"].join(""),
       "background-image"        : ["url('", data.source[0], "')"].join(""),
-      "background-repeat"       : "repeat-x",
+      "background-repeat"       : "repeat-both",
       "background-position"     : [-x, "px ", -y, "px"].join(""),
       "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
     });

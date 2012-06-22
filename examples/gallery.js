@@ -12,7 +12,7 @@
       height    : options.height,
       frames    : spins.length,
       frameTime : 1000,
-      behavior  : "swipe",
+      behavior  : "click",
       module    : "gallery"
     }).bind("onFrame", function(e, data){
       $this.find(".slider").slider("value", data.frame);
