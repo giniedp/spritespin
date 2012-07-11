@@ -882,7 +882,7 @@
           width      : [data.width, "px"].join(""),
           height     : [data.height, "px"].join(""),
           "background-image"    : ["url('", image, "')"].join(""),
-          "background-repeat"   : "repeat-x",
+          "background-repeat"   : "no-repeat",
           "background-position" : [-x, "px ", -y, "px"].join(""),
           // Spritesheets may easily exceed the maximum image size for iphones.
           // In this case the browser will scale down the image automaticly and
@@ -980,6 +980,7 @@
   Module.draw = function(data){      
     var opts = data.modopts;
     var x, y;
+    
     if (data.orientation == "horizontal"){
       x = (data.frame % opts.frames);
       y = 0;      
