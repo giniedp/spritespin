@@ -1,10 +1,7 @@
 (function($, window) {
   
-  var Module = window.SpriteSpin360 = {};
-  window.SpriteSpin.modules["360"] = Module;
+  var Module = window.SpriteSpin.modules["360"] = {};
   
-  Module.defaults = {};
-
   Module.reload = function(data){
     // clear the stage
     data.stage.empty();

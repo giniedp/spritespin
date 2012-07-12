@@ -15,6 +15,6 @@ File.delete(outmin) if File.exists?(outmin)
 File.open(output, 'w') do |f|
   input.each do |path|
     f.puts File.read(path)
-    f.puts "\n"
+    #f.puts "\n"
   end
 end

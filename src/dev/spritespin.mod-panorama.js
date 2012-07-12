@@ -1,9 +1,5 @@
-(function($, window) {
-  
-  var Module = window.SpriteSpinPanorama = {};
-  window.SpriteSpin.modules["panorama"] = Module;
-  
-  Module.defaults = {};
+(function($, window) {  
+  var Module = window.SpriteSpin.modules.panorama = {};
 
   Module.reload = function(data){
     data.stage.empty();             // clear the stage

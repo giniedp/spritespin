@@ -1,10 +1,8 @@
 (function($, window) {
-
   var Spin = window.SpriteSpin = {};
-  
+  var api = Spin.api = {};
   Spin.modules = {};
   Spin.behaviors = {};
-  var api = Spin.api = {};
 	  
   Spin.updateInput = function(e, data){
     if (e.touches === undefined && e.originalEvent !== undefined){
@@ -97,13 +95,13 @@
   
   Spin.preloadImages = function(data, callback) {
     data.preload.fadeIn(250, function(){
-      new SpriteLoader(data.source, function(loader){
+      SpriteLoader.preload(data.source, function(images){
         data.preload.fadeOut(250);
         data.stage.show();
         if (data.canvas){
           data.canvas.show();
         }
-        data.images = loader.images;
+        data.images = images;
         callback.apply(data.target, [data]);
       });
     });
@@ -160,33 +158,32 @@
     target.unbind('.spritespin');
   
     // use custom or build in behavior
-    var currentBehavior = data.behavior;
+    var beh = data.behavior;
     if (typeof(data.behavior) === "string"){
-      currentBehavior = Spin.behaviors[data.behavior];
+      beh = Spin.behaviors[data.behavior];
     }
+    beh = beh || {};
     
     var prevent = function(e){
-      if (e.cancelable){
-        e.preventDefault();
-      }
+      if (e.cancelable){ e.preventDefault(); }
       return false;
     };
     
     // rebind interaction events
-    target.bind('mousedown.spritespin',  currentBehavior.mousedown);
-    target.bind('mousemove.spritespin',  currentBehavior.mousemove);
-    target.bind('mouseup.spritespin',    currentBehavior.mouseup);
-    target.bind('mouseenter.spritespin', currentBehavior.mouseenter);
-    target.bind('mouseover.spritespin',  currentBehavior.mouseover);
-    target.bind('mouseleave.spritespin', currentBehavior.mouseleave);
-    target.bind('dblclick.spritespin',   currentBehavior.dblclick);
-    target.bind('onFrame.spritespin',    currentBehavior.onFrame);
+    target.bind('mousedown.spritespin',  beh.mousedown  || $.noop);
+    target.bind('mousemove.spritespin',  beh.mousemove  || $.noop);
+    target.bind('mouseup.spritespin',    beh.mouseup    || $.noop);
+    target.bind('mouseenter.spritespin', beh.mouseenter || $.noop);
+    target.bind('mouseover.spritespin',  beh.mouseover  || $.noop);
+    target.bind('mouseleave.spritespin', beh.mouseleave || $.noop);
+    target.bind('dblclick.spritespin',   beh.dblclick   || $.noop);
+    target.bind('onFrame.spritespin',    beh.onFrame    || $.noop);
   
     if (data.touchable){
-      target.bind('touchstart.spritespin',  currentBehavior.mousedown);
-      target.bind('touchmove.spritespin',   currentBehavior.mousemove);
-      target.bind('touchend.spritespin',    currentBehavior.mouseup); 
-      target.bind('touchcancel.spritespin', currentBehavior.mouseleave);
+      target.bind('touchstart.spritespin',  beh.mousedown  || $.noop);
+      target.bind('touchmove.spritespin',   beh.mousemove  || $.noop);
+      target.bind('touchend.spritespin',    beh.mouseup    || $.noop); 
+      target.bind('touchcancel.spritespin', beh.mouseleave || $.noop);
       target.bind('click.spritespin',         prevent); 
       target.bind('gesturestart.spritespin',  prevent); 
       target.bind('gesturechange.spritespin', prevent); 
@@ -236,8 +233,9 @@
       animate           : true,                   // Run animation when after initialize
       loop              : false,                  // Repeat animation in a loop
       loopFrame         : 0,                      // Indicates the loop start frame
+      frameStep         : 1,                      // Number of frames to increment on each animation update
       frameTime         : 36,                     // Time between updates
-      frameWrap         : true,
+      frameWrap         : true,                   // Same as 'loob' but for user interaction (behavior)
       reverse           : false,                  // If true animation is played backward
       sense             : 1,                      // Interaction sensitivity used by behavior implementations
       orientation       : "horizontal",
@@ -349,21 +347,21 @@
       
       // update frame counter
       if (frame === undefined){
-        data.frame = (data.frame + (data.reverse ? -1 : 1));
+        data.frame += ((data.animation && data.reverse) ? -data.frameStep : data.frameStep);
       } else {
         data.frame = frame;
       }
       
       // wrap/clamp the frame value to fit in range [0, data.frames]
-      if ((data.animation !== null) && data.loop || 
-          (data.animation == null) && data.frameWrap){
+      if ( data.animation && data.loop ||      // wrap frame during animation
+          !data.animation && data.frameWrap){   // wrap frame during user input 
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
       }
 
       // stop animation if the loopFrame is reached
-      if (!data.loop && (data.animation !== null) && (data.frame === data.loopFrame)){
+      if (!data.loop && data.animation && (data.frame === data.loopFrame)){
         api.animate.apply(data.target, [false]);
       }
       
@@ -398,7 +396,7 @@
         data.animate = animate;
       }
       // stop the running animation
-      if (data.animation !== null){
+      if (data.animation){
         window.clearInterval(data.animation);
         data.animation = null;
       }
@@ -449,14 +447,10 @@
     }); 
   };
   
-  api.prev = function(){
-    return this.each(function(){
-      var $this = $(this);
-      var data = $this.data('spritespin');
-      $this.spritespin("frame", data.frame - (data.reverse ? -1 : 1));
-    });
+  api.smoothTo = function(frame){
+
   };
-  
+
   Spin.behaviors.none = {
     name : "none",
     mousedown  : $.noop,

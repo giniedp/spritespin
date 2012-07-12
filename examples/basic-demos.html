@@ -17,21 +17,14 @@
     </style>
   </head>
   <body>
-    <div id="bike1"></div>
-    <div id="bike2"></div>
-    <div id="bike3"></div>
+    <div id="360frames"></div>
+    <div id="360sprite"></div>
     <div id="panorama"></div>
+    <div id="gallery"></div>
     
     <script type="text/javascript">
     $(function(){
-      $("#bike1").spritespin({
-        width     : 480,
-        height    : 327,
-        frames    : 34,
-        behavior  : "hold",
-        module    : "360",
-        sense     : -1,
-        source    : [
+      var frames = [
           "images/rad_zoom_001.jpg",
           "images/rad_zoom_002.jpg",
           "images/rad_zoom_003.jpg",
@@ -66,15 +59,25 @@
           "images/rad_zoom_032.jpg",
           "images/rad_zoom_033.jpg",
           "images/rad_zoom_034.jpg"
-        ],
+        ];
+
+      $("#360frames").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : frames.length,
+        behavior  : "drag", // "hold"
+        module    : "360",
+        sense     : -1,
+        source    : frames,
         animate   : true,
         loop      : true,
         frameWrap : true,
+        frameStep : 1,
         frameTime : 60,
         enableCanvas : true
       });
       
-      $("#bike2").spritespin({
+      $("#360sprite").spritespin({
         width     : 480,
         height    : 327,
         frames    : 34,
@@ -93,18 +96,29 @@
       $("#panorama").spritespin({
         width     : 480,
         height    : 327,
-        frames    : 3600,
+        frames    : 2091,
         behavior  : "drag",
         module    : "panorama",
         sense     : -1,
-        source    : "images/rad_zoom_034.jpg",
+        source    : "images/panorama.jpg",
+        animate   : true,
+        loop      : true,
+        frameWrap : true,
+        frameTime : 60
+      });
+      
+      $("#gallery").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : frames.length,
+        behavior  : "click", // "swipe"
+        module    : "gallery",
+        source    : frames,
         animate   : false,
         loop      : true,
         frameWrap : true,
-        frameTime : 60,
-        enableCanvas : true
+        frameTime : 60
       });
-      
     });
     </script>
   </body>

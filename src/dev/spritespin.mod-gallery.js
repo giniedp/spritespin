@@ -1,12 +1,5 @@
 (function($, window) {
-  
-  var Module = window.SpriteSpin.modules["gallery"] = {};
-  
-  Module.defaults = {};
-
-  Module.initialize = function(data){
-
-  };
+  var Module = window.SpriteSpin.modules.gallery = {};
   
   Module.reload = function(data){
     data.images = [];
@@ -15,7 +8,6 @@
     data.speed = 500;
     data.opacity = 0.25;
     data.oldFrame = 0;
-    
     var size = 0;
     for(var i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");

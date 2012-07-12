@@ -1,59 +1,34 @@
 (function () {
-  var Loader = this.SpriteLoader = function(images, callback){
-    if (typeof (images) === "string") { 
-      images = [images]; 
+  var Loader = this.SpriteLoader = {};
+  Loader.preload = function(images, callback){
+    if (typeof (images) === "string") { images = [images]; }
+    var i, data = {
+      callback : callback,
+      numLoaded: 0,
+      numImages: images.length,
+      images   : []
     }
-    
-    this.callback = callback;
-    this.numLoaded = 0;
-    this.numErrors = 0;
-    this.numAborts = 0;
-    this.numProcessed = 0;
-    this.numImages = images.length;
-    this.images = [];
-    var i = 0;
     for (i = 0; i < images.length; i += 1 ) {
-      this.load(images[i]); 
+      Loader.load(images[i], data); 
     }
   };
-  Loader.prototype.load = function(imageSource){
+  Loader.load = function(imageSource, data){
     var image = new Image();
-    this.images.push(image);
-    image.loader = this;
+    data.images.push(image);
     image.onload = function(){
-      this.loader.numLoaded += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
+      data.numLoaded += 1;
+      if (data.numLoaded === data.numImages) { 
+        data.callback(data.images); 
       }
     }; 
-    
-    image.onerror = function(){
-      this.loader.numErrors += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
-    
-    image.onabort = function(){
-      this.loader.numAborts += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
     image.src = imageSource;
   };
 }());
-
 (function($, window) {
-
   var Spin = window.SpriteSpin = {};
-  
+  var api = Spin.api = {};
   Spin.modules = {};
   Spin.behaviors = {};
-  var api = Spin.api = {};
 	  
   Spin.updateInput = function(e, data){
     if (e.touches === undefined && e.originalEvent !== undefined){
@@ -146,13 +121,13 @@
   
   Spin.preloadImages = function(data, callback) {
     data.preload.fadeIn(250, function(){
-      new SpriteLoader(data.source, function(loader){
+      SpriteLoader.preload(data.source, function(images){
         data.preload.fadeOut(250);
         data.stage.show();
         if (data.canvas){
           data.canvas.show();
         }
-        data.images = loader.images;
+        data.images = images;
         callback.apply(data.target, [data]);
       });
     });
@@ -209,33 +184,32 @@
     target.unbind('.spritespin');
   
     // use custom or build in behavior
-    var currentBehavior = data.behavior;
+    var beh = data.behavior;
     if (typeof(data.behavior) === "string"){
-      currentBehavior = Spin.behaviors[data.behavior];
+      beh = Spin.behaviors[data.behavior];
     }
+    beh = beh || {};
     
     var prevent = function(e){
-      if (e.cancelable){
-        e.preventDefault();
-      }
+      if (e.cancelable){ e.preventDefault(); }
       return false;
     };
     
     // rebind interaction events
-    target.bind('mousedown.spritespin',  currentBehavior.mousedown);
-    target.bind('mousemove.spritespin',  currentBehavior.mousemove);
-    target.bind('mouseup.spritespin',    currentBehavior.mouseup);
-    target.bind('mouseenter.spritespin', currentBehavior.mouseenter);
-    target.bind('mouseover.spritespin',  currentBehavior.mouseover);
-    target.bind('mouseleave.spritespin', currentBehavior.mouseleave);
-    target.bind('dblclick.spritespin',   currentBehavior.dblclick);
-    target.bind('onFrame.spritespin',    currentBehavior.onFrame);
+    target.bind('mousedown.spritespin',  beh.mousedown  || $.noop);
+    target.bind('mousemove.spritespin',  beh.mousemove  || $.noop);
+    target.bind('mouseup.spritespin',    beh.mouseup    || $.noop);
+    target.bind('mouseenter.spritespin', beh.mouseenter || $.noop);
+    target.bind('mouseover.spritespin',  beh.mouseover  || $.noop);
+    target.bind('mouseleave.spritespin', beh.mouseleave || $.noop);
+    target.bind('dblclick.spritespin',   beh.dblclick   || $.noop);
+    target.bind('onFrame.spritespin',    beh.onFrame    || $.noop);
   
     if (data.touchable){
-      target.bind('touchstart.spritespin',  currentBehavior.mousedown);
-      target.bind('touchmove.spritespin',   currentBehavior.mousemove);
-      target.bind('touchend.spritespin',    currentBehavior.mouseup); 
-      target.bind('touchcancel.spritespin', currentBehavior.mouseleave);
+      target.bind('touchstart.spritespin',  beh.mousedown  || $.noop);
+      target.bind('touchmove.spritespin',   beh.mousemove  || $.noop);
+      target.bind('touchend.spritespin',    beh.mouseup    || $.noop); 
+      target.bind('touchcancel.spritespin', beh.mouseleave || $.noop);
       target.bind('click.spritespin',         prevent); 
       target.bind('gesturestart.spritespin',  prevent); 
       target.bind('gesturechange.spritespin', prevent); 
@@ -285,8 +259,9 @@
       animate           : true,                   // Run animation when after initialize
       loop              : false,                  // Repeat animation in a loop
       loopFrame         : 0,                      // Indicates the loop start frame
+      frameStep         : 1,                      // Number of frames to increment on each animation update
       frameTime         : 36,                     // Time between updates
-      frameWrap         : true,
+      frameWrap         : true,                   // Same as 'loob' but for user interaction (behavior)
       reverse           : false,                  // If true animation is played backward
       sense             : 1,                      // Interaction sensitivity used by behavior implementations
       orientation       : "horizontal",
@@ -398,21 +373,21 @@
       
       // update frame counter
       if (frame === undefined){
-        data.frame = (data.frame + (data.reverse ? -1 : 1));
+        data.frame += ((data.animation && data.reverse) ? -data.frameStep : data.frameStep);
       } else {
         data.frame = frame;
       }
       
       // wrap/clamp the frame value to fit in range [0, data.frames]
-      if ((data.animation !== null) && data.loop || 
-          (data.animation == null) && data.frameWrap){
+      if ( data.animation && data.loop ||      // wrap frame during animation
+          !data.animation && data.frameWrap){   // wrap frame during user input 
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
       }
 
       // stop animation if the loopFrame is reached
-      if (!data.loop && (data.animation !== null) && (data.frame === data.loopFrame)){
+      if (!data.loop && data.animation && (data.frame === data.loopFrame)){
         api.animate.apply(data.target, [false]);
       }
       
@@ -447,7 +422,7 @@
         data.animate = animate;
       }
       // stop the running animation
-      if (data.animation !== null){
+      if (data.animation){
         window.clearInterval(data.animation);
         data.animation = null;
       }
@@ -498,14 +473,10 @@
     }); 
   };
   
-  api.prev = function(){
-    return this.each(function(){
-      var $this = $(this);
-      var data = $this.data('spritespin');
-      $this.spritespin("frame", data.frame - (data.reverse ? -1 : 1));
-    });
+  api.smoothTo = function(frame){
+
   };
-  
+
   Spin.behaviors.none = {
     name : "none",
     mousedown  : $.noop,
@@ -521,69 +492,41 @@
   };
   
 }(jQuery, window));
-
 (function () {
-  var Loader = this.SpriteLoader = function(images, callback){
-    if (typeof (images) === "string") { 
-      images = [images]; 
+  var Loader = this.SpriteLoader = {};
+  Loader.preload = function(images, callback){
+    if (typeof (images) === "string") { images = [images]; }
+    var i, data = {
+      callback : callback,
+      numLoaded: 0,
+      numImages: images.length,
+      images   : []
     }
-    
-    this.callback = callback;
-    this.numLoaded = 0;
-    this.numErrors = 0;
-    this.numAborts = 0;
-    this.numProcessed = 0;
-    this.numImages = images.length;
-    this.images = [];
-    var i = 0;
     for (i = 0; i < images.length; i += 1 ) {
-      this.load(images[i]); 
+      Loader.load(images[i], data); 
     }
   };
-  Loader.prototype.load = function(imageSource){
+  Loader.load = function(imageSource, data){
     var image = new Image();
-    this.images.push(image);
-    image.loader = this;
+    data.images.push(image);
     image.onload = function(){
-      this.loader.numLoaded += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
+      data.numLoaded += 1;
+      if (data.numLoaded === data.numImages) { 
+        data.callback(data.images); 
       }
     }; 
-    
-    image.onerror = function(){
-      this.loader.numErrors += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
-    
-    image.onabort = function(){
-      this.loader.numAborts += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
     image.src = imageSource;
   };
 }());
-
 (function($, window, Spin){
   Spin.behaviors.click = {
     name : "click",
-    mousedown  : $.noop,
-    mousemove  : $.noop,
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.updateInput(e, data);
       $this.spritespin("animate", false); // stop animation
 
-      var o = data.target.offset();
-      var h, p;
-
+      var h, p, o = data.target.offset();
       if (data.orientation == "horizontal"){
         h = data.width / 2;
         p = data.currentX - o.left;
@@ -591,7 +534,6 @@
         h = data.height / 2;
         p = data.currentY - o.top;        
       }
-      
       if (p > h){
         $this.spritespin("frame", data.frame + 1);
         data.reverse = false;
@@ -599,17 +541,9 @@
         $this.spritespin("frame", data.frame - 1);
         data.reverse = true;
       }
-    },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
-    mouseleave : $.noop,
-    dblclick   : $.noop,
-    
-    onFrame : $.noop
+    }
   };
 })(jQuery, window, window.SpriteSpin);
-
 (function($, window, Spin){
   Spin.behaviors.drag = {
     name : "drag",
@@ -632,7 +566,6 @@
       
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
-
         $this.spritespin("update", frame);  // update to frame
         $this.spritespin("animate", false);  // stop animation
       }
@@ -642,19 +575,13 @@
       Spin.resetInput(data);
       data.onDrag = false;
     },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-    },
-    dblclick   : $.noop,
-    onFrame    : $.noop
+    }
   };  
 })(jQuery, window, window.SpriteSpin);
-
 (function($, window, Spin){
   Spin.behaviors.hold = {
     name : "hold",
@@ -670,8 +597,7 @@
       if (data.onDrag){
         Spin.updateInput(e, data);
         
-        var o = data.target.offset();
-        var h, d;
+        var h, d, o = data.target.offset();
         if (data.orientation == "horizontal"){
           h = (data.width / 2);
           d = (data.currentX - o.left - h) / h;
@@ -679,7 +605,6 @@
           h = (data.height / 2);
           d = (data.currentY - o.top - h) / h;
         }
-
         data.reverse = d < 0;
         d = d < 0 ? -d : d;
         data.frameTime = 80 * (1 - d) + 20;        
@@ -691,86 +616,18 @@
       data.onDrag = false;
       $this.spritespin("animate", false);
     },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
     mouseleave : function(e){
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
       $this.spritespin("animate", false);
     },
-    dblclick   : $.noop,
-    
     onFrame : function(e){
       var $this = $(this), data = $this.data('spritespin');
       $this.spritespin("animate", true);
     }
   };
 })(jQuery, window, window.SpriteSpin);
-
-(function($, window, Spin){
-  Spin.behaviors.spin = {
-    name : "spin",
-    mousedown  : function(e){
-      var $this = $(this), data = $this.data('spritespin');
-      Spin.updateInput(e, data);
-      data.onDrag = true;
-    },
-    mousemove  : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      if (data.onDrag){
-        // perform default drag behavior
-        Spin.updateInput(e, data);
-        var d = data.dX / data.width;
-        var dFrame = d * data.frames * data.sense;
-        var frame = Math.round(data.clickframe + dFrame);
-        
-        api.update.apply($this, [frame]);     // update to frame
-        api.animate.apply($this, [false]);    // stop animation
-        
-        // calculate framtetime for spinwheel
-        if (data.ddX !== 0){
-          d = data.ddX / data.width;
-          dFrame = d * data.frames * data.sense;
-          data.frameTime = (data.frameTime / dFrame);
-          data.reverse = (data.ddX < 0);
-        }
-      }
-    },
-    mouseup    : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      if (data.onDrag){
-        data.onDrag = false;
-        $this.spritespin("animate", true);
-      }
-    },
-  
-    mouseenter : $.noop,
-    mouseover  : $.noop,
-    mouseleave : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
-      if (data.onDrag){
-        data.onDrag = false;
-        $this.spritespin("animate", $this.spritespin("animate"));
-      }
-    },
-    dblclick   : $.noop,
-    onFrame    : function(e, data){
-      if (data.ddX !== 0){
-        data.frameTime = data.frameTime + 1;
-      
-        $(this).spritespin("animate", false);
-        if (data.frameTime < 62){
-          $(this).spritespin("animate", true);
-        }  
-      } else {
-        $(this).spritespin("animate", false);
-      }
-    }
-  };
-})(jQuery, window, window.SpriteSpin);
-
 (function($, window, Spin){
   Spin.behaviors.swipe = {
     name : "swipe",
@@ -813,26 +670,17 @@
       data.onDrag = false;
       Spin.resetInput(data);
     },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       data.onDrag = false;
       Spin.resetInput(data);
-    },
-    dblclick   : $.noop,
-    onFrame    : $.noop
+    }
   };  
 })(jQuery, window, window.SpriteSpin);
-
 (function($, window) {
   
-  var Module = window.SpriteSpin360 = {};
-  window.SpriteSpin.modules["360"] = Module;
+  var Module = window.SpriteSpin.modules["360"] = {};
   
-  Module.defaults = {};
-
   Module.reload = function(data){
     // clear the stage
     data.stage.empty();
@@ -896,16 +744,8 @@
   };
   
 }(window.jQuery, window));
-
 (function($, window) {
-  
-  var Module = window.SpriteSpin.modules["gallery"] = {};
-  
-  Module.defaults = {};
-
-  Module.initialize = function(data){
-
-  };
+  var Module = window.SpriteSpin.modules.gallery = {};
   
   Module.reload = function(data){
     data.images = [];
@@ -914,7 +754,6 @@
     data.speed = 500;
     data.opacity = 0.25;
     data.oldFrame = 0;
-    
     var size = 0;
     for(var i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");
@@ -955,13 +794,8 @@
     }
   };
 }(jQuery, window));
-
-(function($, window) {
-  
-  var Module = window.SpriteSpinPanorama = {};
-  window.SpriteSpin.modules["panorama"] = Module;
-  
-  Module.defaults = {};
+(function($, window) {  
+  var Module = window.SpriteSpin.modules.panorama = {};
 
   Module.reload = function(data){
     data.stage.empty();             // clear the stage
@@ -1000,4 +834,3 @@
   };
   
 }(window.jQuery, window));
-
