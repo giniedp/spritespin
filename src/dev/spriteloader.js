@@ -1,48 +1,26 @@
 (function () {
-  var Loader = this.SpriteLoader = function(images, callback){
-    if (typeof (images) === "string") { 
-      images = [images]; 
+  var Loader = this.SpriteLoader = {};
+  Loader.preload = function(images, callback){
+    if (typeof (images) === "string") { images = [images]; }
+    var i, data = {
+      callback : callback,
+      numLoaded: 0,
+      numImages: images.length,
+      images   : []
     }
-    
-    this.callback = callback;
-    this.numLoaded = 0;
-    this.numErrors = 0;
-    this.numAborts = 0;
-    this.numProcessed = 0;
-    this.numImages = images.length;
-    this.images = [];
-    var i = 0;
     for (i = 0; i < images.length; i += 1 ) {
-      this.load(images[i]); 
+      Loader.load(images[i], data); 
     }
   };
-  Loader.prototype.load = function(imageSource){
+  Loader.load = function(imageSource, data){
     var image = new Image();
-    this.images.push(image);
-    image.loader = this;
+    data.images.push(image);
     image.onload = function(){
-      this.loader.numLoaded += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
+      data.numLoaded += 1;
+      if (data.numLoaded === data.numImages) { 
+        data.callback(data.images); 
       }
     }; 
-    
-    image.onerror = function(){
-      this.loader.numErrors += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
-    
-    image.onabort = function(){
-      this.loader.numAborts += 1;
-      this.loader.numProcessed += 1;
-      if (this.loader.numProcessed === this.loader.numImages) { 
-        this.loader.callback(this.loader); 
-      }
-    };
     image.src = imageSource;
   };
 }());

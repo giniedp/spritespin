@@ -20,7 +20,6 @@
       
         var dFrame = d * data.frames * data.sense;
         var frame = Math.round(data.clickframe + dFrame);
-
         $this.spritespin("update", frame);  // update to frame
         $this.spritespin("animate", false);  // stop animation
       }
@@ -30,15 +29,10 @@
       Spin.resetInput(data);
       data.onDrag = false;
     },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       Spin.resetInput(data);
       data.onDrag = false;
-    },
-    dblclick   : $.noop,
-    onFrame    : $.noop
+    }
   };  
 })(jQuery, window, window.SpriteSpin);

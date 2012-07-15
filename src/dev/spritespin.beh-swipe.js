@@ -40,15 +40,10 @@
       data.onDrag = false;
       Spin.resetInput(data);
     },
-    
-    mouseenter : $.noop,
-    mouseover  : $.noop,
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
       data.onDrag = false;
       Spin.resetInput(data);
-    },
-    dblclick   : $.noop,
-    onFrame    : $.noop
+    }
   };  
 })(jQuery, window, window.SpriteSpin);

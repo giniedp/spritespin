@@ -1,10 +1,7 @@
 (function($, window) {
   
-  var Module = window.SpriteSpin360 = {};
-  window.SpriteSpin.modules["360"] = Module;
+  var Module = window.SpriteSpin.modules["360"] = {};
   
-  Module.defaults = {};
-
   Module.reload = function(data){
     // clear the stage
     data.stage.empty();
@@ -21,12 +18,6 @@
       oldFrame  : data.frame
     };
 
-    if (!opts.gridsheet && !data.canvas){
-      for(var i = 0; i < data.images.length; i+= 1){
-        var img = $(data.images[i]).hide();
-        data.stage.append(img);
-      }      
-    }
     Module.draw(data);
   };
   
@@ -36,9 +27,13 @@
       if (data.canvas){
         data.context.drawImage(data.images[data.frame], 0, 0);
       } else {
-        $(data.images[opts.oldFrame]).hide();
-        $(data.images[data.frame]).show();
-        opts.oldFrame = data.frame;        
+        data.stage.css({
+          width      : [data.width, "px"].join(""),
+          height     : [data.height, "px"].join(""),
+          "background-image"    : ["url('", data.source[data.frame], "')"].join(""),
+          "background-repeat"   : "no-repeat",
+          "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
+        });
       }
     } else {
       var image = data.source[0];
