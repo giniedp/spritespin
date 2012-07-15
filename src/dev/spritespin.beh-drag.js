@@ -35,4 +35,4 @@
       data.onDrag = false;
     }
   };  
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));

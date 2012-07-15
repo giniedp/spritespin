@@ -6,7 +6,7 @@
     // clear the stage
     data.stage.empty();
     // precalculate and cache options for this module
-    var opts = data.modopts = {
+    data.modopts = {
       gridsheet : (data.images.length == 1),
       resX      : (data.resolutionX || data.images[0].width),
       resY      : (data.resolutionY || data.images[0].height),

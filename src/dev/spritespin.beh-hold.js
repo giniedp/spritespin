@@ -39,8 +39,8 @@
       $this.spritespin("animate", false);
     },
     onFrame : function(e){
-      var $this = $(this), data = $this.data('spritespin');
+      var $this = $(this);
       $this.spritespin("animate", true);
     }
   };
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));

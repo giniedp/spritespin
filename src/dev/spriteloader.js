@@ -7,7 +7,7 @@
       numLoaded: 0,
       numImages: images.length,
       images   : []
-    }
+    };
     for (i = 0; i < images.length; i += 1 ) {
       Loader.load(images[i], data); 
     }

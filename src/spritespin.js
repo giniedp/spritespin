@@ -7,7 +7,7 @@
       numLoaded: 0,
       numImages: images.length,
       images   : []
-    }
+    };
     for (i = 0; i < images.length; i += 1 ) {
       Loader.load(images[i], data); 
     }
@@ -378,7 +378,7 @@
       
       // wrap/clamp the frame value to fit in range [0, data.frames]
       if ( data.animation ||                    // wrap frame during animation
-          !data.animation && data.frameWrap){   // wrap frame during user input 
+          (!data.animation && data.frameWrap)){   // wrap frame during user input 
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1, data.frames);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
@@ -509,7 +509,7 @@
       numLoaded: 0,
       numImages: images.length,
       images   : []
-    }
+    };
     for (i = 0; i < images.length; i += 1 ) {
       Loader.load(images[i], data); 
     }
@@ -551,7 +551,7 @@
       }
     }
   };
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));
 (function($, window, Spin){
   Spin.behaviors.drag = {
     name : "drag",
@@ -589,7 +589,7 @@
       data.onDrag = false;
     }
   };  
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));
 (function($, window, Spin){
   Spin.behaviors.hold = {
     name : "hold",
@@ -631,11 +631,11 @@
       $this.spritespin("animate", false);
     },
     onFrame : function(e){
-      var $this = $(this), data = $this.data('spritespin');
+      var $this = $(this);
       $this.spritespin("animate", true);
     }
   };
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));
 (function($, window, Spin){
   Spin.behaviors.swipe = {
     name : "swipe",
@@ -684,7 +684,7 @@
       Spin.resetInput(data);
     }
   };  
-})(jQuery, window, window.SpriteSpin);
+}(jQuery, window, window.SpriteSpin));
 (function($, window) {
   
   var Module = window.SpriteSpin.modules["360"] = {};
@@ -693,7 +693,7 @@
     // clear the stage
     data.stage.empty();
     // precalculate and cache options for this module
-    var opts = data.modopts = {
+    data.modopts = {
       gridsheet : (data.images.length == 1),
       resX      : (data.resolutionX || data.images[0].width),
       resY      : (data.resolutionY || data.images[0].height),
@@ -760,8 +760,8 @@
     data.speed = 500;
     data.opacity = 0.25;
     data.oldFrame = 0;
-    var size = 0;
-    for(var i = 0; i < data.source.length; i+= 1){
+    var size = 0, i = 0;
+    for(i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");
       data.stage.append(img);
       data.images.push(img);

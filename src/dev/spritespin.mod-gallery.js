@@ -8,8 +8,8 @@
     data.speed = 500;
     data.opacity = 0.25;
     data.oldFrame = 0;
-    var size = 0;
-    for(var i = 0; i < data.source.length; i+= 1){
+    var size = 0, i = 0;
+    for(i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");
       data.stage.append(img);
       data.images.push(img);

@@ -352,7 +352,7 @@
       
       // wrap/clamp the frame value to fit in range [0, data.frames]
       if ( data.animation ||                    // wrap frame during animation
-          !data.animation && data.frameWrap){   // wrap frame during user input 
+          (!data.animation && data.frameWrap)){   // wrap frame during user input 
         data.frame = Spin.wrap(data.frame, 0, data.frames - 1, data.frames);
       } else {
         data.frame = Spin.clamp(data.frame, 0, data.frames - 1);
