@@ -449,7 +449,7 @@
       $(this).spritespin("update", frame);
     });        
   };
-  
+
   // Gets or sets a value indicating whether the animation is looped or not.
   // Starts the animation when settings.animate is set to true passed value
   // is defined
