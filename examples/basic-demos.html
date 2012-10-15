@@ -17,9 +17,15 @@
     </style>
   </head>
   <body>
+    <strong>360 spin with 36 images / 36 frames</strong>
     <div id="360frames"></div>
+    <strong>360 spin with 1 sprite / 36 frames</strong>
     <div id="360sprite"></div>
+    <strong>360 spin. No wrap over</strong>
+    <div id="360spriteNoWrap"></div>
+    <strong>Panorama feature</strong>
     <div id="panorama"></div>
+    <strong>Gallery feature (don't drag, just click)</strong>
     <div id="gallery"></div>
     
     <script type="text/javascript">
@@ -89,6 +95,23 @@
         animate   : true,
         loop      : false,
         frameWrap : true,
+        frameTime : 60,
+        enableCanvas : false
+      });
+
+      $("#360spriteNoWrap").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : 34,
+        framesX   : 6,
+        behavior  : "drag",
+        module    : "360",
+        sense     : -1,
+        source    : "images/bike6x6.jpg",
+        animate   : false,
+        loop      : false,
+        loopFrame : 35,
+        frameWrap : false,
         frameTime : 60,
         enableCanvas : false
       });
