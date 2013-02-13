@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta content='text/html;charset=UTF-8' http-equiv='content-type'>
+    <title></title>
+    <script src="javascripts/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="./../src/spritespin.js" type="text/javascript"></script>
+
+    <style type="text/css">
+      .spritespin-preload {
+        background : url('stylesheets/images/ajax-loader.gif') no-repeat 50% 50%;
+      }
+      .spritespin-instance {
+        border: 1px dashed;
+        margin: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <strong>360 spin with 36 images / 36 frames</strong>
+    <div id="360frames"></div>
+    <strong>360 spin with 1 sprite / 36 frames</strong>
+    <div id="360sprite"></div>
+    <strong>360 spin. No wrap over</strong>
+    <div id="360spriteNoWrap"></div>
+    <strong>Panorama feature</strong>
+    <div id="panorama"></div>
+    <strong>Gallery feature (don't drag, just click)</strong>
+    <div id="gallery"></div>
+    
+    <script type="text/javascript">
+    $(function(){
+      var frames = [
+          "images/rad_zoom_001.jpg",
+          "images/rad_zoom_002.jpg",
+          "images/rad_zoom_003.jpg",
+          "images/rad_zoom_004.jpg",
+          "images/rad_zoom_005.jpg",
+          "images/rad_zoom_006.jpg",
+          "images/rad_zoom_007.jpg",
+          "images/rad_zoom_008.jpg",
+          "images/rad_zoom_009.jpg",
+          "images/rad_zoom_010.jpg",
+          "images/rad_zoom_011.jpg",
+          "images/rad_zoom_012.jpg",
+          "images/rad_zoom_013.jpg",
+          "images/rad_zoom_014.jpg",
+          "images/rad_zoom_015.jpg",
+          "images/rad_zoom_016.jpg",
+          "images/rad_zoom_017.jpg",
+          "images/rad_zoom_018.jpg",
+          "images/rad_zoom_019.jpg",
+          "images/rad_zoom_020.jpg",
+          "images/rad_zoom_021.jpg",
+          "images/rad_zoom_022.jpg",
+          "images/rad_zoom_023.jpg",
+          "images/rad_zoom_024.jpg",
+          "images/rad_zoom_025.jpg",
+          "images/rad_zoom_026.jpg",
+          "images/rad_zoom_027.jpg",
+          "images/rad_zoom_028.jpg",
+          "images/rad_zoom_029.jpg",
+          "images/rad_zoom_030.jpg",
+          "images/rad_zoom_031.jpg",
+          "images/rad_zoom_032.jpg",
+          "images/rad_zoom_033.jpg",
+          "images/rad_zoom_034.jpg"
+        ];
+
+      $("#360frames").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : frames.length,
+        behavior  : "drag", // "hold"
+        module    : "360",
+        sense     : -1,
+        source    : frames,
+        animate   : true,
+        loop      : true,
+        frameWrap : true,
+        frameStep : 1,
+        frameTime : 60,
+        enableCanvas : true
+      });
+      
+      $("#360sprite").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : 34,
+        framesX   : 6,
+        behavior  : "drag",
+        module    : "360",
+        sense     : -1,
+        source    : "images/bike6x6.jpg",
+        animate   : true,
+        loop      : false,
+        frameWrap : true,
+        frameTime : 60,
+        enableCanvas : false
+      });
+
+      $("#360spriteNoWrap").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : 34,
+        framesX   : 6,
+        behavior  : "drag",
+        module    : "360",
+        sense     : -1,
+        source    : "images/bike6x6.jpg",
+        animate   : false,
+        loop      : false,
+        loopFrame : 35,
+        frameWrap : false,
+        frameTime : 60,
+        enableCanvas : false
+      });
+
+      $("#panorama").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : 2091,
+        behavior  : "drag",
+        module    : "panorama",
+        sense     : -1,
+        source    : "images/panorama.jpg",
+        animate   : true,
+        loop      : true,
+        frameWrap : true,
+        frameTime : 60
+      });
+      
+      $("#gallery").spritespin({
+        width     : 480,
+        height    : 327,
+        frames    : frames.length,
+        behavior  : "click", // "swipe"
+        module    : "gallery",
+        source    : frames,
+        animate   : false,
+        loop      : true,
+        frameWrap : true,
+        frameTime : 60
+      });
+    });
+    </script>
+  </body>
+</html>
