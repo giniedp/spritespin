@@ -96,7 +96,9 @@
   Spin.preloadImages = function(data, callback) {
     data.preload.fadeIn(250, function(){
       SpriteLoader.preload(data.source, function(images){
-        data.preload.fadeOut(250);
+        data.preload.fadeOut(250, function() {
+            data.preload.hide();
+        });
         data.stage.show();
         if (data.canvas){
           data.canvas.show();
