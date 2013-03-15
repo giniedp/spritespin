@@ -30,6 +30,18 @@
   Spin.modules = {};
   Spin.behaviors = {};
 	  
+  Spin.disableSelection = function(e){
+    e.attr('unselectable', 'on')
+     .css({
+        "-moz-user-select": "none",
+        "-khtml-user-select": "none",
+        "-webkit-user-select": "none",
+        "user-select": 'none'
+     })
+     .on('selectstart', false);
+    return e;
+  };
+
   Spin.updateInput = function(e, data){
     if (e.touches === undefined && e.originalEvent !== undefined){
       // jQuery Event normalization does not preserve the 'event.touches'
@@ -220,7 +232,7 @@
             
     // disable selection
 	  target.bind("mousedown.spritespin selectstart.spritespin", prevent);
-	  
+
 	  target.bind("onFrame.spritespin", function(event, data){
 	    Spin.draw(data);
 	  });
@@ -305,7 +317,7 @@
         }
         
         // disable selection & hide overflow
-        $this.attr("unselectable", "on").css({ 
+        Spin.disableSelection($this).css({ 
           overflow : "hidden", 
           position : "relative"
         });
@@ -315,7 +327,7 @@
         $this.append($("<div class='spritespin-stage'/>"));
         $this.append($("<div class='spritespin-preload'/>"));
         $this.addClass("spritespin-instance");
-        
+
         if (settings.enableCanvas){
           var canvas = $("<canvas class='spritespin-canvas'/>")[0];
           var supported = !!(canvas.getContext && canvas.getContext('2d'));
@@ -502,32 +514,6 @@
   };
   
 }(jQuery, window));
-(function () {
-  var Loader = this.SpriteLoader = {};
-  Loader.preload = function(images, callback){
-    if (typeof (images) === "string") { images = [images]; }
-    var i, data = {
-      callback : callback,
-      numLoaded: 0,
-      numImages: images.length,
-      images   : []
-    };
-    for (i = 0; i < images.length; i += 1 ) {
-      Loader.load(images[i], data); 
-    }
-  };
-  Loader.load = function(imageSource, data){
-    var image = new Image();
-    data.images.push(image);
-    image.onload = function(){
-      data.numLoaded += 1;
-      if (data.numLoaded === data.numImages) { 
-        data.callback(data.images); 
-      }
-    }; 
-    image.src = imageSource;
-  };
-}());
 (function($, window, Spin){
   Spin.behaviors.click = {
     name : "click",
@@ -692,11 +678,14 @@
   var Module = window.SpriteSpin.modules["360"] = {};
   
   Module.reload = function(data){
-    // clear the stage
-    data.stage.empty();
+    var images = $(data.images);
+
+    // clear the stage and refill with images
+    data.stage.empty().append(images);
+
     // precalculate and cache options for this module
     data.modopts = {
-      gridsheet : (data.images.length == 1),
+      is_sprite : (data.images.length == 1),
       resX      : (data.resolutionX || data.images[0].width),
       resY      : (data.resolutionY || data.images[0].height),
       offX      : (data.offsetX || 0),
@@ -704,53 +693,70 @@
       stepX     : (data.stepX || data.width),
       stepY     : (data.stepY || data.height),
       numFramesX: (data.framesX || data.frames),
-      oldFrame  : data.frame
+      oldFrame  : data.frame,
+      images    : images
     };
+
+    images.css({
+      width: data.modopts.resX,
+      height: data.modopts.resY
+    });
 
     Module.draw(data);
   };
   
-  Module.draw = function(data){      
-    var opts = data.modopts;
-    if (!opts.gridsheet){
-      if (data.canvas){
-        data.context.drawImage(data.images[data.frame], 0, 0);
-      } else {
-        data.stage.css({
-          width      : [data.width, "px"].join(""),
-          height     : [data.height, "px"].join(""),
-          "background-image"    : ["url('", data.source[data.frame], "')"].join(""),
-          "background-repeat"   : "no-repeat",
-          "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
-        });
-      }
-    } else {
-      var image = data.source[0];
-      var frameX = (data.frame % opts.numFramesX);
-      var frameY = (data.frame / opts.numFramesX)|0;
-      var x = opts.offX + frameX * opts.stepX;
-      var y = opts.offY + frameY * opts.stepY;
-
-      if (data.canvas){
-        data.context.drawImage(data.images[0], x, y, data.width, data.height, 0, 0, data.width, data.height);
-      } else {
-        data.stage.css({
-          width      : [data.width, "px"].join(""),
-          height     : [data.height, "px"].join(""),
-          "background-image"    : ["url('", image, "')"].join(""),
-          "background-repeat"   : "no-repeat",
-          "background-position" : [-x, "px ", -y, "px"].join(""),
-          // Spritesheets may easily exceed the maximum image size for iphones.
-          // In this case the browser will scale down the image automaticly and
-          // this will break the logic how spritespin works.
-          // Here we set the webkit css attribute to display the background in its
-          // original dimension even if it has been scaled down.
-          "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
-        });          
-      }
+  Module.draw = function(data){    
+    if (data.modopts.is_sprite){
+      Module.drawSpritesheet(data);
+    } else{
+      Module.drawImages(data);
     }
   };
-  
+
+  Module.drawSpritesheet = function(data){
+    // Assumes all images are batched in a single sprite image
+
+    var opts = data.modopts;
+    var image = data.source[0];
+    var frameX = (data.frame % opts.numFramesX);
+    var frameY = (data.frame / opts.numFramesX)|0;
+    var x = opts.offX + frameX * opts.stepX;
+    var y = opts.offY + frameY * opts.stepY;
+
+    if (data.canvas){
+      data.context.drawImage(data.images[0], x, y, data.width, data.height, 0, 0, data.width, data.height);
+      return;
+    }
+
+    data.stage.css({
+      width      : [data.width, "px"].join(""),
+      height     : [data.height, "px"].join(""),
+      "background-image"    : ["url('", image, "')"].join(""),
+      "background-repeat"   : "no-repeat",
+      "background-position" : [-x, "px ", -y, "px"].join(""),
+      // Spritesheets may easily exceed the maximum image size for iphones.
+      // In this case the browser will scale down the image automaticly and
+      // this will break the logic how spritespin works.
+      // Here we set the webkit css attribute to display the background in its
+      // original dimension even if it has been scaled down.
+      "-webkit-background-size" : [opts.resX, "px ", opts.resY, "px"].join("")
+    }); 
+  };
+
+  Module.drawImages = function(data){
+    var img = data.images[data.frame];
+    if (data.canvas){
+      data.context.drawImage(img, 0, 0);
+      return;
+    }
+
+    var frame = data.stage.css({
+      width      : [data.width, "px"].join(""),
+      height     : [data.height, "px"].join("")
+    }).children().hide()[data.frame];
+    SpriteSpin.disableSelection($(frame)).show();
+  };
+
 }(window.jQuery, window));
 (function($, window) {
   var Module = window.SpriteSpin.modules.gallery = {};

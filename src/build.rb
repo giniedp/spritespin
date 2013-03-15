@@ -4,7 +4,6 @@ outmin = File.join(root, "spritespin.min.js")
 input = [
   File.join(root, "dev", "spriteloader.js"),
   File.join(root, "dev", "spritespin.core.js"),
-  File.join(root, "dev", "spriteloader.js"),
 ]
 input += Dir.glob(File.join(root, "dev", "spritespin.beh-*.js")) 
 input += Dir.glob(File.join(root, "dev", "spritespin.mod-*.js"))

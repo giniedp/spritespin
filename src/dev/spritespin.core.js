@@ -4,6 +4,18 @@
   Spin.modules = {};
   Spin.behaviors = {};
 	  
+  Spin.disableSelection = function(e){
+    e.attr('unselectable', 'on')
+     .css({
+        "-moz-user-select": "none",
+        "-khtml-user-select": "none",
+        "-webkit-user-select": "none",
+        "user-select": 'none'
+     })
+     .on('selectstart', false);
+    return e;
+  };
+
   Spin.updateInput = function(e, data){
     if (e.touches === undefined && e.originalEvent !== undefined){
       // jQuery Event normalization does not preserve the 'event.touches'
@@ -194,7 +206,7 @@
             
     // disable selection
 	  target.bind("mousedown.spritespin selectstart.spritespin", prevent);
-	  
+
 	  target.bind("onFrame.spritespin", function(event, data){
 	    Spin.draw(data);
 	  });
@@ -279,7 +291,7 @@
         }
         
         // disable selection & hide overflow
-        $this.attr("unselectable", "on").css({ 
+        Spin.disableSelection($this).css({ 
           overflow : "hidden", 
           position : "relative"
         });
@@ -289,7 +301,7 @@
         $this.append($("<div class='spritespin-stage'/>"));
         $this.append($("<div class='spritespin-preload'/>"));
         $this.addClass("spritespin-instance");
-        
+
         if (settings.enableCanvas){
           var canvas = $("<canvas class='spritespin-canvas'/>")[0];
           var supported = !!(canvas.getContext && canvas.getContext('2d'));
