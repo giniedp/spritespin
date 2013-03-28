@@ -681,7 +681,7 @@
     var images = $(data.images);
 
     // clear the stage and refill with images
-    data.stage.empty().append(images);
+    data.stage.empty()
 
     // precalculate and cache options for this module
     data.modopts = {
@@ -696,6 +696,10 @@
       oldFrame  : data.frame,
       images    : images
     };
+
+    if (!data.modopts.is_sprite){
+      data.stage.append(images);
+    }
 
     images.css({
       width: data.modopts.resX,
