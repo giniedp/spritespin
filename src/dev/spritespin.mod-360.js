@@ -22,7 +22,7 @@
       images    : images
     };
 
-    if (!data.modopts.is_sprite){
+    if (!data.modopts.is_sprite && !data.canvas){
       data.stage.append(images);
     }
 
@@ -53,6 +53,7 @@
     var y = opts.offY + frameY * opts.stepY;
 
     if (data.canvas){
+      data.context.clearRect(0, 0, data.width, data.height);
       data.context.drawImage(data.images[0], x, y, data.width, data.height, 0, 0, data.width, data.height);
       return;
     }
@@ -75,6 +76,7 @@
   Module.drawImages = function(data){
     var img = data.images[data.frame];
     if (data.canvas){
+      data.context.clearRect(0, 0, data.width, data.height);
       data.context.drawImage(img, 0, 0);
       return;
     }
