@@ -14,6 +14,7 @@
         border: 1px dashed;
         margin: 20px;
       }
+
     </style>
   </head>
   <body>
@@ -27,7 +28,15 @@
     <div id="panorama"></div>
     <strong>Gallery feature (don't drag, just click)</strong>
     <div id="gallery"></div>
-    
+    <strong>3d rotation</strong>
+    <div id="head3d"></div>
+
+    <strong>Responsive frames</strong>
+    <div id="responsive-frames"></div>
+    <strong>Responsive sprites</strong>
+    <div id="responsive-sprites"></div>
+
+
     <script type="text/javascript">
     $(function(){
       var frames = [
@@ -97,6 +106,12 @@
         frameWrap : true,
         frameTime : 60,
         enableCanvas : false
+      })
+      .mousemove(function(e){
+        $(this).data('spritespin').onDrag = true;
+      })
+      .mouseenter(function(e){
+        $(this).data('spritespin').onDrag = true;
       });
 
       $("#360spriteNoWrap").spritespin({
@@ -142,6 +157,23 @@
         frameWrap : true,
         frameTime : 60
       });
+
+      $("#head3d").spritespin({
+        width     : 64,
+        height    : 64,
+        frames    : 100,
+        behavior  : "drag3d",
+        module    : "360",
+        source    : "images/head.png",
+        animate   : false,
+        loop      : true,
+        frameWrap : true,
+        frameTime : 60,
+        senseX    : 10,
+        senseY    : 10,
+        framesX    : 10
+      });
+
     });
     </script>
   </body>
