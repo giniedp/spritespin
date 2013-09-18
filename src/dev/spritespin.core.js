@@ -345,6 +345,11 @@
     return this.each(function(){
       var $this = $(this);
       $this.unbind('.spritespin');
+      var data = $this.data('spritespin');
+      if (data && data.animation){
+        window.clearInterval(data.animation);
+        data.animation = null;
+      }
       $this.removeData('spritespin');
     });
   };
