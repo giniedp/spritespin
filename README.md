@@ -1,21 +1,30 @@
-SpriteSpin jQuery Plugin
-=====================================================
-Spritespin is a jQuery plugin that is able to play sprite image animations.
+# SpriteSpin
 
-It takes an array of images or a stiched sprite sheet and plays them frame by frame like a flip book.
+jQuery plugin for creating flipbook animations
 
-The aim of this plugin is to provide a 360 degree view of some kind of product. There is no flash needed. Everything is done with javascript and the jQuery framework.
+## Getting Started
+Download the [production version][min] or the [development version][max].
 
-Requirements
-=====
-The only requirement is the jQuery core framework. The plugin is tested with
-jQuery-1.4.2.
+[min]: https://raw.github.com/giniedp/spritespin/master/dist/SpriteSpin.min.js
+[max]: https://raw.github.com/giniedp/spritespin/master/dist/SpriteSpin.js
 
-Usage
-=====
-Create a container on your site where you want the animation to show up:
-    <div id="spritespin"/>
-In your javascript fire the plugin on that container:
-    $("#spritespin").spritespin([options]);
+In your web page:
 
-For more information visit http://spritespin.ginie.eu
+```html
+<script src="jquery.js"></script>
+<script src="dist/SpriteSpin.min.js"></script>
+<script>
+jQuery(function($) {
+  $.awesome(); // "awesome"
+});
+</script>
+```
+
+## Documentation
+_(Coming soon)_
+
+## Examples
+_(Coming soon)_
+
+## Release History
+_(Nothing yet)_

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SpriteSpin</title>
+    <link href="css/main.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/prettify.js" type="text/javascript"></script>
+    <script src="http://localhost:35729/livereload.js"></script>
+  </head>
+  <body onload="prettyPrint()">
+    <nav>
+      <h1 class="name">
+        <a href="index.html">SpriteSpin</a>
+      </h1>
+      <div class="menu icon-menu"></div>
+      <ul class="nav-links">
+        <li class="text-link">
+          <a href="#howto">Getting Started</a>
+        </li>
+        <li class="text-link">
+          <a href="#howto">Documentation</a>
+        </li>
+        <li class="text-link">
+          <a href="#examples">Examples</a>
+        </li>
+        <li class="text-link">
+          <a href="#comments">Comments</a>
+        </li>
+      </ul>
+      <div class="social-media">
+        <a class="icon-github" href="https://github.com/colinwren"></a><a class="icon-twitter" href="https://twitter.com/colinwrenca"></a>
+      </div>
+    </nav>
+    <div class="content">
+      <section id="spritespin">
+        <h1>
+          SpritSpin
+        </h1>
+        <hr />
+        <p>
+          SpriteSpin is a jQuery plugin that turns image frames into animations.
+          It requires an array of images or a stiched sprite sheet and plays them frame by frame like a flip book.
+          The aim of this plugin is to provide a 360 degree view of any kind of product.
+        </p>
+        <p>
+          The plugin is built with extensibility in mind and allows web developers to customize the behavior
+          and presentation of the animations.
+        </p>
+        <h2>
+          Requirements
+        </h2>
+        <p>
+          SpriteSpin depends on the jQuery-1.4.2 framework and later.
+          Although the basic usability is straight forward a bit of javascript knowledge is required.
+        </p>
+        <div class="row">
+          <div class="span3">
+            <h2>
+              Buzzwords
+            </h2>
+            <ul>
+              <li>
+                360 Views
+              </li>
+              <li>
+                Panorama Views
+              </li>
+              <li>
+                Touch Support
+              </li>
+              <li>
+                Public Api
+              </li>
+              <li>
+                Customizable
+              </li>
+              <li>
+                No flash
+              </li>
+            </ul>
+          </div>
+          <div class="span3">
+            <h2>
+              Browsers
+            </h2>
+            <ul>
+              <li>
+                IE 6 and greater
+              </li>
+              <li>
+                Opera
+              </li>
+              <li>
+                Firefox
+              </li>
+              <li>
+                Safari
+              </li>
+              <li>
+                Chrome
+              </li>
+            </ul>
+          </div>
+          <div class="span3">
+            <h2>
+              Mobile
+            </h2>
+            <ul>
+              <li>
+                iPhone
+              </li>
+              <li>
+                iPad
+              </li>
+              <li>
+                Android
+              </li>
+              <li>
+                WP7 no touch support
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section><section id="howto">
+  <h1>
+    Getting Started
+  </h1>
+  <hr />
+  <section id="basic-setup">
+    <h2>
+      Basic Setup
+    </h2>
+    <p>
+      Reference jQuery and SpriteSpin scripts
+    </p>
+    <pre class="prettyprint linenums">&lt;script src=&#39;jquery-1.4.2.js&#39; type=&#39;text/javascript&#39; /&gt;
+&lt;script src=&#39;spritespin.js&#39; type=&#39;text/javascrip&#39; /&gt;</pre>
+    <p>
+      Create a container for SpriteSpin
+    </p>
+    <pre class="prettyprint linenums">&lt;div id=&#39;mySpriteSpin&#39;/&gt;</pre>
+    <p>
+      Initialize the plugin
+    </p>
+    <pre class="prettyprint linenums">&ltscript type='text/javascript'&gt
+  $("#mySpriteSpin").spritespin({
+    // path to the source images.
+    source: [
+      "path/to/frame_001.jpg",
+      "path/to/frame_002.jpg",
+      "path/to/frame_003.jpg",
+      "path/to/frame_004.jpg",
+      "path/to/frame_005.jpg",
+      "path/to/frame_006.jpg",
+      "path/to/frame_007.jpg",
+      "path/to/frame_008.jpg",
+      "path/to/frame_009.jpg",
+      "path/to/frame_010.jpg",
+    ],
+    width: 200,  // width in pixels af single frame
+    height: 140  // height in pixels of a single frame
+  });
+&lt/script&gt</pre>
+  </section>
+  <section id="spriteSheet">
+    <h2>
+      Sprite Sheets
+    </h2>
+    <p>
+      A sprite sheet contains all the image frames within a single image. The frames must be continuously aligned
+      from left to right in one or multiple rows. The sprite sheet initialization requires two additional
+      parameters. The total number of used frames and the number of frames in one row.
+    </p>
+    <pre class="prettyprint linenums">&ltscript type='text/javascript'&gt
+  $("#mySpriteSpin").spritespin({
+    source  : "sprites/bike6x6_small.jpg", // path to sprite sheet
+    width   : 205,  // width in pixels a single frame
+    height  : 140,  // height in pixels of a single frame
+    frames  : 34,   // total number of frames
+    framesX : 6     // number of frames in one row inside the spritesheet
+  });
+&lt/script&gt</pre>
+    <p>
+      <strong>framesX</strong> may be omitted and spritespin will try to calculate that number based on the
+      width of the source sheet and the given <strong>width</strong>. However, this does only work if the frames are
+      tightly packed inside the sheet.
+    </p>
+    <p>
+      In this example the frames are tightly packed in a 6x6 grid, but the sheet is missing two frames at the end.
+      Thus the <strong>frames</strong> option is initialized with <em>34</em> and not <em>36</em>.
+    </p>
+  </section>
+  <section id="panorama">
+    <h2>
+      Panorama View
+    </h2>
+    <p>
+      The panorama view shows a wide shot image that is then scrolled vertically.
+      To create a panorama view, the <strong>module</strong> option must be set to <em>panorama</em>.
+      The <strong>width</strong> option specifies the width of the display container, not the width of a frame as seen
+      above.
+    </p>
+    <pre class="prettyprint linenums">$("#mySpriteSpin").spritespin({
+  source : "sprites/panorama/panorama_small.jpg",
+  width  : 205,        // width in pixels of the window
+  height : 140,        // height in pixels of the window
+  module : "panorama", // rendering implementation to use
+});</pre>
+  </section>
+</section><section id="options">
+  <h1>
+    Options
+  </h1>
+  <hr />
+  <section>
+    <p>
+      There are many options that can be used to initialize the plugin. Most of them are described below. However,
+      it is recommended to take a look at the examples where the options are described with more detail.
+    </p>
+    <p>
+      <strong>source : </strong><em>string or array</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Sprite source or array of file sources.
+    </p>
+    <p>
+      <strong>width : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Display width
+    </p>
+    <p>
+      <strong>height : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Display height
+    </p>
+    <p>
+      <strong>frame : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;The number of the current frame to show.
+    </p>
+    <p>
+      <strong>frames : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Total number of frames inside the spritesheet or the source array.
+    </p>
+    <p>
+      <strong>framesX : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Number of frames in a row in sprite sheet
+    </p>
+    <p>
+      <strong>module : </strong><em>string</em><br />&nbsp;&nbsp;&nbsp;&nbsp;The display module to use. Default is &quot;360&quot;
+    </p>
+    <p>
+      <strong>behavior : </strong><em>string</em><br />&nbsp;&nbsp;&nbsp;&nbsp;The input behavior. Default is &quot;drag&quot;
+    </p>
+    <p>
+      <strong>renderer : </strong><em>string</em><br />&nbsp;&nbsp;&nbsp;&nbsp;The render method to use. Default is &quot;image&quot;. May be one of [image|canvas|background]
+    </p>
+    <p>
+      <strong>frameTime : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Time between updates during animation. Initial is 40 which is 25 frames per second
+    </p>
+    <p>
+      <strong>animate : </strong><em>bool</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Starts the animation on startup or reload
+    </p>
+    <p>
+      <strong>reverse : </strong><em>bool</em><br />&nbsp;&nbsp;&nbsp;&nbsp;If true animation is played backward
+    </p>
+    <p>
+      <strong>loop : </strong><em>bool</em><br />&nbsp;&nbsp;&nbsp;&nbsp;If true animation is looped
+    </p>
+    <p>
+      <strong>stopFrame : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Stops the animation at this frame if loop is disabled
+    </p>
+    <p>
+      <strong>wrap : </strong><em>bool</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Same as &quot;loop&quot; but for user interaction
+    </p>
+    <p>
+      <strong>sense : </strong><em>number</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Mouse sensitivity (used by behavior implementations)
+    </p>
+    <p>
+      <strong>orientation : </strong><em>string</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Preferred interaction axis (used by behavior implementations)
+    </p>
+    <p>
+      <strong>onInit : </strong><em>function</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Occurs when plugin has been initialized, but before loading the source files
+    </p>
+    <p>
+      <strong>onProgress : </strong><em>function</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Occurs when any source file has been loaded
+    </p>
+    <p>
+      <strong>onLoad : </strong><em>function</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Occurs when all source files have been loaded
+    </p>
+    <p>
+      <strong>onFrame : </strong><em>function</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Occurs when the frame number has been updated (e.g. during animation)
+    </p>
+    <p>
+      <strong>onDraw : </strong><em>function</em><br />&nbsp;&nbsp;&nbsp;&nbsp;Occurs when all update is complete and frame can be drawn
+    </p>
+    <p>
+      To update some options on a running instance of the plugin, just reinitialize the plugin with the new options object.
+    </p>
+    <pre class="prettyprint linenums">// change the source file on an already initialized plugin
+$("#mySpriteSpin").spritespin({
+  source      : "sprites/other_spritesheet.jpg",
+});</pre>
+  </section>
+</section>
+<section id="api-methods">
+  <h1>
+    jQuery API
+  </h1>
+  <hr />
+  <p>
+    The following helper methods are available on a SpriteSpin instance.
+  </p>
+</section>
+<h4>
+  Animate
+</h4>
+<pre class="prettyprint linenums">$("#mySpriteSpin").spritespin("animate" [, play:boolean] [, loop:boolean])</pre>
+<h6>
+  Examples
+</h6>
+<pre class="prettyprint linenums">// Get a value indicating whether the animation is running or not.
+$("#mySpriteSpin").spritespin("animate")
+
+// Start the animation if its not running.
+$("#mySpriteSpin").spritespin("animate", true)
+
+// Stop the animation if its already running.
+$("#mySpriteSpin").spritespin("animate", false)
+
+// Toggle the animation.
+$("#mySpriteSpin").spritespin("animate", "toggle")
+
+// Start the animation if its not already running and keep it looping.
+$("#mySpriteSpin").spritespin("animate", true, true)
+
+// Start the animation if its not already running and play it only once.
+$("#mySpriteSpin").spritespin("animate", true, false)</pre>
+<h4>
+  Loop
+</h4>
+<pre class="prettyprint linenums">$("#mySpriteSpin").spritespin("loop" [, do_loop:boolean])</pre>
+<h6>
+  Examples
+</h6>
+<pre class="prettyprint linenums">// Get a value indicating whether the animation is looped or not.
+$("#mySpriteSpin").spritespin("loop")
+
+// Set the loop option to true. If <em>animation</em> option is also true, the animation will be started.
+$("#mySpriteSpin").spritespin("loop", true)
+
+// Set the loop option to false. Current animation will be stopped at the end of loop.
+$("#mySpriteSpin").spritespin("loop", false)</pre>
+<h4>
+  Frame
+</h4>
+<pre class="prettyprint linenums">$("#mySpriteSpin").spritespin("frame" [, value:number])</pre>
+<h6>
+  Examples
+</h6>
+<pre class="prettyprint linenums">// Get the current frame number
+$("#mySpriteSpin").spritespin("frame")
+
+// Update the current frame number to 10.
+$("#mySpriteSpin").spritespin("frame", 10)</pre>
+<section id="data-object">
+  <h1>
+    Data Object
+  </h1>
+  <hr />
+  <p>
+    You can manipulate the state of SpriteSpin by setting values directly to its data object. This way you can implement
+    advanced behavior.
+  </p>
+</section>
+<pre class="prettyprint linenums">var data = $("#mySpriteSpin").data("spritespin");</pre>
+    </div>
+  </body>
+</html>

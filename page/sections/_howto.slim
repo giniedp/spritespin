@@ -1,0 +1,74 @@
+section#howto
+  h1 Getting Started
+  hr
+  section#basic-setup
+    h2 Basic Setup
+    p Reference jQuery and SpriteSpin scripts
+    pre.prettyprint.linenums
+      = "<script src='jquery-1.4.2.js' type='text/javascript' />\n"
+      = "<script src='spritespin.js' type='text/javascrip' />"
+
+    p Create a container for SpriteSpin
+    pre.prettyprint.linenums
+      = "<div id='mySpriteSpin'/>"
+
+    p Initialize the plugin
+    pre.prettyprint.linenums
+      | &ltscript type='text/javascript'&gt
+          $("#mySpriteSpin").spritespin({
+            // path to the source images.
+            source: [
+              "path/to/frame_001.jpg",
+              "path/to/frame_002.jpg",
+              "path/to/frame_003.jpg",
+              "path/to/frame_004.jpg",
+              "path/to/frame_005.jpg",
+              "path/to/frame_006.jpg",
+              "path/to/frame_007.jpg",
+              "path/to/frame_008.jpg",
+              "path/to/frame_009.jpg",
+              "path/to/frame_010.jpg",
+            ],
+            width: 200,  // width in pixels af single frame
+            height: 140  // height in pixels of a single frame
+          });
+        &lt/script&gt
+  section#spriteSheet
+    h2 Sprite Sheets
+    p
+      | A sprite sheet contains all the image frames within a single image. The frames must be continuously aligned
+        from left to right in one or multiple rows. The sprite sheet initialization requires two additional
+        parameters. The total number of used frames and the number of frames in one row.
+    pre.prettyprint.linenums
+      | &ltscript type='text/javascript'&gt
+          $("#mySpriteSpin").spritespin({
+            source  : "sprites/bike6x6_small.jpg", // path to sprite sheet
+            width   : 205,  // width in pixels a single frame
+            height  : 140,  // height in pixels of a single frame
+            frames  : 34,   // total number of frames
+            framesX : 6     // number of frames in one row inside the spritesheet
+          });
+        &lt/script&gt
+
+    p
+      | <strong>framesX</strong> may be omitted and spritespin will try to calculate that number based on the
+        width of the source sheet and the given <strong>width</strong>. However, this does only work if the frames are
+        tightly packed inside the sheet.
+    p
+      | In this example the frames are tightly packed in a 6x6 grid, but the sheet is missing two frames at the end.
+        Thus the <strong>frames</strong> option is initialized with <em>34</em> and not <em>36</em>.
+
+  section#panorama
+    h2 Panorama View
+    p
+      | The panorama view shows a wide shot image that is then scrolled vertically.
+        To create a panorama view, the <strong>module</strong> option must be set to <em>panorama</em>.
+        The <strong>width</strong> option specifies the width of the display container, not the width of a frame as seen
+        above.
+    pre.prettyprint.linenums
+      | $("#mySpriteSpin").spritespin({
+          source : "sprites/panorama/panorama_small.jpg",
+          width  : 205,        // width in pixels of the window
+          height : 140,        // height in pixels of the window
+          module : "panorama", // rendering implementation to use
+        });
