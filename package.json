@@ -1,11 +1,10 @@
 {
-  "name": "jquery-plugin",
-  "version": "0.0.0-ignored",
+  "name": "SpriteSpin",
+  "version": "2.1.0",
   "engines": {
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt qunit"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.6.0",
@@ -18,5 +17,24 @@
     "grunt-docco": "~0.3.0",
     "grunt-slim": "~0.1.0",
     "grunt": "~0.4.1"
+  },
+  "description": "jQuery plugin for creating flipbook animations",
+  "main": "dist/spritespin.js",
+  "dependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/giniedp/spritespin.git"
+  },
+  "keywords": [
+    "spritespin",
+    "360",
+    "animation",
+    "flipbook"
+  ],
+  "author": "Alexander Graefenstein",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/giniedp/spritespin/issues"
   }
 }

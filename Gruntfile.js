@@ -5,15 +5,19 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     // Metadata.
-    pkg: grunt.file.readJSON('spritespin.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+    pkg: grunt.file.readJSON('package.json'),
+    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
       '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
       '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
 
     clean: {
-      files: ['dist']
+      files: [
+        'dist/*.js',
+        'dist/*.css',
+        'dist/*.html'
+      ]
     },
     concat: {
       options: {
@@ -21,8 +25,8 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['src/spritespin.js', 'src/spritespin.api.js', 'src/spritespin.*-*.js'],
-        dest: 'dist/js/<%= pkg.name %>.js'
+        src: ['src/scripts/spritespin.js', 'src/scripts/spritespin.api.js', 'src/scripts/spritespin.*-*.js'],
+        dest: 'dist/spritespin.js'
       }
     },
     uglify: {
@@ -31,40 +35,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: '<%= concat.dist.dest %>',
-        dest: 'dist/js/<%= pkg.name %>.min.js'
-      }
-    },
-    copy: {
-      page: {
-        files: [{
-          expand: true,
-          cwd: 'page/',
-          src: 'images/*',
-          dest: 'dist/'
-        }]
-      }
-    },
-    qunit: {
-      files: ['test/**/*.html']
-    },
-    jshint: {
-      gruntfile: {
-        options: {
-          jshintrc: '.jshintrc'
-        },
-        src: 'Gruntfile.js'
-      },
-      src: {
-        options: {
-          jshintrc: 'src/.jshintrc'
-        },
-        src: ['src/**/*.js']
-      },
-      test: {
-        options: {
-          jshintrc: 'test/.jshintrc'
-        },
-        src: ['test/**/*.js']
+        dest: 'dist/spritespin.min.js'
       }
     },
     docco: {
@@ -72,7 +43,7 @@ module.exports = function(grunt) {
         options: {
           output: 'dist/docs/'
         },
-        src: '<%= jshint.src.src %>'
+        src: '<%= concat.dist.src %>'
       }
     },
     slim: {
@@ -82,7 +53,7 @@ module.exports = function(grunt) {
         },
         files: [{
           expand: true,
-          cwd: 'page',
+          cwd: 'src',
           src: ['index.slim', 'example-*.slim'],
           dest: 'dist',
           ext: '.html'
@@ -92,37 +63,18 @@ module.exports = function(grunt) {
     compass: {
       page: {
         options: {
-          sassDir: 'page/style',
-          cssDir: 'dist/css'
+          sassDir: 'src/style',
+          cssDir: 'dist'
         }
       }
     },
     watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
-      },
-      page: {
-        options: {
-          livereload: true
-        },
-        files: 'page/**/*',
-        tasks: ['compass', 'slim', 'copy']
-      },
-      src: {
-        files: '<%= jshint.src.src %>',
-        tasks: ['jshint:src', 'qunit', 'concat']
-      },
-      test: {
-        files: '<%= jshint.test.src %>',
-        tasks: ['jshint:test', 'qunit']
-      },
       all: {
         options: {
           livereload: true
         },
-        files: ['page/**/*', 'src/*'],
-        tasks: ['clean', 'compass:page', 'slim:page', 'copy', 'concat']
+        files: ['src/**/*'],
+        tasks: ['clean', 'compass:page', 'slim:page', 'concat']
       }
     }
   });
@@ -140,7 +92,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-slim');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'uglify', 'docco', 'slim']);
-  grunt.registerTask('build', ['clean', 'concat', 'uglify', 'slim', 'docco']);
-
+  grunt.registerTask('default', ['clean', 'concat', 'uglify', 'slim', 'compass']);
 };

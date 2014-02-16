@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title SpriteSpin
+    script src="http://code.jquery.com/jquery-latest.min.js"
+    script src="spritespin.js"
+
+  body
+    .spritespin
+    javascript:
+      $('.spritespin').spritespin({
+        source: 'images/bike6x6_big.jpg',
+        width: 480 * 2,
+        height: 327 * 2,
+        frames: 34,
+        framesX: 6,
+        sense: -1,
+        renderer: 'image'
+      });
