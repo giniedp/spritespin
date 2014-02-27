@@ -38,6 +38,7 @@
       data.startX = data.currentX;
       data.startY = data.currentY;
       data.clickframe = data.frame;
+      data.timeStamp = e.timeStamp;
     }
     
     if (data.oldX === undefined || data.oldY === undefined){
@@ -222,6 +223,53 @@
 	    target.bind("onLoad.spritespin", data.onLoad);
 	  }
   };
+
+  Spin.inertia = function(data, lastEvent, timestamp) {
+    var distance = Math.ceil(data.dX),
+        direction = "forward";
+
+    // Spin direction was in reverse, resulting in a negative distance
+    // so we need to flip it to positive.
+    if(distance < 0) {
+      distance = distance * -1;
+      direction = "reverse";
+    }
+
+    var velocity = distance / (timestamp - lastEvent.timeStamp),
+        momentum = data.weight * velocity,
+        timeout = 150 - (momentum / 10 * 100);
+
+    if(timeout < 5) {
+      timeout = 0;
+    }
+
+    // We simply loop over the distance with a delay incrementing by a single frame each time,
+    // increasing the loop time by 2ms as we go to give the effect of the animation slowing.
+    function animateInertia(frame, direction, timeout) {
+      setTimeout(function() {
+        // If we're taking more than 100ms then break out.
+        if(timeout > 140 || data.stopInertia) {
+          return; 
+        } 
+        else {
+          timeout = timeout + (timeout * 3 / 100) || 5;
+
+          if(direction == "forward") {
+            data.target.spritespin("update", ++frame);
+          }
+          else {
+            data.target.spritespin("update", --frame);
+          }
+          animateInertia(data.frame, direction, timeout);
+          }
+      }, timeout);
+    }
+
+    // Start the inertia animation but only if the drag was far enough.
+    if(data.frame && Date.now() - lastEvent.timeStamp < 200) {
+      animateInertia(data.frame, direction, timeout);
+    }
+  };
 	
   $.fn.spritespin = function(method) {
     if ( api[method] ) {
@@ -263,7 +311,11 @@
       // events
       onFrame           : undefined,              // Occurs whe frame has been updated
       onLoad            : undefined,              // Occurs when images are loaded
-      touchable         : undefined              // Tells spritespin that it is running on a touchable device
+      touchable         : undefined,              // Tells spritespin that it is running on a touchable device
+
+      // intertia
+      inertia          : false,                   // Toggle inertia on / off (only available for 'drag' behavior)
+      weight           : 5                        // Set weight
     };
     
     // extending options
