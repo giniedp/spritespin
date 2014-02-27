@@ -28,14 +28,12 @@
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
-      data.stopInertia = false;
       if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;
     },
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
-      data.stopInertia = false;
       if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;

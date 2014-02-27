@@ -228,6 +228,8 @@
     var distance = Math.ceil(data.dX),
         direction;
 
+    data.stopInertia = false;
+
     if(data.sense > 0) {
       direction = true;
     } 
@@ -254,10 +256,10 @@
     }
 
     // We simply loop over the distance with a delay incrementing by a single frame each time,
-    // increasing the loop time by 2ms as we go to give the effect of the animation slowing.
+    // increasing the loop time by 10% as we go to give the effect of the animation slowing.
     function animateInertia(frame, direction, timeout) {
       setTimeout(function() {
-        // If we're taking more than 100ms then break out.
+        // If we're waiting more than 140ms then break out.
         if(timeout > 140 || data.stopInertia) {
           return; 
         } 

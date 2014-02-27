@@ -254,6 +254,8 @@
     var distance = Math.ceil(data.dX),
         direction;
 
+    data.stopInertia = false;
+
     if(data.sense > 0) {
       direction = true;
     } 
@@ -268,9 +270,11 @@
       direction = !direction;
     }
 
-    var velocity = distance / (timestamp - lastEvent.timeStamp),
+    if(lastEvent) {
+      var velocity = distance / (timestamp - lastEvent.timeStamp),
         momentum = data.weight * velocity,
         timeout = 150 - (momentum / 10 * 100); // Reduce initial timeout by 10% of momentum.
+    }
 
     // If the timeout is a negtive, then set it to 0.
     if(timeout < 5) {
@@ -278,10 +282,10 @@
     }
 
     // We simply loop over the distance with a delay incrementing by a single frame each time,
-    // increasing the loop time by 2ms as we go to give the effect of the animation slowing.
+    // increasing the loop time by 10% as we go to give the effect of the animation slowing.
     function animateInertia(frame, direction, timeout) {
       setTimeout(function() {
-        // If we're taking more than 100ms then break out.
+        // If we're waiting more than 140ms then break out.
         if(timeout > 140 || data.stopInertia) {
           return; 
         } 
@@ -635,14 +639,12 @@
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
-      data.stopInertia = false;
       if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;
     },
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
-      data.stopInertia = false;
       if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;
