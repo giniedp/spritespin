@@ -252,19 +252,27 @@
 
   Spin.inertia = function(data, lastEvent, timestamp) {
     var distance = Math.ceil(data.dX),
-        direction = "forward";
+        direction;
+
+    if(data.sense > 0) {
+      direction = true;
+    } 
+    else {
+      direction = false;
+    }
 
     // Spin direction was in reverse, resulting in a negative distance
     // so we need to flip it to positive.
     if(distance < 0) {
       distance = distance * -1;
-      direction = "reverse";
+      direction = !direction;
     }
 
     var velocity = distance / (timestamp - lastEvent.timeStamp),
         momentum = data.weight * velocity,
-        timeout = 150 - (momentum / 10 * 100);
+        timeout = 150 - (momentum / 10 * 100); // Reduce initial timeout by 10% of momentum.
 
+    // If the timeout is a negtive, then set it to 0.
     if(timeout < 5) {
       timeout = 0;
     }
@@ -280,7 +288,7 @@
         else {
           timeout = timeout + (timeout * 3 / 100) || 5;
 
-          if(direction == "forward") {
+          if(direction) {
             data.target.spritespin("update", ++frame);
           }
           else {
