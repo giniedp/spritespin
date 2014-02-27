@@ -2,7 +2,9 @@
   Spin.behaviors.drag = {
     name : "drag",
     mousedown  : function(e){ 
-      var $this = $(this), data = $this.data('spritespin');
+      var $this = $(this), data = $this.data('spritespin'); 
+      $(this).data('lastEvent', e);
+      data.stopInertia = true;
       Spin.updateInput(e, data);
       data.onDrag = true;
     },
@@ -26,13 +28,15 @@
     },
     mouseup    : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
+      if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;
     },
     mouseleave : function(e){ 
       var $this = $(this), data = $this.data('spritespin');
+      if (data.inertia) Spin.inertia(data, $(this).data('lastEvent'), e.timeStamp);
       Spin.resetInput(data);
       data.onDrag = false;
     }
-  };  
+  }; 
 }(jQuery, window, window.SpriteSpin));
