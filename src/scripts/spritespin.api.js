@@ -78,4 +78,5 @@
       return this;
     }
   });
+
 }(window.jQuery || window.Zepto || window.$));

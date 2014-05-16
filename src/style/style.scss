@@ -12,3 +12,9 @@ button.example {
   border: 1px solid #E1E1E8;
   color: #48484C;
 }
+
+.spritespin-instance.loading{
+  background: url('images/ajax-loader.gif');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}

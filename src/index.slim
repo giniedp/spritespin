@@ -47,18 +47,36 @@ html
     meta property="og:url" content="http://spritespin.ginie.eu/"
     meta property="og:description" content="jQuery plugin for creating flip book like animations."
 
-  body onload="prettyPrint()"
+  body onload="prettyPrint(); initShowcase();"
     .content
       section#spritespin
         h1 SpritSpin
         hr
-        p
-          | SpriteSpin is a jQuery plugin that turns image frames into animations.
-            It requires an array of images or a stiched sprite sheet and plays them frame by frame like a flip book.
-            The aim of this plugin is to provide a 360 degree view of any kind of product.
-        p
-          | The plugin is built with extensibility in mind and allows web developers to customize the behavior
-            and presentation of the animations.
+        .block-left
+          p
+            | SpriteSpin is a jQuery plugin that turns image frames into animations.
+              It requires an array of images or a stiched sprite sheet and plays them frame by frame like a flip book.
+              The aim of this plugin is to provide a 360 degree view of any kind of product.
+          p
+            | The plugin is built with extensibility in mind and allows web developers to customize the behavior
+              and presentation of the animations.
+        .block-right
+          #showcase-example
+          javascript:
+            var initShowcase = function(){
+              var width = $('.block-right').innerWidth();
+              var height = (width * 0.68)|0;
+
+              console.log(width);
+              $('#showcase-example').spritespin({
+                source: SpriteSpin.sourceArray('./images/rad_zoom_{frame}.jpg', { frame: [1, 34], digits: 3 }),
+                width: width,
+                height: height,
+                sense: -1
+              });
+            };
+            $(window).on('resize', initShowcase);
+        .clear
 
         h2 Requirements
         p
@@ -157,13 +175,16 @@ html
                 });
               &lt/script&gt
           #basic-setup-example
+          button.example onclick='showSetupExample(); $(this).remove(); return false;' Show Example
           javascript:
+            showSetupExample = function() {
               $('#basic-setup-example').spritespin({
                 source: SpriteSpin.sourceArray('./images/rad_zoom_{frame}.jpg', { frame: [1, 34], digits: 3 }),
                 width: 480,
                 height: 327,
                 sense: -1
               });
+            }
 
         section#spriteSheet
           h2 Sprite Sheets

@@ -133,7 +133,8 @@
   // - digits is the number of digits used in the file name for the frame number
   //
   // example:
-  //      sourceArray('http://example.com/image_{frame}.jpg, 1, 3, 2) // -> [ 'http://example.com/image_01.jpg', 'http://example.com/image_02.jpg' ]
+  //      sourceArray('http://example.com/image_{frame}.jpg, { frame: [1, 3], digits: 2 })
+  //      // -> [ 'http://example.com/image_01.jpg', 'http://example.com/image_02.jpg', 'http://example.com/image_03.jpg' ]
   Spin.sourceArray = function(path, opts){
     var fStart = 0, fEnd = 0, lStart = 0, lEnd = 0, digits = opts.digits || 2;
     if (opts.frame) {
@@ -285,7 +286,7 @@
       data.animation = window.setInterval(function(){
         try {
           Spin.updateFrame(data);
-        } catch(err){
+        } catch(ignore){
           // The try catch block is a hack for Opera Browser
           // Opera sometimes rises an exception here and
           // stops performing the script
@@ -294,7 +295,7 @@
     }
   };
 
-  // Reads the module names on the SpriteSpin data and adds actual module implementations.
+  // Reads the module names on given SpriteSpin data and adds actual module implementations.
   Spin.setModules = function(data){
     var i, name, mod;
     for(i = 0; i < data.mods.length; i += 1){
@@ -377,7 +378,7 @@
     }
 
     // bind auto start function to load event.
-    bind(target, 'onLoad', function(event, data){
+    bind(target, 'onLoad', function(e, data){
       Spin.setAnimation(data);
     });
 

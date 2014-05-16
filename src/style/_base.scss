@@ -48,6 +48,30 @@ body {
   }
 }
 
+.clear{
+  clear: both;
+}
+.block-left{
+  width: 70%;
+  display: block;
+  float: left;
+  @include breakpoint(small-phone) {
+    width: 100%;
+    display: block;
+    float: none;
+  }
+}
+.block-right{
+  width: 30%;
+  display: block;
+  float: right;
+  @include breakpoint(small-phone) {
+    width: 100%;
+    display: block;
+    float: none;
+  }
+}
+
 .content {
   position: relative;
   margin: 30px auto 0;
