@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SpriteSpin</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="spritespin.js"></script>
+  </head>
+  <body>
+    <div class="spritespin"></div>
+    <script type="text/javascript">
+      $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+        width: 400,
+        height: 225,
+        frames: 24,
+        lanes: 12,
+        sense: 1,
+        senseLane: -2,
+        renderer: 'canvas'
+      });
+    </script>
+  </body>
+</html>

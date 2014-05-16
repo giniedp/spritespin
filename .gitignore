@@ -1,2 +1,5 @@
 .DS_Store
 *.orig
+.idea
+.sass-cache/
+node_modules

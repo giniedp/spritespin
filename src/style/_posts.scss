@@ -1,0 +1,56 @@
+.post-head {
+  border-bottom: 1px solid $grey;
+  margin: 1em 0;
+  padding-bottom: 5px;
+  position: relative;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.post-title {
+  float: left;
+  padding-right: 4.9em;
+  margin: 0 0 5px;
+  font-size: 2em;
+
+  @include breakpoint(big-phone) {
+    font-size: 1.7em;
+  }
+}
+
+.post-date {
+  position: absolute;
+  bottom: 10px;
+  right: 0;
+  font-size: 1.3em;
+  line-height: 1.7em;
+  color: $lightTextColor;
+}
+
+.post-body {
+  margin-bottom: 1.2em;
+  font-family: $postFont;
+  line-height: 1.65em;
+}
+
+.social {
+  padding: .55em 0 1.4em;
+}
+
+.comments {
+  margin-top: 1em;
+  font-weight: bold;
+  font-size: 1.2em;
+
+  a {
+    color: $lightTextColor;
+    text-decoration: none;
+  }
+
+  .icon-bubbles {
+    padding: 3px 15px 5px 0;
+    float: left;
+  }
+}

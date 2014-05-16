@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title SpriteSpin
+    script src="http://code.jquery.com/jquery-latest.min.js"
+    script src="spritespin.js"
+
+  body
+    .spritespin
+    javascript:
+      $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        width: 480,
+        height: 327,
+        sense: -1,
+        renderer: 'image'
+      });

@@ -1,0 +1,199 @@
+@import url(http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic);
+
+// Choose one of these to be your mainTheme color
+$green: hsl(151, 65%, 60%);
+$blue: black;
+$orange: hsl(6, 90%, 70%);
+$purple: hsl(260, 38%, 56%);
+
+$offBlack: hsl(10, 1%, 22%);
+$grey: lighten($offBlack, 50);
+
+$codeFont: Monaco, Consolas, monospace;
+$postFont: Arvo, 'Merriweather', serif;
+$headerFont: Arvo, 'Open Sans', sans-serif;
+
+$mainTheme: $blue;
+$baseTextColor: $offBlack;
+$lightTextColor: $grey;
+
+@mixin breakpoint($point) {
+  @if $point == big-phone {
+    @media (max-width: 1250px) { @content; }
+  }
+  @else if $point == small-phone {
+    @media (max-width: 630px)  { @content; }
+  }
+}
+
+html{
+  font-size: 16px;
+}
+body {
+  margin: 0;
+  color: $baseTextColor;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  font-family: $headerFont;
+
+  line-height: 1.6em;
+  font-size: 1.2em;
+
+  @include breakpoint(big-phone) {
+    font-size: 16px;
+  }
+
+  @include breakpoint(small-phone) {
+    font-size: 12px;
+  }
+}
+
+.clear{
+  clear: both;
+}
+.block-left{
+  width: 70%;
+  display: block;
+  float: left;
+  @include breakpoint(small-phone) {
+    width: 100%;
+    display: block;
+    float: none;
+  }
+}
+.block-right{
+  width: 30%;
+  display: block;
+  float: right;
+  @include breakpoint(small-phone) {
+    width: 100%;
+    display: block;
+    float: none;
+  }
+}
+
+.content {
+  position: relative;
+  margin: 30px auto 0;
+  max-width: 960px;
+
+  a {
+    color: $baseTextColor;
+    @include transition(color 0.2s);
+
+    &:hover {
+      color: $mainTheme;
+    }
+  }
+
+  @include breakpoint(big-phone) {
+    margin: 65px auto 25px;
+    width: 90%;
+  }
+
+  @include breakpoint(small-phone) {
+    margin: 50px auto 15px;
+  }
+}
+
+.row{
+  @include clearfix;
+}
+.span3{
+  width: 33%;
+  float: left;
+}
+
+table {
+  max-width: 100%;
+}
+th {
+  text-align: left;
+}
+.table {
+  width: 100%;
+  margin-bottom: 20px;
+  // Cells
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        padding: 10px;
+        line-height: 20px;
+        vertical-align: top;
+        border-top: 1px solid $grey;
+      }
+    }
+  }
+  // Bottom align for column headings
+  > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid $grey;
+  }
+  // Remove top border from thead by default
+  > caption + thead,
+  > colgroup + thead,
+  > thead:first-child {
+    > tr:first-child {
+      > th,
+      > td {
+        border-top: 0;
+      }
+    }
+  }
+  // Account for multiple tbody instances
+  > tbody + tbody {
+    border-top: 2px solid $grey;
+  }
+
+  // Nesting
+  .table {
+
+  }
+}
+
+.table-bordered {
+  border: 1px solid $grey;
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        border: 1px solid $grey;
+      }
+    }
+  }
+  > thead > tr {
+    > th,
+    > td {
+      border-bottom-width: 2px;
+    }
+  }
+}
+
+
+.table-striped {
+  > tbody > tr:nth-child(odd) {
+    > td,
+    > th {
+      background-color: lighten($grey, 25%);
+    }
+  }
+}
+
+
+// Hover effect
+//
+// Placed here since it has to come after the potential zebra striping
+
+.table-hover {
+  > tbody > tr:hover {
+    > td,
+    > th {
+      background-color: lighten($grey, 10%);
+    }
+  }
+}
