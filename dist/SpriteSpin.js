@@ -1,4 +1,4 @@
-/*! SpriteSpin - v3.0.0 - 2014-05-17
+/*! SpriteSpin - v3.1.0 - 2014-05-28
 * Copyright (c) 2014 ; Licensed  */
 
 (function($) {
@@ -157,7 +157,6 @@
     }
     return result;
   };
-
 
   // Measures the image frames that are used in the given data object
   Spin.measureSource = function(data){
@@ -643,122 +642,130 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  SpriteSpin.registerModule('click', {
+  function click(e) {
+    var $this = $(this), data = $this.data('spritespin');
 
-    mouseup: function (e) {
-      var $this = $(this), data = $this.data('spritespin');
-      SpriteSpin.updateInput(e, data);
+    SpriteSpin.updateInput(e, data);
 
-      var half, pos;
-      if (data.orientation === "horizontal") {
-        half = data.target.innerWidth() / 2;
-        pos = data.currentX - data.target.offset().left;
-      } else {
-        half = data.target.innerHeight() / 2;
-        pos = data.currentY - data.target.offset().top;
-      }
-      if (pos > half) {
-        $this.spritespin("next");
-      } else {
-        $this.spritespin("prev");
-      }
+    var half, pos;
+    if (data.orientation === "horizontal") {
+      half = data.target.innerWidth() / 2;
+      pos = data.currentX - data.target.offset().left;
+    } else {
+      half = data.target.innerHeight() / 2;
+      pos = data.currentY - data.target.offset().top;
     }
+    if (pos > half) {
+      $this.spritespin("next");
+    } else {
+      $this.spritespin("prev");
+    }
+  }
 
+  SpriteSpin.registerModule('click', {
+    mouseup: click,
+    touchend: click
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
 (function ($, SpriteSpin) {
   "use strict";
+
+  function dragStart(e) {
+    var data = $(this).spritespin('data');
+    SpriteSpin.updateInput(e, data);
+    data.dragging = true;
+  }
+
+  function dragEnd() {
+    var $this = $(this), data = $this.spritespin('data');
+    SpriteSpin.resetInput(data);
+    data.dragging = false;
+  }
+
+  function drag(e) {
+    var dFrame, dLane, lane, frame, $this = $(this), data = $this.spritespin('data');
+    if (data.dragging) {
+      SpriteSpin.updateInput(e, data);
+
+      if (data.orientation === 'horizontal') {
+        dFrame = data.ndX * data.frames * data.sense;
+        dLane = data.ndY * data.lanes * (data.senseLane || data.sense);
+      } else {
+        dFrame = data.ndY * data.frames * data.sense;
+        dLane = data.ndX * data.lanes * (data.senseLane || data.sense);
+      }
+
+      frame = Math.floor(data.clickframe + dFrame);
+      lane = Math.floor(data.clicklane + dLane);
+      SpriteSpin.updateFrame(data, frame, lane);
+      data.animate = false;
+      SpriteSpin.stopAnimation(data);
+    }
+  }
 
   SpriteSpin.registerModule('drag', {
+    mousedown: dragStart,
+    mousemove: drag,
+    mouseup: dragEnd,
+    mouseleave: dragEnd,
 
-    mousedown: function (e) {
-      var data = $(this).spritespin('data');
-      SpriteSpin.updateInput(e, data);
-      data.dragging = true;
-    },
-
-    mousemove: function (e) {
-      var dFrame, dLane, lane, frame, $this = $(this), data = $this.spritespin('data');
-      if (data.dragging) {
-        SpriteSpin.updateInput(e, data);
-
-        if (data.orientation === 'horizontal') {
-          dFrame = data.ndX * data.frames * data.sense;
-          dLane = data.ndY * data.lanes * (data.senseLane || data.sense);
-        } else {
-          dFrame = data.ndY * data.frames * data.sense;
-          dLane = data.ndX * data.lanes * (data.senseLane || data.sense);
-        }
-
-        frame = Math.floor(data.clickframe + dFrame);
-        lane = Math.floor(data.clicklane + dLane);
-        SpriteSpin.updateFrame(data, frame, lane);
-        data.animate = false;
-        SpriteSpin.stopAnimation(data);
-      }
-    },
-
-    mouseup: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      SpriteSpin.resetInput(data);
-      data.dragging = false;
-    },
-
-    mouseleave: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      SpriteSpin.resetInput(data);
-      data.dragging = false;
-    }
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
 
 (function ($, SpriteSpin) {
   "use strict";
+
+  function startAnimation(e) {
+    var $this = $(this), data = $this.spritespin('data');
+    SpriteSpin.updateInput(e, data);
+    data.onDrag = true;
+    $this.spritespin("animate", true);
+  }
+
+  function stopAnimation(e) {
+    var $this = $(this), data = $this.spritespin('data');
+    SpriteSpin.resetInput(data);
+    data.onDrag = false;
+    $this.spritespin("animate", false);
+  }
+
+  function updateInput(e) {
+    var $this = $(this), data = $this.spritespin('data');
+
+    if (data.onDrag) {
+      SpriteSpin.updateInput(e, data);
+
+      var half, delta;
+      if (data.orientation === "horizontal") {
+        half = (data.target.innerWidth() / 2);
+        delta = (data.currentX - data.target.offset().left - half) / half;
+      } else {
+        half = (data.height / 2);
+        delta = (data.currentY - data.target.offset().top - half) / half;
+      }
+      data.reverse = delta < 0;
+      delta = delta < 0 ? -delta : delta;
+      data.frameTime = 80 * (1 - delta) + 20;
+    }
+  }
 
   SpriteSpin.registerModule('hold', {
 
-    mousedown: function (e) {
-      var $this = $(this), data = $this.spritespin('data');
-      SpriteSpin.updateInput(e, data);
-      data.onDrag = true;
-      $this.spritespin("animate", true);
-    },
+    mousedown: startAnimation,
+    mousemove: updateInput,
+    mouseup: stopAnimation,
+    mouseleave: stopAnimation,
 
-    mousemove: function (e) {
-      var $this = $(this), data = $this.spritespin('data');
-
-      if (data.onDrag) {
-        SpriteSpin.updateInput(e, data);
-
-        var half, delta;
-        if (data.orientation === "horizontal") {
-          half = (data.target.innerWidth() / 2);
-          delta = (data.currentX - data.target.offset().left - half) / half;
-        } else {
-          half = (data.height / 2);
-          delta = (data.currentY - data.target.offset().top - half) / half;
-        }
-        data.reverse = delta < 0;
-        delta = delta < 0 ? -delta : delta;
-        data.frameTime = 80 * (1 - delta) + 20;
-      }
-    },
-
-    mouseup: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      SpriteSpin.resetInput(data);
-      data.onDrag = false;
-      $this.spritespin("animate", false);
-    },
-
-    mouseleave: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      SpriteSpin.resetInput(data);
-      data.onDrag = false;
-      $this.spritespin("animate", false);
-    },
+    touchstart: startAnimation,
+    touchmove: updateInput,
+    touchend: stopAnimation,
+    touchcancel: stopAnimation,
 
     onFrame: function () {
       var $this = $(this);
@@ -770,55 +777,58 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  SpriteSpin.registerModule('swipe', {
+  function dragStart(e) {
+    var $this = $(this), data = $this.spritespin('data');
+    SpriteSpin.updateInput(e, data);
+    data.onDrag = true;
+  }
 
-    mousedown: function (e) {
-      var $this = $(this), data = $this.spritespin('data');
+  function dragEnd() {
+    var $this = $(this), data = $this.spritespin('data');
+    data.onDrag = false;
+    SpriteSpin.resetInput(data);
+  }
+
+  function drag(e) {
+    var $this = $(this), data = $this.spritespin('data');
+    if (data.onDrag) {
       SpriteSpin.updateInput(e, data);
-      data.onDrag = true;
-    },
 
-    mousemove: function (e) {
-      var $this = $(this), data = $this.spritespin('data');
-      if (data.onDrag) {
-        SpriteSpin.updateInput(e, data);
+      var frame = data.frame;
+      var snap = data.snap || 0.25;
+      var d, s;
 
-        var frame = data.frame;
-        var snap = data.snap || 0.25;
-        var d, s;
-
-        if (data.orientation === "horizontal") {
-          d = data.dX;
-          s = data.target.innerWidth() * snap;
-        } else {
-          d = data.dY;
-          s = data.target.innerHeight() * snap;
-        }
-
-        if (d > s) {
-          frame = data.frame - 1;
-          data.onDrag = false;
-        } else if (d < -s) {
-          frame = data.frame + 1;
-          data.onDrag = false;
-        }
-
-        $this.spritespin("update", frame);  // update to frame
-        $this.spritespin("animate", false); // stop animation
+      if (data.orientation === "horizontal") {
+        d = data.dX;
+        s = data.target.innerWidth() * snap;
+      } else {
+        d = data.dY;
+        s = data.target.innerHeight() * snap;
       }
-    },
 
-    mouseup: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      data.onDrag = false;
-      SpriteSpin.resetInput(data);
-    },
+      if (d > s) {
+        frame = data.frame - 1;
+        data.onDrag = false;
+      } else if (d < -s) {
+        frame = data.frame + 1;
+        data.onDrag = false;
+      }
 
-    mouseleave: function () {
-      var $this = $(this), data = $this.spritespin('data');
-      data.onDrag = false;
-      SpriteSpin.resetInput(data);
+      $this.spritespin("update", frame);  // update to frame
+      $this.spritespin("animate", false); // stop animation
     }
+  }
+
+  SpriteSpin.registerModule('swipe', {
+    mousedown: dragStart,
+    mousemove: drag,
+    mouseup: dragEnd,
+    mouseleave: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));

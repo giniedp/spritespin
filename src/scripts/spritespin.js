@@ -156,7 +156,6 @@
     return result;
   };
 
-
   // Measures the image frames that are used in the given data object
   Spin.measureSource = function(data){
     if (data.images.length === 1){
