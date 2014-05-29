@@ -89,46 +89,49 @@
             <div class="content"><div class='highlight'><pre>(<span class="function"><span class="keyword">function</span> <span class="params">($, SpriteSpin)</span> {</span>
   <span class="string">"use strict"</span>;
 
-  SpriteSpin.registerModule(<span class="string">'drag'</span>, {
+  <span class="function"><span class="keyword">function</span> <span class="title">dragStart</span><span class="params">(e)</span> {</span>
+    <span class="keyword">var</span> data = $(<span class="keyword">this</span>).spritespin(<span class="string">'data'</span>);
+    SpriteSpin.updateInput(e, data);
+    data.dragging = <span class="literal">true</span>;
+  }
 
-    mousedown: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
-      <span class="keyword">var</span> data = $(<span class="keyword">this</span>).spritespin(<span class="string">'data'</span>);
+  <span class="function"><span class="keyword">function</span> <span class="title">dragEnd</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
+    SpriteSpin.resetInput(data);
+    data.dragging = <span class="literal">false</span>;
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">drag</span><span class="params">(e)</span> {</span>
+    <span class="keyword">var</span> dFrame, dLane, lane, frame, $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
+    <span class="keyword">if</span> (data.dragging) {
       SpriteSpin.updateInput(e, data);
-      data.dragging = <span class="literal">true</span>;
-    },
 
-    mousemove: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
-      <span class="keyword">var</span> dFrame, dLane, lane, frame, $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
-      <span class="keyword">if</span> (data.dragging) {
-        SpriteSpin.updateInput(e, data);
-
-        <span class="keyword">if</span> (data.orientation === <span class="string">'horizontal'</span>) {
-          dFrame = data.ndX * data.frames * data.sense;
-          dLane = data.ndY * data.lanes * (data.senseLane || data.sense);
-        } <span class="keyword">else</span> {
-          dFrame = data.ndY * data.frames * data.sense;
-          dLane = data.ndX * data.lanes * (data.senseLane || data.sense);
-        }
-
-        frame = Math.floor(data.clickframe + dFrame);
-        lane = Math.floor(data.clicklane + dLane);
-        SpriteSpin.updateFrame(data, frame, lane);
-        data.animate = <span class="literal">false</span>;
-        SpriteSpin.stopAnimation(data);
+      <span class="keyword">if</span> (data.orientation === <span class="string">'horizontal'</span>) {
+        dFrame = data.ndX * data.frames * data.sense;
+        dLane = data.ndY * data.lanes * (data.senseLane || data.sense);
+      } <span class="keyword">else</span> {
+        dFrame = data.ndY * data.frames * data.sense;
+        dLane = data.ndX * data.lanes * (data.senseLane || data.sense);
       }
-    },
 
-    mouseup: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
-      SpriteSpin.resetInput(data);
-      data.dragging = <span class="literal">false</span>;
-    },
-
-    mouseleave: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
-      SpriteSpin.resetInput(data);
-      data.dragging = <span class="literal">false</span>;
+      frame = Math.floor(data.clickframe + dFrame);
+      lane = Math.floor(data.clicklane + dLane);
+      SpriteSpin.updateFrame(data, frame, lane);
+      data.animate = <span class="literal">false</span>;
+      SpriteSpin.stopAnimation(data);
     }
+  }
+
+  SpriteSpin.registerModule(<span class="string">'drag'</span>, {
+    mousedown: dragStart,
+    mousemove: drag,
+    mouseup: dragEnd,
+    mouseleave: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));</pre></div></div>

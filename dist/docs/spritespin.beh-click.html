@@ -89,27 +89,29 @@
             <div class="content"><div class='highlight'><pre>(<span class="function"><span class="keyword">function</span> <span class="params">($, SpriteSpin)</span> {</span>
   <span class="string">"use strict"</span>;
 
-  SpriteSpin.registerModule(<span class="string">'click'</span>, {
+  <span class="function"><span class="keyword">function</span> <span class="title">click</span><span class="params">(e)</span> {</span>
+    <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.data(<span class="string">'spritespin'</span>);
 
-    mouseup: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
-      <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.data(<span class="string">'spritespin'</span>);
-      SpriteSpin.updateInput(e, data);
+    SpriteSpin.updateInput(e, data);
 
-      <span class="keyword">var</span> half, pos;
-      <span class="keyword">if</span> (data.orientation === <span class="string">"horizontal"</span>) {
-        half = data.target.innerWidth() / <span class="number">2</span>;
-        pos = data.currentX - data.target.offset().left;
-      } <span class="keyword">else</span> {
-        half = data.target.innerHeight() / <span class="number">2</span>;
-        pos = data.currentY - data.target.offset().top;
-      }
-      <span class="keyword">if</span> (pos &gt; half) {
-        $<span class="keyword">this</span>.spritespin(<span class="string">"next"</span>);
-      } <span class="keyword">else</span> {
-        $<span class="keyword">this</span>.spritespin(<span class="string">"prev"</span>);
-      }
+    <span class="keyword">var</span> half, pos;
+    <span class="keyword">if</span> (data.orientation === <span class="string">"horizontal"</span>) {
+      half = data.target.innerWidth() / <span class="number">2</span>;
+      pos = data.currentX - data.target.offset().left;
+    } <span class="keyword">else</span> {
+      half = data.target.innerHeight() / <span class="number">2</span>;
+      pos = data.currentY - data.target.offset().top;
     }
+    <span class="keyword">if</span> (pos &gt; half) {
+      $<span class="keyword">this</span>.spritespin(<span class="string">"next"</span>);
+    } <span class="keyword">else</span> {
+      $<span class="keyword">this</span>.spritespin(<span class="string">"prev"</span>);
+    }
+  }
 
+  SpriteSpin.registerModule(<span class="string">'click'</span>, {
+    mouseup: click,
+    touchend: click
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));</pre></div></div>
