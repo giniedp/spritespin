@@ -83,6 +83,12 @@
     return false;
   }
 
+  function log(){
+    if (window.console && window.console.log){
+      window.console.log.apply(window.console, arguments);
+    }
+  }
+
   // Binds on the given target and event the given function.
   // The SpriteSpin namespace is attached to the event name
   function bind(target, event, func){
@@ -123,6 +129,42 @@
     }
   }
 
+  // taken from https://github.com/stomita/ios-imagefile-megapixel
+  function detectSubsampling(img, size) {
+    var iw = (size || img).width;
+    var ih = (size || img).height;
+    var canvas, context;
+    // subsampling may happen over megapixel image
+    if (iw * ih > 1024 * 1024) {
+      canvas = document.createElement('canvas');
+      if (!canvas || !canvas.getContext || !canvas.getContext('2d')){
+        return false;
+      }
+      canvas.width = canvas.height = 1;
+      context = canvas.getContext('2d');
+      context.drawImage(img, -iw + 1, 0);
+      // subsampled image becomes half smaller in rendering size.
+      // check alpha channel value to confirm image is covering edge pixel or not.
+      // if alpha value is 0 image is not covering, hence subsampled.
+      // TODO: this wont work for images that have transparent pixels at border
+      try {
+        return context.getImageData(0, 0, 1, 1).data[3] === 0;
+      }
+      catch(err) {
+        // avoids cross origin exception for chrome when code runs without a server
+        log(err.message, err.stack);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  function naturalSize(image){
+    var img = new Image();
+    img.src = image.src;
+    return { width: img.width, height: img.height };
+  }
+
   // Public Helper Functions
   // ----------
 
@@ -158,9 +200,17 @@
 
   // Measures the image frames that are used in the given data object
   Spin.measureSource = function(data){
+    var img = data.images[0];
+    var size = naturalSize(img);
+
     if (data.images.length === 1){
-      data.sourceWidth = data.images[0].width;
-      data.sourceHeight = data.images[0].height;
+
+      data.sourceWidth = size.width;
+      data.sourceHeight = size.height;
+      if (detectSubsampling(img, size)){
+        data.sourceWidth /= 2;
+        data.sourceHeight /= 2;
+      }
 
       // calculate the number of frames packed in a row
       // assume tightly packed images without any padding pixels
@@ -173,13 +223,17 @@
           var framesY = Math.ceil((data.frames * data.lanes) / data.framesX);
           data.frameHeight = Math.floor(data.sourceHeight / framesY);
         } else {
-          data.frameWidth = data.images[0].width;
-          data.frameHeight = data.images[0].height;
+          data.frameWidth = size.width;
+          data.frameHeight = size.height;
         }
       }
     } else {
-      data.sourceWidth = data.frameWidth = data.images[0].width;
-      data.sourceHeight = data.frameHeight = data.images[0].height;
+      data.sourceWidth = data.frameWidth = size.width;
+      data.sourceHeight = data.frameHeight = size.height;
+      if (detectSubsampling(img, size)){
+        data.sourceWidth = data.frameWidth = size.width / 2;
+        data.sourceHeight = data.frameHeight = size.height / 2;
+      }
       data.frames = data.frames || data.images.length;
     }
   };
