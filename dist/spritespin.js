@@ -1,4 +1,4 @@
-/*! SpriteSpin - v3.1.0
+/*! SpriteSpin - v3.1.1
 * Copyright (c) 2014 ; Licensed  */
 
 (function($) {
@@ -550,13 +550,15 @@
     }
     if (typeof obj === 'object') {
       obj.target = obj.target || $(this);
-      return Spin.create(obj);
+      Spin.create(obj);
+      return obj.target;
     }
 
     return $.error( 'Invalid call to spritespin' );
   };
 
 }(window.jQuery || window.Zepto || window.$));
+
 (function ($) {
   "use strict";
 

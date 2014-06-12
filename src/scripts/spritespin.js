@@ -548,7 +548,8 @@
     }
     if (typeof obj === 'object') {
       obj.target = obj.target || $(this);
-      return Spin.create(obj);
+      Spin.create(obj);
+      return obj.target;
     }
 
     return $.error( 'Invalid call to spritespin' );
