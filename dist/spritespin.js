@@ -1,4 +1,4 @@
-/*! SpriteSpin - v3.1.1
+/*! SpriteSpin - v3.1.2
 * Copyright (c) 2014 ; Licensed  */
 
 (function($) {
@@ -631,16 +631,31 @@
     },
 
     // Starts the animations that will play until the given frame number is reached
-    playTo: function(frame){
-      this.data.animate = true;
-      this.data.loop = false;
-      this.data.stopFrame = frame;
-      SpriteSpin.setAnimation(this.data);
+    // options:
+    //   force [boolean] starts the animation, even if current frame is the target frame
+    //   nearest [boolean] animates to the direction with minimum distance to the target frame
+    playTo: function(frame, options){
+      var data = this.data;
+      options = options || {};
+      if (!options.force && data.frame == frame){
+        return
+      }
+      if (options.nearest){
+        var a = frame - data.frame;                 // distance to the target frame
+        var b = data.frames - 1 - frame + frame;    // distance to last frame and the to target frame
+        var c = Math.abs(a) < Math.abs(b) ? a : b;  // minimum distance
+        data.reverse = c < 0;
+      }
+      data.animate = true;
+      data.loop = false;
+      data.stopFrame = frame;
+      SpriteSpin.setAnimation(data);
       return this;
     }
   });
 
 }(window.jQuery || window.Zepto || window.$));
+
 (function ($, SpriteSpin) {
   "use strict";
 
