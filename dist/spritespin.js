@@ -1,4 +1,4 @@
-/*! SpriteSpin - v3.1.2
+/*! SpriteSpin - v3.1.3
 * Copyright (c) 2014 ; Licensed  */
 
 (function($) {
@@ -637,12 +637,12 @@
     playTo: function(frame, options){
       var data = this.data;
       options = options || {};
-      if (!options.force && data.frame == frame){
-        return
+      if (!options.force && data.frame === frame){
+        return;
       }
       if (options.nearest){
         var a = frame - data.frame;                 // distance to the target frame
-        var b = data.frames - 1 - frame + frame;    // distance to last frame and the to target frame
+        var b = frame > data.frame ? a - data.frames : a + data.frames;        // distance to last frame and the to target frame
         var c = Math.abs(a) < Math.abs(b) ? a : b;  // minimum distance
         data.reverse = c < 0;
       }
