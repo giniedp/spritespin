@@ -142,13 +142,15 @@
       }
       canvas.width = canvas.height = 1;
       context = canvas.getContext('2d');
+      context.fillStyle = "FF00FF";
+      context.fillRect(0, 0, 1, 1);
       context.drawImage(img, -iw + 1, 0);
       // subsampled image becomes half smaller in rendering size.
-      // check alpha channel value to confirm image is covering edge pixel or not.
-      // if alpha value is 0 image is not covering, hence subsampled.
-      // TODO: this wont work for images that have transparent pixels at border
+      // check color value to confirm image is covering edge pixel or not.
+      // if color is the magenta color as set by the rectangle before the image was drawn, the image is subsampled
       try {
-        return context.getImageData(0, 0, 1, 1).data[3] === 0;
+        var dat = context.getImageData(0, 0, 1, 1).data;
+        return (dat[0] === 255) && (dat[1] === 0) && (dat[2] === 255);
       }
       catch(err) {
         // avoids cross origin exception for chrome when code runs without a server
