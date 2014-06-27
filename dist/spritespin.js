@@ -1,4 +1,4 @@
-/*! SpriteSpin - v3.1.3
+/*! SpriteSpin - v3.1.4
 * Copyright (c) 2014 ; Licensed  */
 
 (function($) {
