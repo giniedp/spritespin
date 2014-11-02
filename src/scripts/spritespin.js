@@ -16,6 +16,7 @@
     'mousedown', 'mousemove', 'mouseup', 'mouseenter', 'mouseover', 'mouseleave', 'dblclick',
     'touchstart', 'touchmove', 'touchend', 'touchcancel',
     'selectstart', 'gesturestart', 'gesturechange', 'gestureend'];
+  var preventEvents = ['dragstart'];
 
   // Collection of modules that can be used to extend the functionality of SpriteSpin.
   Spin.mods = {};
