@@ -354,13 +354,13 @@
 
   // Reads the module names on given SpriteSpin data and adds actual module implementations.
   Spin.setModules = function(data){
-    var i, name, mod;
+    var i, modName, mod;
     for(i = 0; i < data.mods.length; i += 1){
-      name = data.mods[i];
-      if (typeof name === 'string'){
-        mod = Spin.mods[name];
+      modName = data.mods[i];
+      if (typeof modName === 'string'){
+        mod = Spin.mods[modName];
         if (!mod){
-          $.error("No module found with name " + name);
+          $.error("No module found with name " + modName);
         } else {
           data.mods[i] = mod;
         }
@@ -415,8 +415,8 @@
     unbind(target);
 
     // disable all default browser behavior on the following events
-    for (j = 0; j < modEvents.length; j += 1){
-      bind(target, modEvents[j],  prevent);
+    for (j = 0; j < preventEvents.length; j += 1){
+      bind(target, preventEvents[j],  prevent);
     }
 
     // Bind module functions to SpriteSpin events
