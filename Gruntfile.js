@@ -73,7 +73,7 @@ module.exports = function(grunt) {
           livereload: true
         },
         files: ['src/**/*'],
-        tasks: ['clean', 'compass:page', 'slim:page', 'concat']
+        tasks: ['clean', 'concat', 'uglify', 'slim', 'compass']
       }
     }
   });
