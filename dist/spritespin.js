@@ -5,10 +5,12 @@
   "use strict";
 
   // The SpriteSpin object. This object wraps the core logic of SpriteSpin
-  var Spin = window.SpriteSpin = {};
+  var Spin = {};
+  window.SpriteSpin = Spin;
 
   // The namespace that is used for data storage and events
-  var name = Spin.namespace = 'spritespin';
+  var name = 'spritespin';
+  Spin.namespace = name;
 
   // Event names that are recognized by SpriteSpin. A module may implement any of these and they will be bound
   // to the target element on which the plugin is called.
@@ -16,6 +18,7 @@
     'mousedown', 'mousemove', 'mouseup', 'mouseenter', 'mouseover', 'mouseleave', 'dblclick',
     'touchstart', 'touchmove', 'touchend', 'touchcancel',
     'selectstart', 'gesturestart', 'gesturechange', 'gestureend'];
+  var preventEvents = ['dragstart'];
 
   // Collection of modules that can be used to extend the functionality of SpriteSpin.
   Spin.mods = {};
@@ -354,13 +357,13 @@
 
   // Reads the module names on given SpriteSpin data and adds actual module implementations.
   Spin.setModules = function(data){
-    var i, name, mod;
+    var i, modName, mod;
     for(i = 0; i < data.mods.length; i += 1){
-      name = data.mods[i];
-      if (typeof name === 'string'){
-        mod = Spin.mods[name];
+      modName = data.mods[i];
+      if (typeof modName === 'string'){
+        mod = Spin.mods[modName];
         if (!mod){
-          $.error("No module found with name " + name);
+          $.error("No module found with name " + modName);
         } else {
           data.mods[i] = mod;
         }
@@ -415,8 +418,8 @@
     unbind(target);
 
     // disable all default browser behavior on the following events
-    for (j = 0; j < modEvents.length; j += 1){
-      bind(target, modEvents[j],  prevent);
+    for (j = 0; j < preventEvents.length; j += 1){
+      bind(target, preventEvents[j],  prevent);
     }
 
     // Bind module functions to SpriteSpin events
@@ -750,7 +753,7 @@
     data.dragging = true;
   }
 
-  function dragEnd() {
+  function dragEnd(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.resetInput(data);
     data.dragging = false;
@@ -782,6 +785,11 @@
       SpriteSpin.updateFrame(data, frame, lane);
       data.animate = false;
       SpriteSpin.stopAnimation(data);
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+          ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
@@ -817,21 +825,21 @@
   function startAnimation(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.updateInput(e, data);
-    data.onDrag = true;
-    $this.spritespin("animate", true);
+    data.dragging = true;
+    $this.spritespin("api").startAnimation();
   }
 
   function stopAnimation(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.resetInput(data);
-    data.onDrag = false;
-    $this.spritespin("animate", false);
+    data.dragging = false;
+    $this.spritespin("api").stopAnimation();
   }
 
   function updateInput(e) {
     var $this = $(this), data = $this.spritespin('data');
 
-    if (data.onDrag) {
+    if (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
       var half, delta;
@@ -845,6 +853,11 @@
       data.reverse = delta < 0;
       delta = delta < 0 ? -delta : delta;
       data.frameTime = 80 * (1 - delta) + 20;
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
@@ -861,30 +874,30 @@
     touchcancel: stopAnimation,
 
     onFrame: function () {
-      var $this = $(this);
-      $this.spritespin("animate", true);
+      $(this).spritespin("api").startAnimation();
     }
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
+
 (function ($, SpriteSpin) {
   "use strict";
 
   function dragStart(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.updateInput(e, data);
-    data.onDrag = true;
+    data.dragging = true;
   }
 
   function dragEnd() {
     var $this = $(this), data = $this.spritespin('data');
-    data.onDrag = false;
+    data.dragging = false;
     SpriteSpin.resetInput(data);
   }
 
   function drag(e) {
     var $this = $(this), data = $this.spritespin('data');
-    if (data.onDrag) {
+    if (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
       var frame = data.frame;
@@ -901,14 +914,19 @@
 
       if (d > s) {
         frame = data.frame - 1;
-        data.onDrag = false;
+        data.dragging = false;
       } else if (d < -s) {
         frame = data.frame + 1;
-        data.onDrag = false;
+        data.dragging = false;
       }
 
       $this.spritespin("update", frame);  // update to frame
       $this.spritespin("animate", false); // stop animation
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
