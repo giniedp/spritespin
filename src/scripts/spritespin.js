@@ -3,10 +3,12 @@
   "use strict";
 
   // The SpriteSpin object. This object wraps the core logic of SpriteSpin
-  var Spin = window.SpriteSpin = {};
+  var Spin = {};
+  window.SpriteSpin = Spin;
 
   // The namespace that is used for data storage and events
-  var name = Spin.namespace = 'spritespin';
+  var name = 'spritespin';
+  Spin.namespace = name;
 
   // Event names that are recognized by SpriteSpin. A module may implement any of these and they will be bound
   // to the target element on which the plugin is called.
