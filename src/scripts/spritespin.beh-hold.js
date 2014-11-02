@@ -4,21 +4,21 @@
   function startAnimation(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.updateInput(e, data);
-    data.onDrag = true;
-    $this.spritespin("animate", true);
+    data.dragging = true;
+    $this.spritespin("api").startAnimation();
   }
 
   function stopAnimation(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.resetInput(data);
-    data.onDrag = false;
-    $this.spritespin("animate", false);
+    data.dragging = false;
+    $this.spritespin("api").stopAnimation();
   }
 
   function updateInput(e) {
     var $this = $(this), data = $this.spritespin('data');
 
-    if (data.onDrag) {
+    if (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
       var half, delta;
@@ -32,6 +32,11 @@
       data.reverse = delta < 0;
       delta = delta < 0 ? -delta : delta;
       data.frameTime = 80 * (1 - delta) + 20;
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
@@ -48,8 +53,7 @@
     touchcancel: stopAnimation,
 
     onFrame: function () {
-      var $this = $(this);
-      $this.spritespin("animate", true);
+      $(this).spritespin("api").startAnimation();
     }
   });
 

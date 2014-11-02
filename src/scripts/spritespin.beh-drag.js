@@ -7,7 +7,7 @@
     data.dragging = true;
   }
 
-  function dragEnd() {
+  function dragEnd(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.resetInput(data);
     data.dragging = false;
@@ -39,6 +39,11 @@
       SpriteSpin.updateFrame(data, frame, lane);
       data.animate = false;
       SpriteSpin.stopAnimation(data);
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+          ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 

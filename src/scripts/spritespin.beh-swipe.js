@@ -4,18 +4,18 @@
   function dragStart(e) {
     var $this = $(this), data = $this.spritespin('data');
     SpriteSpin.updateInput(e, data);
-    data.onDrag = true;
+    data.dragging = true;
   }
 
   function dragEnd() {
     var $this = $(this), data = $this.spritespin('data');
-    data.onDrag = false;
+    data.dragging = false;
     SpriteSpin.resetInput(data);
   }
 
   function drag(e) {
     var $this = $(this), data = $this.spritespin('data');
-    if (data.onDrag) {
+    if (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
       var frame = data.frame;
@@ -32,14 +32,19 @@
 
       if (d > s) {
         frame = data.frame - 1;
-        data.onDrag = false;
+        data.dragging = false;
       } else if (d < -s) {
         frame = data.frame + 1;
-        data.onDrag = false;
+        data.dragging = false;
       }
 
       $this.spritespin("update", frame);  // update to frame
       $this.spritespin("animate", false); // stop animation
+
+      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
