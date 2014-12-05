@@ -48,6 +48,7 @@
     sense             : 1,            // Interaction sensitivity used by behavior implementations
     senseLane         : undefined,    // Interaction sensitivity used by behavior implementations
     orientation       : 'horizontal', //
+    detectSubsapling  : true,
 
     onInit            : undefined,    // Occurs when plugin has been initialized, but before loading the source files
     onProgress        : undefined,    // Occurs when any source file has been loaded
@@ -212,7 +213,7 @@
 
       data.sourceWidth = size.width;
       data.sourceHeight = size.height;
-      if (detectSubsampling(img, size)){
+      if (data.detectSubsapling && detectSubsampling(img, size)){
         data.sourceWidth /= 2;
         data.sourceHeight /= 2;
       }
