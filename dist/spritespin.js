@@ -147,7 +147,7 @@
       }
       canvas.width = canvas.height = 1;
       context = canvas.getContext('2d');
-      context.fillStyle = "FF00FF";
+      context.fillStyle = "#FF00FF";
       context.fillRect(0, 0, 1, 1);
       context.drawImage(img, -iw + 1, 0);
       // subsampled image becomes half smaller in rendering size.
