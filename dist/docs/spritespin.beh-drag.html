@@ -95,7 +95,7 @@
     data.dragging = <span class="literal">true</span>;
   }
 
-  <span class="function"><span class="keyword">function</span> <span class="title">dragEnd</span><span class="params">()</span> {</span>
+  <span class="function"><span class="keyword">function</span> <span class="title">dragEnd</span><span class="params">(e)</span> {</span>
     <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
     SpriteSpin.resetInput(data);
     data.dragging = <span class="literal">false</span>;
@@ -106,19 +106,32 @@
     <span class="keyword">if</span> (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
-      <span class="keyword">if</span> (data.orientation === <span class="string">'horizontal'</span>) {
-        dFrame = data.ndX * data.frames * data.sense;
-        dLane = data.ndY * data.lanes * (data.senseLane || data.sense);
+      <span class="keyword">var</span> angle = <span class="number">0</span>;
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> data.orientation === <span class="string">'number'</span>) {
+        angle = (Number(data.orientation) || <span class="number">0</span>) * Math.PI / <span class="number">180</span>;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (data.orientation === <span class="string">'horizontal'</span>) {
+        angle = <span class="number">0</span>;
       } <span class="keyword">else</span> {
-        dFrame = data.ndY * data.frames * data.sense;
-        dLane = data.ndX * data.lanes * (data.senseLane || data.sense);
+        angle = Math.PI / <span class="number">2</span>;
       }
+      <span class="keyword">var</span> sn = Math.sin(angle);
+      <span class="keyword">var</span> cs = Math.cos(angle);
+      <span class="keyword">var</span> x = data.ndX * cs - data.ndY * sn;
+      <span class="keyword">var</span> y = data.ndX * sn + data.ndY * cs;
+
+      dFrame = x * data.frames * data.sense;
+      dLane = y * data.lanes * (data.senseLane || data.sense);
 
       frame = Math.floor(data.clickframe + dFrame);
       lane = Math.floor(data.clicklane + dLane);
       SpriteSpin.updateFrame(data, frame, lane);
       data.animate = <span class="literal">false</span>;
       SpriteSpin.stopAnimation(data);
+
+      <span class="keyword">if</span> (((data.orientation === <span class="string">'horizontal'</span>) &amp;&amp; (data.dX &lt; data.dY)) ||
+          ((data.orientation === <span class="string">'vertical'</span>) &amp;&amp; (data.dX &lt; data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
@@ -134,6 +147,18 @@
     touchcancel: dragEnd
   });
 
+  SpriteSpin.registerModule(<span class="string">'move'</span>, {
+    mousemove: <span class="function"><span class="keyword">function</span><span class="params">(e)</span>{</span>
+      dragStart.call(<span class="keyword">this</span>, e);
+      drag.call(<span class="keyword">this</span>, e);
+    },
+    mouseleave: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
+  });
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));</pre></div></div>
             
         </li>

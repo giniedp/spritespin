@@ -103,7 +103,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> Spin = window.SpriteSpin = {};</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> Spin = {};
+  window.SpriteSpin = Spin;</pre></div></div>
             
         </li>
         
@@ -118,7 +119,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> name = Spin.namespace = <span class="string">'spritespin'</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> name = <span class="string">'spritespin'</span>;
+  Spin.namespace = name;</pre></div></div>
             
         </li>
         
@@ -137,7 +139,8 @@ to the target element on which the plugin is called.</p>
             <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> modEvents = [
     <span class="string">'mousedown'</span>, <span class="string">'mousemove'</span>, <span class="string">'mouseup'</span>, <span class="string">'mouseenter'</span>, <span class="string">'mouseover'</span>, <span class="string">'mouseleave'</span>, <span class="string">'dblclick'</span>,
     <span class="string">'touchstart'</span>, <span class="string">'touchmove'</span>, <span class="string">'touchend'</span>, <span class="string">'touchcancel'</span>,
-    <span class="string">'selectstart'</span>, <span class="string">'gesturestart'</span>, <span class="string">'gesturechange'</span>, <span class="string">'gestureend'</span>];</pre></div></div>
+    <span class="string">'selectstart'</span>, <span class="string">'gesturestart'</span>, <span class="string">'gesturechange'</span>, <span class="string">'gestureend'</span>];
+  <span class="keyword">var</span> preventEvents = [<span class="string">'dragstart'</span>];</pre></div></div>
             
         </li>
         
@@ -193,6 +196,7 @@ lifetime of a SpriteSpin instance. The data is stored inside the target DOM elem
     sense             : <span class="number">1</span>,            <span class="comment">// Interaction sensitivity used by behavior implementations</span>
     senseLane         : <span class="literal">undefined</span>,    <span class="comment">// Interaction sensitivity used by behavior implementations</span>
     orientation       : <span class="string">'horizontal'</span>, <span class="comment">//</span>
+    detectSubsapling  : <span class="literal">true</span>,
 
     onInit            : <span class="literal">undefined</span>,    <span class="comment">// Occurs when plugin has been initialized, but before loading the source files</span>
     onProgress        : <span class="literal">undefined</span>,    <span class="comment">// Occurs when any source file has been loaded</span>
@@ -275,6 +279,12 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
             <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">prevent</span><span class="params">(e)</span>{</span>
     e.preventDefault();
     <span class="keyword">return</span> <span class="literal">false</span>;
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">log</span><span class="params">()</span>{</span>
+    <span class="keyword">if</span> (window.console &amp;&amp; window.console.log){
+      window.console.log.apply(window.console, arguments);
+    }
   }</pre></div></div>
             
         </li>
@@ -388,9 +398,14 @@ The SpriteSpin namespace is attached to the event name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <h2 id="public-helper-functions">Public Helper Functions</h2>
+              <p>taken from <a href="https://github.com/stomita/ios-imagefile-megapixel">https://github.com/stomita/ios-imagefile-megapixel</a></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">detectSubsampling</span><span class="params">(img, size)</span> {</span>
+    <span class="keyword">var</span> iw = (size || img).width;
+    <span class="keyword">var</span> ih = (size || img).height;
+    <span class="keyword">var</span> canvas, context;</pre></div></div>
             
         </li>
         
@@ -400,6 +415,90 @@ The SpriteSpin namespace is attached to the event name</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>subsampling may happen over megapixel image</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (iw * ih &gt; <span class="number">1024</span> * <span class="number">1024</span>) {
+      canvas = document.createElement(<span class="string">'canvas'</span>);
+      <span class="keyword">if</span> (!canvas || !canvas.getContext || !canvas.getContext(<span class="string">'2d'</span>)){
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+      canvas.width = canvas.height = <span class="number">1</span>;
+      context = canvas.getContext(<span class="string">'2d'</span>);
+      context.fillStyle = <span class="string">"#FF00FF"</span>;
+      context.fillRect(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>);
+      context.drawImage(img, -iw + <span class="number">1</span>, <span class="number">0</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>subsampled image becomes half smaller in rendering size.
+check color value to confirm image is covering edge pixel or not.
+if color is the magenta color as set by the rectangle before the image was drawn, the image is subsampled</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">try</span> {
+        <span class="keyword">var</span> dat = context.getImageData(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>).data;
+        <span class="keyword">return</span> (dat[<span class="number">0</span>] === <span class="number">255</span>) &amp;&amp; (dat[<span class="number">1</span>] === <span class="number">0</span>) &amp;&amp; (dat[<span class="number">2</span>] === <span class="number">255</span>);
+      }
+      <span class="keyword">catch</span>(err) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>avoids cross origin exception for chrome when code runs without a server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        log(err.message, err.stack);
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+    }
+    <span class="keyword">return</span> <span class="literal">false</span>;
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">naturalSize</span><span class="params">(image)</span>{</span>
+    <span class="keyword">var</span> img = <span class="keyword">new</span> Image();
+    img.src = image.src;
+    <span class="keyword">return</span> { width: img.width, height: img.height };
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h2 id="public-helper-functions">Public Helper Functions</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Generates an array of source strings</p>
 <ul>
@@ -438,29 +537,37 @@ The SpriteSpin namespace is attached to the event name</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Measures the image frames that are used in the given data object</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  Spin.measureSource = <span class="function"><span class="keyword">function</span><span class="params">(data)</span>{</span>
+    <span class="keyword">var</span> img = data.images[<span class="number">0</span>];
+    <span class="keyword">var</span> size = naturalSize(img);
+
     <span class="keyword">if</span> (data.images.length === <span class="number">1</span>){
-      data.sourceWidth = data.images[<span class="number">0</span>].width;
-      data.sourceHeight = data.images[<span class="number">0</span>].height;</pre></div></div>
+
+      data.sourceWidth = size.width;
+      data.sourceHeight = size.height;
+      <span class="keyword">if</span> (data.detectSubsapling &amp;&amp; detectSubsampling(img, size)){
+        data.sourceWidth /= <span class="number">2</span>;
+        data.sourceHeight /= <span class="number">2</span>;
+      }</pre></div></div>
             
         </li>
         
         
-        <li id="section-19">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>calculate the number of frames packed in a row
 assume tightly packed images without any padding pixels</p>
@@ -472,11 +579,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>calculate size of a single frame</p>
 
@@ -488,13 +595,17 @@ assume tightly packed images without any padding pixels</p>
           <span class="keyword">var</span> framesY = Math.ceil((data.frames * data.lanes) / data.framesX);
           data.frameHeight = Math.floor(data.sourceHeight / framesY);
         } <span class="keyword">else</span> {
-          data.frameWidth = data.images[<span class="number">0</span>].width;
-          data.frameHeight = data.images[<span class="number">0</span>].height;
+          data.frameWidth = size.width;
+          data.frameHeight = size.height;
         }
       }
     } <span class="keyword">else</span> {
-      data.sourceWidth = data.frameWidth = data.images[<span class="number">0</span>].width;
-      data.sourceHeight = data.frameHeight = data.images[<span class="number">0</span>].height;
+      data.sourceWidth = data.frameWidth = size.width;
+      data.sourceHeight = data.frameHeight = size.height;
+      <span class="keyword">if</span> (detectSubsampling(img, size)){
+        data.sourceWidth = data.frameWidth = size.width / <span class="number">2</span>;
+        data.sourceHeight = data.frameHeight = size.height / <span class="number">2</span>;
+      }
       data.frames = data.frames || data.images.length;
     }
   };</pre></div></div>
@@ -502,11 +613,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Resets the input state of the SpriteSpin data.</p>
 
@@ -523,11 +634,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Updates the input state of the SpriteSpin data using the given mouse or touch event.</p>
 
@@ -538,11 +649,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>jQuery Event normalization does not preserve the &#39;event.touches&#39;
 try to grab touches from the original event</p>
@@ -556,11 +667,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>cache positions from previous frame</p>
 
@@ -572,11 +683,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>get current touch or mouse position</p>
 
@@ -593,11 +704,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Cache the initial click/touch position and store the frame number at which the click happened.
 Useful for different behavior implementations. This must be restored when the click/touch is released.</p>
@@ -614,11 +725,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-27">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Calculate the vector from start position to current pointer position.</p>
 
@@ -630,11 +741,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-28">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Calculate the vector from last frame position to current pointer position.</p>
 
@@ -653,11 +764,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-29">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Updates the frame number of the SpriteSpin data. Performs an auto increment if no frame number is given.</p>
 
@@ -676,11 +787,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-30">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>wrap the frame value to fit in range [0, data.frames]</p>
 
@@ -691,11 +802,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-31">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>stop animation if loop is disabled and the stopFrame is reached</p>
 
@@ -710,11 +821,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-32">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>wrap/clamp the frame value to fit in range [0, data.frames]</p>
 
@@ -736,11 +847,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-33">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Stops the running animation on given SpriteSpin data.</p>
 
@@ -756,11 +867,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-34">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Starts animation on given SpriteSpin data if animation is enabled.</p>
 
@@ -777,11 +888,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-35">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>The try catch block is a hack for Opera Browser
 Opera sometimes rises an exception here and
@@ -797,24 +908,24 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Reads the module names on given SpriteSpin data and adds actual module implementations.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  Spin.setModules = <span class="function"><span class="keyword">function</span><span class="params">(data)</span>{</span>
-    <span class="keyword">var</span> i, name, mod;
+    <span class="keyword">var</span> i, modName, mod;
     <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; data.mods.length; i += <span class="number">1</span>){
-      name = data.mods[i];
-      <span class="keyword">if</span> (<span class="keyword">typeof</span> name === <span class="string">'string'</span>){
-        mod = Spin.mods[name];
+      modName = data.mods[i];
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> modName === <span class="string">'string'</span>){
+        mod = Spin.mods[modName];
         <span class="keyword">if</span> (!mod){
-          $.error(<span class="string">"No module found with name "</span> + name);
+          $.error(<span class="string">"No module found with name "</span> + modName);
         } <span class="keyword">else</span> {
           data.mods[i] = mod;
         }
@@ -825,11 +936,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Applies css attributes to layout the SpriteSpin containers.</p>
 
@@ -840,11 +951,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>disable selection</p>
 
@@ -889,11 +1000,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Binds all SpriteSpin events on the target element of the given SpriteSpin data.</p>
 
@@ -905,11 +1016,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Clear all SpriteSpin events on the target element</p>
 
@@ -920,28 +1031,28 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>disable all default browser behavior on the following events</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; modEvents.length; j += <span class="number">1</span>){
-      bind(target, modEvents[j],  prevent);
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; preventEvents.length; j += <span class="number">1</span>){
+      bind(target, preventEvents[j],  prevent);
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-42">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Bind module functions to SpriteSpin events</p>
 
@@ -957,11 +1068,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>bind</p>
 
@@ -976,11 +1087,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>bind auto start function to load event.</p>
 
@@ -993,11 +1104,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>bind all user events that have been passed on initialization</p>
 
@@ -1013,11 +1124,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>Performs the first time boot process: module initialization, layouting, event binding etc.</p>
 
@@ -1049,11 +1160,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>SpriteSpin constructor</p>
 
@@ -1068,11 +1179,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>SpriteSpin is not initialized
 Create default settings object and extend with given options</p>
@@ -1084,11 +1195,11 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>ensure that there is anything set as a source</p>
 
@@ -1099,11 +1210,11 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>if image tags are contained inside this DOM element
 use these images as the source files</p>
@@ -1117,11 +1228,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>build inner html</p>
 <div>
@@ -1139,11 +1250,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>add the canvas element if canvas rendering is enabled and supported</p>
 
@@ -1161,11 +1272,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>fallback to image rendering mode</p>
 
@@ -1178,11 +1289,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>setup references to DOM elements</p>
 
@@ -1194,11 +1305,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>store the data</p>
 
@@ -1210,11 +1321,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>just update the data object</p>
 
@@ -1226,11 +1337,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>convert string source to array of strings</p>
 
@@ -1243,11 +1354,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>behavior and module attributes tell us what additional modules must be loaded.</p>
 
@@ -1280,11 +1391,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>Helper method to register a module as an available extension to SpriteSpin.
 Use this to add custom Rendering or Updateing modules that can be addressed with the
@@ -1304,11 +1415,11 @@ Use this to add custom Rendering or Updateing modules that can be addressed with
         </li>
         
         
-        <li id="section-60">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>Api constructor</p>
 
@@ -1321,11 +1432,11 @@ Use this to add custom Rendering or Updateing modules that can be addressed with
         </li>
         
         
-        <li id="section-61">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>Helper method that allows to extend the api with more methods.
 Receives an object with named functions that are extensions to the API.</p>
@@ -1349,11 +1460,11 @@ Receives an object with named functions that are extensions to the API.</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>Expose the spritespin method to jquery
 Receives an object with initialization options or a method name
@@ -1375,7 +1486,8 @@ The name can be one of [data|api].</p>
     }
     <span class="keyword">if</span> (<span class="keyword">typeof</span> obj === <span class="string">'object'</span>) {
       obj.target = obj.target || $(<span class="keyword">this</span>);
-      <span class="keyword">return</span> Spin.create(obj);
+      Spin.create(obj);
+      <span class="keyword">return</span> obj.target;
     }
 
     <span class="keyword">return</span> $.error( <span class="string">'Invalid call to spritespin'</span> );

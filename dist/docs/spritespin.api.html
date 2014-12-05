@@ -311,15 +311,29 @@ This might start the animation (if the &#39;animate&#39; data attribute is set t
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Starts the animations that will play until the given frame number is reached</p>
+              <p>Starts the animations that will play until the given frame number is reached
+options:
+  force [boolean] starts the animation, even if current frame is the target frame
+  nearest [boolean] animates to the direction with minimum distance to the target frame</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    playTo: <span class="function"><span class="keyword">function</span><span class="params">(frame)</span>{</span>
-      <span class="keyword">this</span>.data.animate = <span class="literal">true</span>;
-      <span class="keyword">this</span>.data.loop = <span class="literal">false</span>;
-      <span class="keyword">this</span>.data.stopFrame = frame;
-      SpriteSpin.setAnimation(<span class="keyword">this</span>.data);
+            <div class="content"><div class='highlight'><pre>    playTo: <span class="function"><span class="keyword">function</span><span class="params">(frame, options)</span>{</span>
+      <span class="keyword">var</span> data = <span class="keyword">this</span>.data;
+      options = options || {};
+      <span class="keyword">if</span> (!options.force &amp;&amp; data.frame === frame){
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (options.nearest){
+        <span class="keyword">var</span> a = frame - data.frame;                 <span class="comment">// distance to the target frame</span>
+        <span class="keyword">var</span> b = frame &gt; data.frame ? a - data.frames : a + data.frames;        <span class="comment">// distance to last frame and the to target frame</span>
+        <span class="keyword">var</span> c = Math.abs(a) &lt; Math.abs(b) ? a : b;  <span class="comment">// minimum distance</span>
+        data.reverse = c &lt; <span class="number">0</span>;
+      }
+      data.animate = <span class="literal">true</span>;
+      data.loop = <span class="literal">false</span>;
+      data.stopFrame = frame;
+      SpriteSpin.setAnimation(data);
       <span class="keyword">return</span> <span class="keyword">this</span>;
     }
   });

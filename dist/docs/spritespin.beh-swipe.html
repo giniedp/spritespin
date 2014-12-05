@@ -92,18 +92,18 @@
   <span class="function"><span class="keyword">function</span> <span class="title">dragStart</span><span class="params">(e)</span> {</span>
     <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
     SpriteSpin.updateInput(e, data);
-    data.onDrag = <span class="literal">true</span>;
+    data.dragging = <span class="literal">true</span>;
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">dragEnd</span><span class="params">()</span> {</span>
     <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
-    data.onDrag = <span class="literal">false</span>;
+    data.dragging = <span class="literal">false</span>;
     SpriteSpin.resetInput(data);
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">drag</span><span class="params">(e)</span> {</span>
     <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>), data = $<span class="keyword">this</span>.spritespin(<span class="string">'data'</span>);
-    <span class="keyword">if</span> (data.onDrag) {
+    <span class="keyword">if</span> (data.dragging) {
       SpriteSpin.updateInput(e, data);
 
       <span class="keyword">var</span> frame = data.frame;
@@ -120,14 +120,19 @@
 
       <span class="keyword">if</span> (d &gt; s) {
         frame = data.frame - <span class="number">1</span>;
-        data.onDrag = <span class="literal">false</span>;
+        data.dragging = <span class="literal">false</span>;
       } <span class="keyword">else</span> <span class="keyword">if</span> (d &lt; -s) {
         frame = data.frame + <span class="number">1</span>;
-        data.onDrag = <span class="literal">false</span>;
+        data.dragging = <span class="literal">false</span>;
       }
 
       $<span class="keyword">this</span>.spritespin(<span class="string">"update"</span>, frame);  <span class="comment">// update to frame</span>
       $<span class="keyword">this</span>.spritespin(<span class="string">"animate"</span>, <span class="literal">false</span>); <span class="comment">// stop animation</span>
+
+      <span class="keyword">if</span> (((data.orientation === <span class="string">'horizontal'</span>) &amp;&amp; (data.dX &lt; data.dY)) ||
+        ((data.orientation === <span class="string">'vertical'</span>) &amp;&amp; (data.dX &lt; data.dY))) {
+        e.preventDefault();
+      }
     }
   }
 
