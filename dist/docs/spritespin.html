@@ -196,7 +196,7 @@ lifetime of a SpriteSpin instance. The data is stored inside the target DOM elem
     sense             : <span class="number">1</span>,            <span class="comment">// Interaction sensitivity used by behavior implementations</span>
     senseLane         : <span class="literal">undefined</span>,    <span class="comment">// Interaction sensitivity used by behavior implementations</span>
     orientation       : <span class="string">'horizontal'</span>, <span class="comment">//</span>
-    detectSubsapling  : <span class="literal">true</span>,
+    detectSubsampling : <span class="literal">true</span>,
 
     onInit            : <span class="literal">undefined</span>,    <span class="comment">// Occurs when plugin has been initialized, but before loading the source files</span>
     onProgress        : <span class="literal">undefined</span>,    <span class="comment">// Occurs when any source file has been loaded</span>
@@ -555,7 +555,7 @@ if color is the magenta color as set by the rectangle before the image was drawn
 
       data.sourceWidth = size.width;
       data.sourceHeight = size.height;
-      <span class="keyword">if</span> (data.detectSubsapling &amp;&amp; detectSubsampling(img, size)){
+      <span class="keyword">if</span> (data.detectSubsampling &amp;&amp; detectSubsampling(img, size)){
         data.sourceWidth /= <span class="number">2</span>;
         data.sourceHeight /= <span class="number">2</span>;
       }</pre></div></div>
