@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SpriteSpin</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SpriteSpin">
+    <meta property="og:site_name" content="SpriteSpin">
+    <meta property="og:url" content="http://spritespin.ginie.eu/">
+    <meta property="og:description" content="jQuery plugin for creating flip book like animations.">
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="/spritespin.min.js"></script>
+    <script src="https://code.angularjs.org/1.2.9/angular.min.js"></script>
+    <script src="https://code.angularjs.org/1.2.9/angular-route.min.js"></script>
+    <link type="text/css" rel="stylesheet" media="all" href="/style.css">
+  </head>
+  <body>
+    <nav class="navbar nav-fullwidth">
+      <ul class="container">
+        <li><a href="/">SpriteSpin</a></li>
+        <li><a href="/download.html">Download</a></li>
+        <li><a href="/howto.html">How To</a></li>
+        <li><a href="/examples.html">Examples</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <h1>Sprite Sheets</h1>
+      <p>
+        A sprite sheet contains all the image frames within a single image. The frames must be continuously aligned
+        from left to right in one or multiple rows. The sprite sheet initialization requires two additional
+        parameters. The total number of used frames and the number of frames in one row.
+      </p>
+    </div>
+    <pre><code class="language-javascript">&ltscript type='text/javascript'&gt
+  $("#mySpriteSpin").spritespin({
+  source  : "sprites/bike6x6_big.jpg", // path to sprite sheet
+  width   : 480,  // width in pixels of the window/frame
+  height  : 327,  // height in pixels of the window/frame
+  frames  : 34,   // total number of frames
+  framesX : 6     // number of frames in one row inside the spritesheet
+  });
+&lt/script&gt</code></pre>
+    <div class="container">
+      <p>
+        <strong>framesX</strong> may be omitted and spritespin will try to calculate that number based on the
+        width of the source sheet and the given <strong>width</strong>. However, this does only work if the frames are
+        tightly packed inside the sheet.
+      </p>
+      <p>
+        In this example the frames are tightly packed in a 6x6 grid, but the sheet is missing two frames at the end.
+        Thus the <strong>frames</strong> option is initialized with <em>34</em> and not <em>36</em>.
+      </p>
+    </div>
+    <div class="container">
+      <div id="sprite-sheet-example"></div>
+      <button onclick="showSpriteExample(); $(this).remove(); return false;" class="btn btn-blue">Show Example</button>
+      <script type="text/javascript">
+        showSpriteExample = function () {
+          $('#sprite-sheet-example').spritespin({
+            source: './images/bike6x6_big.jpg',
+            width: 480,
+            height: 327,
+            frames: 34,
+            framesX: 6,
+            sense: -1
+          });
+        };
+      </script>
+    </div>
+    <hr>
+    <div class="container">
+      <h1>Panorama View</h1>
+      <p>
+        The panorama view shows a wide shot image that is then scrolled vertically.
+        To create a panorama view, the <strong>module</strong> option must be set to <em>panorama</em>.
+        The <strong>width</strong> option specifies the width of the display container, not the width of a frame as seen
+        above.
+      </p>
+    </div>
+    <pre><code class="language-javascript">$("#mySpriteSpin").spritespin({
+  source : "sprites/panorama/panorama.jpg",
+  width  : 205,        // width in pixels of the window
+  height : 140,        // height in pixels of the window
+  module : 'panorama'  // rendering implementation to use
+});</code></pre>
+    <div class="container">
+      <div id="panorama-example"></div>
+      <button onclick="showPanoramaExample(); $(this).remove(); return false;" class="btn btn-blue">Show Example</button>
+      <script type="text/javascript">
+        showPanoramaExample = function () {
+          $('#panorama-example').spritespin({
+            source: './images/panorama.jpg',
+            width: 480,
+            height: 200,
+            module: "panorama"
+          });
+        };
+      </script>
+    </div>
+    <hr>
+    <div class="container">
+      <h1>3D View</h1>
+      <p>You can add several lanes of 360 shots into sprite spin to mimic a 3D like experience.</p>
+    </div>
+    <pre><code class="language-javascript">$('.spritespin').spritespin({
+  // fill source array using a helper function
+  source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
+  lane: [0,11],
+  frame: [0,23],
+  digits: 2
+  }),
+  width: 400,
+  height: 225,
+  frames: 24,
+  lanes: 12,
+  sense: 1,
+  senseLane: -2,
+  renderer: 'canvas'
+});</code></pre>
+    <div class="container">
+      <div id="lanes-example"></div>
+      <button onclick="showLanesExample(); $(this).remove(); return false;" class="btn btn-blue">Show Example</button>
+      <script type="text/javascript">
+        showLanesExample = function () {
+          $('#lanes-example').spritespin({
+                    // fill source array using a helper function
+            source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
+              lane: [0, 11],
+              frame: [0, 23],
+              digits: 2
+            }),
+            width: 400,
+            height: 225,
+            frames: 24,
+            lanes: 12,
+            lane: 6,
+            animate: false,
+            sense: 1,
+            senseLane: -2,
+            renderer: 'canvas'
+          });
+        };
+      </script>
+    </div>
+    <hr>
+    <div class="container">
+      <h1>More Examples</h1>
+      <p><a href="http://jsfiddle.net/giniedp/J28EA/1/embedded/result,js,html,css,resources" target="_blank">How to add a slider</a></p>
+      <p><a href="http://jsfiddle.net/giniedp/Xaqw5/embedded/result,js,html,css,resources" target="_blank">How to show details for specific frames</a></p>
+      <p><a href="http://jsfiddle.net/giniedp/2V4gF/1/embedded/result,js,html,css,resources" target="_blank">How to use the API object</a></p>
+    </div>
+    <div class="container">
+      <hr>
+      <div id="disqus_thread"></div>
+    </div>
+    <script type="text/javascript" async>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'spritespin';
+      var disqus_url = 'http://giniedp.github.com/spritespin/index.html';
+      //var disqus_developer = 1; // 'undefined';
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function(){
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <script src="/highlight.js"></script>
+  </body>
+</html>

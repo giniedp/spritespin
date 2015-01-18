@@ -45,18 +45,15 @@ module.exports = function(grunt) {
         src: '<%= concat.dist.src %>'
       }
     },
-    slim: {
+    jade: {
       page:{
         options: {
-          pretty: true
+          pretty: true,
+          extension: '.html'
         },
-        files: [{
-          expand: true,
-          cwd: 'src',
-          src: ['index.slim', 'example-*.slim'],
-          dest: 'dist',
-          ext: '.html'
-        }]
+        files: {
+          'dest/': ['src/page/*.jade']
+        }
       }
     },
     compass: {
@@ -79,6 +76,7 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
+
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -88,8 +86,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compass');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-docco');
-  grunt.loadNpmTasks('grunt-slim');
+  grunt.loadNpmTasks('grunt-jade');
 
   // Default task.
-  grunt.registerTask('default', ['clean', 'concat', 'uglify', 'slim', 'compass']);
+  grunt.registerTask('default', ['clean', 'concat', 'uglify', 'jade', 'compass']);
 };

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>spritespin.mod-zoom.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>spritespin.mod-zoom.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+<span class="hljs-pi">  "use strict"</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateInput</span><span class="hljs-params">(e, data)</span></span>{
+    e.preventDefault();
+
+    data.dragging = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">if</span> (!e.touches &amp;&amp; e.originalEvent){
+      e.touches = e.originalEvent.touches;
+    }
+
+    <span class="hljs-keyword">var</span> x, y;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>get current touch or mouse position</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (e.touches &amp;&amp; e.touches.length){
+      x = e.touches[<span class="hljs-number">0</span>].clientX || <span class="hljs-number">0</span>;
+      y = e.touches[<span class="hljs-number">0</span>].clientY || <span class="hljs-number">0</span>;
+    } <span class="hljs-keyword">else</span> {
+      x = e.clientX || <span class="hljs-number">0</span>;
+      y = e.clientY || <span class="hljs-number">0</span>;
+    }
+
+    data.zoomX = x / data.width;
+    data.zoomY = y / data.height;
+    data.zoomX = data.zoomX &gt; <span class="hljs-number">1</span> ? <span class="hljs-number">1</span> : (data.zoomX &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : data.zoomX);
+    data.zoomY = data.zoomY &gt; <span class="hljs-number">1</span> ? <span class="hljs-number">1</span> : (data.zoomY &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : data.zoomY);
+
+    SpriteSpin.updateFrame(data);
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onclick</span><span class="hljs-params">(e)</span></span>{
+    e.preventDefault();
+
+    <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
+    <span class="hljs-keyword">var</span> now = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime();
+
+    <span class="hljs-keyword">if</span> (!data.zoomClickTime){
+      data.zoomClickTime = now;
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">var</span> timeDelta = now - data.zoomClickTime;
+    <span class="hljs-keyword">if</span>(timeDelta &gt; <span class="hljs-number">500</span>){
+      data.zoomClickTime = now;
+      <span class="hljs-keyword">return</span>;
+    }
+
+    data.zoomClickTime = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">if</span> ($(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'api'</span>).toggleZoom()){
+      updateInput(e, data);
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onmove</span><span class="hljs-params">(e)</span></span>{
+    <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
+    <span class="hljs-keyword">if</span> (!data.zoomStage.is(<span class="hljs-string">':visible'</span>)){
+      <span class="hljs-keyword">return</span>;
+    }
+    updateInput(e, data);
+  }
+
+
+  SpriteSpin.registerModule(<span class="hljs-string">'zoom'</span>, {
+    mousedown: onclick,
+    touchstart: onclick,
+    mousemove: onmove,
+    touchmove: onmove,
+    onInit: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+      <span class="hljs-keyword">if</span> (!data.zoomStage){
+        data.zoomStage = $(<span class="hljs-string">"&lt;div class='spritezoom-stage'&gt;&lt;/div&gt;"</span>)
+          .css({
+            width    : <span class="hljs-string">'100%'</span>,
+            height   : <span class="hljs-string">'100%'</span>,
+            top      : <span class="hljs-number">0</span>,
+            left     : <span class="hljs-number">0</span>,
+            bottom   : <span class="hljs-number">0</span>,
+            right    : <span class="hljs-number">0</span>,
+            position : <span class="hljs-string">'absolute'</span>
+          }).appendTo(data.target).hide();
+      }
+    },
+    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+      <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
+      <span class="hljs-keyword">var</span> source = data.source[index];
+      <span class="hljs-keyword">if</span> (data.zoomSource){
+        source = data.zoomSource[index];
+      }
+      <span class="hljs-keyword">if</span> (!source){
+        <span class="hljs-keyword">return</span>;
+      }
+      <span class="hljs-keyword">var</span> x = data.zoomX;
+      <span class="hljs-keyword">var</span> y = data.zoomY;
+      <span class="hljs-keyword">if</span> (x == <span class="hljs-literal">null</span> || y == <span class="hljs-literal">null</span>){
+        x = data.zoomX = <span class="hljs-number">0.5</span>;
+        y = data.zoomY = <span class="hljs-number">0.5</span>;
+      }
+      data.zoomStage.css({
+        <span class="hljs-string">"background-repeat"</span>   : <span class="hljs-string">"no-repeat"</span>,
+        <span class="hljs-string">"background-image"</span>    : [<span class="hljs-string">"url('"</span>, source, <span class="hljs-string">"')"</span>].join(<span class="hljs-string">""</span>),
+        <span class="hljs-string">"background-position"</span> : [(x * <span class="hljs-number">100</span>)|<span class="hljs-number">0</span>, <span class="hljs-string">"% "</span>, (y * <span class="hljs-number">100</span>)|<span class="hljs-number">0</span>, <span class="hljs-string">"%"</span>].join(<span class="hljs-string">""</span>)
+      });
+    }
+  });
+
+  SpriteSpin.extendApi({
+    toggleZoom: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      <span class="hljs-keyword">var</span> data = <span class="hljs-keyword">this</span>.data;
+      <span class="hljs-keyword">if</span> (!data.zoomStage){
+        $.error(<span class="hljs-string">'zoom module is not initialized or is not available.'</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+      <span class="hljs-keyword">if</span> (data.zoomStage.is(<span class="hljs-string">':visible'</span>)){
+        data.zoomStage.fadeOut();
+        data.stage.fadeIn();
+      } <span class="hljs-keyword">else</span> {
+        data.zoomStage.fadeIn();
+        data.stage.fadeOut();
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+  });
+
+}(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

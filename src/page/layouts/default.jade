@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+  head
+    title SpriteSpin
+    meta(property="og:type" content="website")
+    meta(property="og:title" content="SpriteSpin")
+    meta(property="og:site_name" content="SpriteSpin")
+    meta(property="og:url" content="http://spritespin.ginie.eu/")
+    meta(property="og:description" content="jQuery plugin for creating flip book like animations.")
+    script(src='http://code.jquery.com/jquery-1.11.2.min.js')
+    script(src='/spritespin.min.js')
+    script(src='https://code.angularjs.org/1.2.9/angular.min.js')
+    script(src='https://code.angularjs.org/1.2.9/angular-route.min.js')
+    link(type="text/css" rel="stylesheet" media="all" href="/style.css")
+    block head
+  body
+    nav.navbar.nav-fullwidth
+      ul.container
+        li: a(href='/') SpriteSpin
+        li: a(href='/download.html') Download
+        li: a(href='/howto.html') How To
+        li: a(href='/examples.html') Examples
+    block content
+    .container
+      hr
+      #disqus_thread
+    script(type='text/javascript' async).
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'spritespin';
+      var disqus_url = 'http://giniedp.github.com/spritespin/index.html';
+      //var disqus_developer = 1; // 'undefined';
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function(){
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    script(src='/highlight.js')

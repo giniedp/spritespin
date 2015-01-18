@@ -1,0 +1,52 @@
+@import "kube/mixins.less";
+@import "kube/variables.less";
+
+@import "kube/reset.less";
+@import "kube/typography.less";
+
+@import "kube/grid.less";
+@import "kube/blocks.less";
+
+@import "kube/navigation.less";
+@import "kube/buttons.less";
+
+@import "kube/labels.less";
+
+@import "highlight.less";
+
+html, body{
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+nav.navbar{
+  padding: 30px 50px 28px;
+  background: #222;
+  margin-bottom: 1.65em;
+  a{
+    color: white;
+  }
+}
+a{
+  text-decoration: none;
+}
+pre{
+  background: #222;
+}
+
+.container, ul.container, code{
+  width: 960px;
+  margin: 0 auto auto;
+  display: block;
+}
+button.example {
+  padding: 10px;
+  background-color: #F7F7F9;
+  border: 1px solid #E1E1E8;
+  color: #48484C;
+}
+
+.spritespin-instance.loading{
+  background: url('images/ajax-loader.gif');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}

@@ -1,0 +1,10 @@
+extends layouts/example.jade
+block content
+  .spritespin
+  script(type='text/javascript').
+    $('.spritespin').spritespin({
+      source: 'images/panorama.jpg',
+      width: 600,
+      height: 300,
+      module: 'panorama'
+    });

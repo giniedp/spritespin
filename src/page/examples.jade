@@ -1,0 +1,124 @@
+extends layouts/default.jade
+block content
+  .container
+    h1 Sprite Sheets
+    p
+      | A sprite sheet contains all the image frames within a single image. The frames must be continuously aligned
+      | from left to right in one or multiple rows. The sprite sheet initialization requires two additional
+      | parameters. The total number of used frames and the number of frames in one row.
+  pre
+    code.language-javascript
+      | &ltscript type='text/javascript'&gt
+      |   $("#mySpriteSpin").spritespin({
+      |   source  : "sprites/bike6x6_big.jpg", // path to sprite sheet
+      |   width   : 480,  // width in pixels of the window/frame
+      |   height  : 327,  // height in pixels of the window/frame
+      |   frames  : 34,   // total number of frames
+      |   framesX : 6     // number of frames in one row inside the spritesheet
+      |   });
+      | &lt/script&gt
+  .container
+    p
+      | <strong>framesX</strong> may be omitted and spritespin will try to calculate that number based on the
+      | width of the source sheet and the given <strong>width</strong>. However, this does only work if the frames are
+      | tightly packed inside the sheet.
+    p
+      | In this example the frames are tightly packed in a 6x6 grid, but the sheet is missing two frames at the end.
+      | Thus the <strong>frames</strong> option is initialized with <em>34</em> and not <em>36</em>.
+  .container
+    #sprite-sheet-example
+    button.btn.btn-blue(onclick='showSpriteExample(); $(this).remove(); return false;') Show Example
+    script(type='text/javascript').
+      showSpriteExample = function () {
+        $('#sprite-sheet-example').spritespin({
+          source: './images/bike6x6_big.jpg',
+          width: 480,
+          height: 327,
+          frames: 34,
+          framesX: 6,
+          sense: -1
+        });
+      };
+  hr
+  .container
+    h1 Panorama View
+    p
+      | The panorama view shows a wide shot image that is then scrolled vertically.
+      | To create a panorama view, the <strong>module</strong> option must be set to <em>panorama</em>.
+      | The <strong>width</strong> option specifies the width of the display container, not the width of a frame as seen
+      | above.
+  pre
+    code.language-javascript
+      | $("#mySpriteSpin").spritespin({
+      |   source : "sprites/panorama/panorama.jpg",
+      |   width  : 205,        // width in pixels of the window
+      |   height : 140,        // height in pixels of the window
+      |   module : 'panorama'  // rendering implementation to use
+      | });
+  .container
+    #panorama-example
+    button.btn.btn-blue(onclick='showPanoramaExample(); $(this).remove(); return false;') Show Example
+    script(type='text/javascript').
+      showPanoramaExample = function () {
+        $('#panorama-example').spritespin({
+          source: './images/panorama.jpg',
+          width: 480,
+          height: 200,
+          module: "panorama"
+        });
+      };
+  hr
+  .container
+    h1 3D View
+    p
+      | You can add several lanes of 360 shots into sprite spin to mimic a 3D like experience.
+  pre
+    code.language-javascript
+      | $('.spritespin').spritespin({
+      |   // fill source array using a helper function
+      |   source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
+      |   lane: [0,11],
+      |   frame: [0,23],
+      |   digits: 2
+      |   }),
+      |   width: 400,
+      |   height: 225,
+      |   frames: 24,
+      |   lanes: 12,
+      |   sense: 1,
+      |   senseLane: -2,
+      |   renderer: 'canvas'
+      | });
+  .container
+    #lanes-example
+    button.btn.btn-blue(onclick='showLanesExample(); $(this).remove(); return false;') Show Example
+    script(type='text/javascript').
+      showLanesExample = function () {
+        $('#lanes-example').spritespin({
+                  // fill source array using a helper function
+          source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
+            lane: [0, 11],
+            frame: [0, 23],
+            digits: 2
+          }),
+          width: 400,
+          height: 225,
+          frames: 24,
+          lanes: 12,
+          lane: 6,
+          animate: false,
+          sense: 1,
+          senseLane: -2,
+          renderer: 'canvas'
+        });
+      };
+  hr
+  .container
+    h1 More Examples
+
+    p
+      a(href='http://jsfiddle.net/giniedp/J28EA/1/embedded/result,js,html,css,resources' target='_blank') How to add a slider
+    p
+      a(href='http://jsfiddle.net/giniedp/Xaqw5/embedded/result,js,html,css,resources' target='_blank') How to show details for specific frames
+    p
+      a(href='http://jsfiddle.net/giniedp/2V4gF/1/embedded/result,js,html,css,resources' target='_blank') How to use the API object

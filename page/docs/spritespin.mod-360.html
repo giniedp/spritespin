@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>spritespin.mod-360.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>spritespin.mod-360.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+<span class="hljs-pi">  "use strict"</span>;
+
+  <span class="hljs-keyword">var</span> floor = <span class="hljs-built_in">Math</span>.floor;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawSprite</span><span class="hljs-params">(data)</span></span>{
+    <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
+
+    <span class="hljs-keyword">var</span> x = data.frameWidth * (index % data.framesX);
+    <span class="hljs-keyword">var</span> y = data.frameHeight * floor(index / data.framesX);
+
+    <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
+      data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+      data.context.drawImage(data.images[<span class="hljs-number">0</span>], x, y, data.frameWidth, data.frameHeight, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+      <span class="hljs-keyword">return</span>;
+    }
+
+    x = -floor(x * data.scaleWidth);
+    y = -floor(y * data.scaleHeight);
+
+    <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>) {
+      data.stage.css({
+        <span class="hljs-string">"background-image"</span>    : [<span class="hljs-string">"url('"</span>, data.source[<span class="hljs-number">0</span>], <span class="hljs-string">"')"</span>].join(<span class="hljs-string">""</span>),
+        <span class="hljs-string">"background-position"</span> : [x, <span class="hljs-string">"px "</span>, y, <span class="hljs-string">"px"</span>].join(<span class="hljs-string">""</span>)
+      });
+    } <span class="hljs-keyword">else</span> {
+      $(data.images).css({ top: y, left: x });
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawFrames</span><span class="hljs-params">(data)</span></span>{
+    <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
+    <span class="hljs-keyword">var</span> img = data.images[index];
+    <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
+      <span class="hljs-keyword">if</span> (img){
+        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        data.context.drawImage(data.images[index], <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+      }
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>) {
+      data.stage.css({
+        <span class="hljs-string">"background-image"</span> : [<span class="hljs-string">"url('"</span>, data.source[index], <span class="hljs-string">"')"</span>].join(<span class="hljs-string">""</span>),
+        <span class="hljs-string">"background-position"</span> : [<span class="hljs-number">0</span>, <span class="hljs-string">"px "</span>, <span class="hljs-number">0</span>, <span class="hljs-string">"px"</span>].join(<span class="hljs-string">""</span>)
+      });
+    } <span class="hljs-keyword">else</span> {
+      $(data.images).hide();
+      $(data.images[index]).show();
+    }
+  }
+
+  SpriteSpin.registerModule(<span class="hljs-string">'360'</span>, {
+
+    onLoad: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+      <span class="hljs-keyword">var</span> w, h;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>calculate scaling if we are in responsive mode</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      data.scaleWidth = data.width / data.frameWidth;
+      data.scaleHeight = data.height / data.frameHeight;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>assume that the source is a spritesheet, when there is only one image given</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      data.sourceIsSprite = data.images.length === <span class="hljs-number">1</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>clear and enable the stage container</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      data.stage.empty().css({ <span class="hljs-string">"background-image"</span> : <span class="hljs-string">'none'</span> }).show();
+
+      <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>)
+      {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>prepare rendering to canvas
+clear and enable the canvas container</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        data.canvas.show();
+      }
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>)
+      {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>prepare rendering frames as background images</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+        <span class="hljs-keyword">if</span> (data.sourceIsSprite){
+          w = floor(data.sourceWidth * data.scaleWidth);
+          h = floor(data.sourceHeight * data.scaleHeight);
+        } <span class="hljs-keyword">else</span> {
+          w = floor(data.frameWidth * data.scaleWidth);
+          h = floor(data.frameHeight * data.scaleHeight);
+        }
+        <span class="hljs-keyword">var</span> background = [w, <span class="hljs-string">"px "</span>, h, <span class="hljs-string">"px"</span>].join(<span class="hljs-string">""</span>);
+
+        data.stage.css({
+          <span class="hljs-string">"background-repeat"</span>   : <span class="hljs-string">"no-repeat"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>set custom background size to enable responsive rendering</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-string">"-webkit-background-size"</span> : background, <span class="hljs-comment">/* Safari 3-4 Chrome 1-3 */</span>
+          <span class="hljs-string">"-moz-background-size"</span>    : background, <span class="hljs-comment">/* Firefox 3.6 */</span>
+          <span class="hljs-string">"-o-background-size"</span>      : background, <span class="hljs-comment">/* Opera 9.5 */</span>
+          <span class="hljs-string">"background-size"</span>         : background  <span class="hljs-comment">/* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */</span>
+        });
+      }
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'image'</span>)
+      {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>prepare rendering frames as image elements</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (data.sourceIsSprite){
+          w = floor(data.sourceWidth * data.scaleWidth);
+          h = floor(data.sourceHeight * data.scaleHeight);
+        } <span class="hljs-keyword">else</span> {
+          w = h = <span class="hljs-string">'100%'</span>;
+        }
+        $(data.images).appendTo(data.stage).css({
+          width: w,
+          height: h,
+          position: <span class="hljs-string">'absolute'</span>
+        });
+      }
+    },
+
+    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+      
+      <span class="hljs-keyword">if</span> (data.sourceIsSprite){
+        drawSprite(data);
+      } <span class="hljs-keyword">else</span>{
+        drawFrames(data);
+      }
+    }
+  });
+
+}(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

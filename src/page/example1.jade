@@ -1,0 +1,16 @@
+extends layouts/example.jade
+block content
+   .spritespin
+   script(type='text/javascript').
+      $('.spritespin').spritespin({
+         source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+         width: 800,
+         height: 450,
+         frames: 24,
+         lanes: 12,
+         sense: 1,
+         senseLane: -2,
+         behavior: 'move',
+         renderer: 'canvas'
+      });
+

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SpriteSpin</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SpriteSpin">
+    <meta property="og:site_name" content="SpriteSpin">
+    <meta property="og:url" content="http://spritespin.ginie.eu/">
+    <meta property="og:description" content="jQuery plugin for creating flip book like animations.">
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="/spritespin.min.js"></script>
+    <script src="https://code.angularjs.org/1.2.9/angular.min.js"></script>
+    <script src="https://code.angularjs.org/1.2.9/angular-route.min.js"></script>
+    <link type="text/css" rel="stylesheet" media="all" href="/style.css">
+  </head>
+  <body>
+    <nav class="navbar nav-fullwidth">
+      <ul class="container">
+        <li><a href="/">SpriteSpin</a></li>
+        <li><a href="/download.html">Download</a></li>
+        <li><a href="/howto.html">How To</a></li>
+        <li><a href="/examples.html">Examples</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <h1>Getting Started</h1>
+      <hr>
+      <p>Reference jQuery and SpriteSpin scripts</p>
+    </div>
+    <pre><code class="language-javascript">&lt;script src='jquery-1.4.2.js' type='text/javascript' /&gt;
+&lt;script src='spritespin.js' type='text/javascrip' /&gt;</code></pre>
+    <div class="container">
+      <p>Create a container for SpriteSpin</p>
+    </div>
+    <pre><code class="language-javascript">&lt;div id='mySpriteSpin'/&gt;</code></pre>
+    <div class="container">
+      <p>Initialize the plugin</p>
+    </div>
+    <pre><code class="language-javascript">&ltscript type='text/javascript'&gt
+$("#mySpriteSpin").spritespin({
+  // path to the source images.
+  source: [
+  "path/to/frame_001.jpg",
+  "path/to/frame_002.jpg",
+  "path/to/frame_003.jpg",
+  "path/to/frame_004.jpg",
+  "path/to/frame_005.jpg",
+  "path/to/frame_006.jpg",
+  "path/to/frame_007.jpg",
+  "path/to/frame_008.jpg",
+  "path/to/frame_009.jpg",
+  "path/to/frame_010.jpg",
+  ],
+  width   : 480,  // width in pixels of the window/frame
+  height  : 327,  // height in pixels of the window/frame
+});
+&lt/script&gt</code></pre>
+    <div class="container">
+      <div id="basic-setup-example"></div>
+    </div>
+    <script type="text/javascript">
+      $(function () {
+        $('#basic-setup-example').spritespin({
+          source: SpriteSpin.sourceArray('./images/rad_zoom_{frame}.jpg', {frame: [1, 34], digits: 3}),
+          width: 480,
+          height: 327,
+          sense: -1
+        });
+      });
+    </script>
+    <hr>
+    <div class="container">
+      <h1>Options</h1>
+      <p>
+        There are many options that can be used to initialize the plugin. The following is a set with default values
+        and their meaning. However, it is recommended to take a look at the examples where the options are described
+        with more detail.
+      </p>
+    </div>
+    <pre><code class="language-javascript">Spin.defaults = {
+  source            : undefined,    // Stitched source image or array of files
+  width             : undefined,    // actual display width
+  height            : undefined,    // actual display height
+  frames            : undefined,    // Total number of frames
+  framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a spritesheet)
+  lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
+  module            : '360',        // The presentation module to use
+  behavior          : 'drag',       // The interaction module to use
+  renderer          : 'canvas',     // The rendering mode to use
+  lane              : 0,            // The initial sequence number to play
+  frame             : 0,            // Initial (and current) frame number
+  frameTime         : 40,           // Time in ms between updates. 40 is exactly 25 FPS
+  animate           : true,         // If true starts the animation on load
+  reverse           : false,        // If true animation is played backward
+  loop              : true,         // If true loops the animation
+  stopFrame         : 0,            // Stops the animation at this frame if loop is disabled
+  wrap              : true,         // If true wraps around the frame index on user interaction
+  wrapLane          : false,        // If true wraps around the lane index on user interaction
+  sense             : 1,            // Interaction sensitivity used by behavior implementations
+  senseLane         : undefined,    // Interaction sensitivity used by behavior implementations
+  orientation       : 'horizontal', // Preferred axis for user interaction
+  detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
+  scrollThreshold   : 50,           // Number of pixels the user must drag within a frame to enable page scroll (for touch devices)
+  preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
+  onInit            : undefined,    // Occurs when plugin has been initialized, but before loading the source files
+  onProgress        : undefined,    // Occurs when any source file has been loaded
+  onLoad            : undefined,    // Occurs when all source files have been loaded
+  onFrame           : undefined,    // Occurs when the frame number has been updated (e.g. during animation)
+  onDraw            : undefined     // Occurs when all update is complete and frame can be drawn
+};</code></pre>
+    <hr>
+    <div class="container">
+      <h1>API Object</h1>
+      <p>SpriteSpin offers an API object with functions that simplify certain tasks.</p>
+    </div>
+    <pre><code class="language-javascript">var api = $("#mySpriteSpin").spritespin({
+  // initialization options
+}).spritespin("api");</code></pre>
+    <div class="container">
+      <p>For the available API methods take a look at the<a href="./docs/spritespin.api.html" target="blank"> annotated source code.</a></p>
+      <p>You can add your own methods to the api.</p>
+    </div>
+    <pre><code class="language-javascript">SpriteSpin.extendApi({
+  myCustomFunction: function(){
+    this.data.customValue = 'i have added something to the sprite spin data object';
+  }
+});</code></pre>
+    <hr>
+    <div class="container">
+      <h1>Data Object</h1>
+      <p>You can access the data object that represents the state of the SpriteSpin instance and manipulate it directly.</p>
+    </div>
+    <pre><code class="language-javascript">var data = $("#mySpriteSpin").spritespin({
+  // initialization options
+}).data("spritespin");</code></pre>
+    <div class="container">
+      <p>
+        Most of the initialization parameters are available in the data object. However, changing some of them
+        may break the instance. For example you can not change the source images or the size properties directly. Those
+        options need a special processing by the plugin before they can be actively used.
+      </p>
+    </div>
+    <div class="container">
+      <hr>
+      <div id="disqus_thread"></div>
+    </div>
+    <script type="text/javascript" async>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'spritespin';
+      var disqus_url = 'http://giniedp.github.com/spritespin/index.html';
+      //var disqus_developer = 1; // 'undefined';
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function(){
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <script src="/highlight.js"></script>
+  </body>
+</html>

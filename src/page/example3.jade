@@ -1,0 +1,13 @@
+extends layouts/example.jade
+block content
+  .spritespin
+  script(type='text/javascript').
+    $('.spritespin').spritespin({
+      source: 'images/bike6x6_big.jpg',
+      width: 480,
+      height: 327,
+      frames: 34,
+      framesX: 6,
+      sense: -1,
+      renderer: 'image'
+    });

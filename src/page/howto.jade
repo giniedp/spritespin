@@ -1,0 +1,124 @@
+extends layouts/default.jade
+block content
+  .container
+    h1 Getting Started
+    hr
+    p Reference jQuery and SpriteSpin scripts
+  pre
+    code.language-javascript
+      = "<script src='jquery-1.4.2.js' type='text/javascript' />\n"
+      = "<script src='spritespin.js' type='text/javascrip' />"
+  .container
+    p Create a container for SpriteSpin
+  pre
+    code.language-javascript
+      = "<div id='mySpriteSpin'/>"
+  .container
+    p Initialize the plugin
+  pre
+    code.language-javascript
+      | &ltscript type='text/javascript'&gt
+      | $("#mySpriteSpin").spritespin({
+      |   // path to the source images.
+      |   source: [
+      |   "path/to/frame_001.jpg",
+      |   "path/to/frame_002.jpg",
+      |   "path/to/frame_003.jpg",
+      |   "path/to/frame_004.jpg",
+      |   "path/to/frame_005.jpg",
+      |   "path/to/frame_006.jpg",
+      |   "path/to/frame_007.jpg",
+      |   "path/to/frame_008.jpg",
+      |   "path/to/frame_009.jpg",
+      |   "path/to/frame_010.jpg",
+      |   ],
+      |   width   : 480,  // width in pixels of the window/frame
+      |   height  : 327,  // height in pixels of the window/frame
+      | });
+      | &lt/script&gt
+  .container
+    #basic-setup-example
+  script(type='text/javascript').
+    $(function () {
+      $('#basic-setup-example').spritespin({
+        source: SpriteSpin.sourceArray('./images/rad_zoom_{frame}.jpg', {frame: [1, 34], digits: 3}),
+        width: 480,
+        height: 327,
+        sense: -1
+      });
+    });
+  hr
+  .container
+    h1 Options
+    p
+      | There are many options that can be used to initialize the plugin. The following is a set with default values
+      | and their meaning. However, it is recommended to take a look at the examples where the options are described
+      | with more detail.
+  pre
+    code.language-javascript
+      | Spin.defaults = {
+      |   source            : undefined,    // Stitched source image or array of files
+      |   width             : undefined,    // actual display width
+      |   height            : undefined,    // actual display height
+      |   frames            : undefined,    // Total number of frames
+      |   framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a spritesheet)
+      |   lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
+      |   module            : '360',        // The presentation module to use
+      |   behavior          : 'drag',       // The interaction module to use
+      |   renderer          : 'canvas',     // The rendering mode to use
+      |   lane              : 0,            // The initial sequence number to play
+      |   frame             : 0,            // Initial (and current) frame number
+      |   frameTime         : 40,           // Time in ms between updates. 40 is exactly 25 FPS
+      |   animate           : true,         // If true starts the animation on load
+      |   reverse           : false,        // If true animation is played backward
+      |   loop              : true,         // If true loops the animation
+      |   stopFrame         : 0,            // Stops the animation at this frame if loop is disabled
+      |   wrap              : true,         // If true wraps around the frame index on user interaction
+      |   wrapLane          : false,        // If true wraps around the lane index on user interaction
+      |   sense             : 1,            // Interaction sensitivity used by behavior implementations
+      |   senseLane         : undefined,    // Interaction sensitivity used by behavior implementations
+      |   orientation       : 'horizontal', // Preferred axis for user interaction
+      |   detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
+      |   scrollThreshold   : 50,           // Number of pixels the user must drag within a frame to enable page scroll (for touch devices)
+      |   preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
+      |   onInit            : undefined,    // Occurs when plugin has been initialized, but before loading the source files
+      |   onProgress        : undefined,    // Occurs when any source file has been loaded
+      |   onLoad            : undefined,    // Occurs when all source files have been loaded
+      |   onFrame           : undefined,    // Occurs when the frame number has been updated (e.g. during animation)
+      |   onDraw            : undefined     // Occurs when all update is complete and frame can be drawn
+      | };
+  hr
+  .container
+    h1 API Object
+    p
+      | SpriteSpin offers an API object with functions that simplify certain tasks.
+  pre
+    code.language-javascript
+      | var api = $("#mySpriteSpin").spritespin({
+      |   // initialization options
+      | }).spritespin("api");
+  .container
+    p
+      | For the available API methods take a look at the
+      a(href='./docs/spritespin.api.html' target='blank')  annotated source code.
+    p You can add your own methods to the api.
+  pre: code.language-javascript
+    | SpriteSpin.extendApi({
+    |   myCustomFunction: function(){
+    |     this.data.customValue = 'i have added something to the sprite spin data object';
+    |   }
+    | });
+  hr
+  .container
+    h1 Data Object
+    p You can access the data object that represents the state of the SpriteSpin instance and manipulate it directly.
+  pre
+    code.language-javascript
+      | var data = $("#mySpriteSpin").spritespin({
+      |   // initialization options
+      | }).data("spritespin");
+  .container
+    p
+      | Most of the initialization parameters are available in the data object. However, changing some of them
+      | may break the instance. For example you can not change the source images or the size properties directly. Those
+      | options need a special processing by the plugin before they can be actively used.

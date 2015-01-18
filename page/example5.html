@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SpriteSpin</title>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="spritespin.js"></script>
+  </head>
+  <body>
+    <div class="spritespin"></div>
+    <script type="text/javascript">
+      SpriteSpin.registerModule('myModule', {
+        onFrame: function(e, data){
+          // do nothing if there is no animation running
+          if (!data.animation) return;
+          // on first frame reverse the animation
+          if (data.reverse && (data.frame == 0)) {
+            data.reverse = !data.reverse;
+          }
+          // on last frame reverse the animation
+          if (!data.reverse && (data.frame == (data.frames - 1))) {
+            data.reverse = !data.reverse;
+          }
+        },
+        onProgress: function(e, progress, data){
+          // build an array of unloaded image indices
+          var indices = data.indices;
+          if (!indices){
+            indices = [];
+            for (var i = 0; i < data.source.length; i += 1){
+              indices.push(i);
+            }
+            // cache the array
+            data.indices = indices;
+          }
+      
+          // unset the index of the image that already has been loaded
+          var pos = indices.indexOf(progress.index);
+          indices[pos] = undefined;
+      
+          // remove all elements from from the beginning
+          while((indices[0] === undefined) && (indices.length > 0)){
+            indices.shift();
+          }
+      
+          // now we know how many images has been loaded starting at the first image
+          if (indices[0] == undefined){
+            data.frames = data.source.length;
+          } else {
+            data.frames = indices[0] + 1;
+          }
+          console.log('can play', data.frames, 'frames');
+        },
+        onLoad: function(e, data){
+          console.log('starting with', data.frames, 'frames loaded');
+        }
+      });
+      
+      $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        width: 240,
+        height: 164,
+        sense: -1,
+        mods: ['drag', '360', 'myModule'],
+        preloadCount: 5
+      });
+    </script>
+  </body>
+</html>
