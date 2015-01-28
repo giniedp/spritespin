@@ -36,16 +36,27 @@ block content
           indices.shift();
         }
 
-        // now we know how many images has been loaded starting at the first image
+        // now we know how many images have been loaded starting at the first image
         if (indices[0] == undefined){
           data.frames = data.source.length;
         } else {
           data.frames = indices[0] + 1;
         }
-        console.log('can play', data.frames, 'frames');
+
+        // check if the user has already dragged the image
+        if (data.dragging){
+          data.dragged = true;
+        }
+
+        // start the animation when 100% is loaded and if the user has not dragged the image
+        if (data.frames == data.source.length && !data.dragged){
+          data.target.spritespin('api').startAnimation();
+        }
+
+        // console.log('can play', data.frames, 'frames');
       },
       onLoad: function(e, data){
-        console.log('starting with', data.frames, 'frames loaded');
+        // console.log('starting with', data.frames, 'frames loaded');
       }
     });
 
@@ -54,6 +65,7 @@ block content
       width: 240,
       height: 164,
       sense: -1,
+      animate: false,
       mods: ['drag', '360', 'myModule'],
       preloadCount: 5
     });
