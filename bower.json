@@ -6,7 +6,7 @@
   "authors": [
     "Alexander Graefenstein <mail@ginie.eu>"
   ],
-  "main": "dist/spritespin.js",
+  "main": "release/spritespin.js",
   "keywords": [
     "spritespin",
     "360",
