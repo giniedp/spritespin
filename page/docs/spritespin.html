@@ -305,7 +305,7 @@ The SpriteSpin namespace is attached to the event name</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> src = (<span class="hljs-keyword">typeof</span> opts.source === <span class="hljs-string">'string'</span>) ? [opts.source] : opts.source;
-    <span class="hljs-keyword">var</span> i, count = <span class="hljs-number">0</span>, img, images = [], targetCount = (opts.preloadCount || images.length);
+    <span class="hljs-keyword">var</span> i, count = <span class="hljs-number">0</span>, img, images = [], targetCount = opts.preloadCount;
     <span class="hljs-keyword">var</span> completed = <span class="hljs-literal">false</span>, firstLoaded = <span class="hljs-literal">false</span>;
     <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
       count += <span class="hljs-number">1</span>;
@@ -318,7 +318,7 @@ The SpriteSpin namespace is attached to the event name</p>
         });
       }
       firstLoaded = firstLoaded || (<span class="hljs-keyword">this</span> === images[<span class="hljs-number">0</span>]);
-      <span class="hljs-keyword">if</span> (!completed &amp;&amp; count &gt;= targetCount &amp;&amp; firstLoaded &amp;&amp; (<span class="hljs-keyword">typeof</span> opts.complete === <span class="hljs-string">'function'</span>)) {
+      <span class="hljs-keyword">if</span> (!completed &amp;&amp; (count &gt;= (targetCount || images.length)) &amp;&amp; firstLoaded &amp;&amp; (<span class="hljs-keyword">typeof</span> opts.complete === <span class="hljs-string">'function'</span>)) {
         completed = <span class="hljs-literal">true</span>;
         opts.complete(images);
       }

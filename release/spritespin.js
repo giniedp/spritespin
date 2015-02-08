@@ -130,7 +130,7 @@
   function load(opts){
     // convert opts.source to an array of strings
     var src = (typeof opts.source === 'string') ? [opts.source] : opts.source;
-    var i, count = 0, img, images = [], targetCount = (opts.preloadCount || images.length);
+    var i, count = 0, img, images = [], targetCount = opts.preloadCount;
     var completed = false, firstLoaded = false;
     var tick = function(){
       count += 1;
@@ -143,7 +143,7 @@
         });
       }
       firstLoaded = firstLoaded || (this === images[0]);
-      if (!completed && count >= targetCount && firstLoaded && (typeof opts.complete === 'function')) {
+      if (!completed && (count >= (targetCount || images.length)) && firstLoaded && (typeof opts.complete === 'function')) {
         completed = true;
         opts.complete(images);
       }
@@ -1345,8 +1345,7 @@
       e.touches = e.originalEvent.touches;
     }
 
-    var x, y;
-    // get current touch or mouse position
+    var x, y, dx, dy;
     if (e.touches && e.touches.length){
       x = e.touches[0].clientX || 0;
       y = e.touches[0].clientY || 0;
@@ -1354,11 +1353,28 @@
       x = e.clientX || 0;
       y = e.clientY || 0;
     }
+    x /= data.width;
+    y /= data.height;
 
-    data.zoomX = x / data.width;
-    data.zoomY = y / data.height;
-    data.zoomX = data.zoomX > 1 ? 1 : (data.zoomX < 0 ? 0 : data.zoomX);
-    data.zoomY = data.zoomY > 1 ? 1 : (data.zoomY < 0 ? 0 : data.zoomY);
+    if (data.zoomPX == null){
+      data.zoomPX = x;
+      data.zoomPY = y;
+    }
+    if (data.zoomX == null){
+      data.zoomX = x;
+      data.zoomY = y;
+    }
+    dx = x - data.zoomPX;
+    dy = y - data.zoomPY;
+    data.zoomPX = x;
+    data.zoomPY = y;
+
+    if (e.type.match(/touch/)){
+      dx = -dx;
+      dy = -dy;
+    }
+    data.zoomX = SpriteSpin.clamp(data.zoomX + dx, 0, 1);
+    data.zoomY = SpriteSpin.clamp(data.zoomY + dy, 0, 1);
 
     SpriteSpin.updateFrame(data);
   }
@@ -1368,7 +1384,8 @@
 
     var data = $(this).spritespin('data');
     var now = new Date().getTime();
-
+    delete data.zoomPX;
+    delete data.zoomPY;
     if (!data.zoomClickTime){
       data.zoomClickTime = now;
       return;
