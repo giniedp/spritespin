@@ -69,7 +69,7 @@
   gulp.task('watch', function(){
     gulp.run('build');
 
-    gulp.watch("src/scripts/*.js", function(){
+    gulp.watch("src/*.js", function(){
       gulp.run('concat', 'uglify', 'doc');
     });
 
