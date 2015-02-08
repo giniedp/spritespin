@@ -130,7 +130,7 @@
   function load(opts){
     // convert opts.source to an array of strings
     var src = (typeof opts.source === 'string') ? [opts.source] : opts.source;
-    var i, count = 0, img, images = [], targetCount = (opts.preloadCount || images.length);
+    var i, count = 0, img, images = [], targetCount = opts.preloadCount;
     var completed = false, firstLoaded = false;
     var tick = function(){
       count += 1;
@@ -143,7 +143,7 @@
         });
       }
       firstLoaded = firstLoaded || (this === images[0]);
-      if (!completed && count >= targetCount && firstLoaded && (typeof opts.complete === 'function')) {
+      if (!completed && (count >= (targetCount || images.length)) && firstLoaded && (typeof opts.complete === 'function')) {
         completed = true;
         opts.complete(images);
       }
