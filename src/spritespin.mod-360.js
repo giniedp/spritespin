@@ -32,9 +32,9 @@
     var index = data.lane * data.frames + data.frame;
     var img = data.images[index];
     if (data.renderer === 'canvas'){
-      if (img){
+      if (img && img.complete !== false){
         data.context.clearRect(0, 0, data.width, data.height);
-        data.context.drawImage(data.images[index], 0, 0, data.width, data.height);
+        data.context.drawImage(img, 0, 0, data.width, data.height);
       }
     } else if (data.renderer === 'background') {
       data.stage.css({
