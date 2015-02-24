@@ -64,9 +64,9 @@
     <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
     <span class="hljs-keyword">var</span> img = data.images[index];
     <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
-      <span class="hljs-keyword">if</span> (img){
+      <span class="hljs-keyword">if</span> (img &amp;&amp; img.complete !== <span class="hljs-literal">false</span>){
         data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
-        data.context.drawImage(data.images[index], <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        data.context.drawImage(img, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
       }
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>) {
       data.stage.css({

@@ -130,20 +130,20 @@
   function load(opts){
     // convert opts.source to an array of strings
     var src = (typeof opts.source === 'string') ? [opts.source] : opts.source;
-    var i, count = 0, img, images = [], targetCount = opts.preloadCount;
+    var i, count = 0, img, images = [], targetCount = (opts.preloadCount || src.length);
     var completed = false, firstLoaded = false;
     var tick = function(){
       count += 1;
       if (typeof opts.progress === 'function'){
         opts.progress({
-          index: images.indexOf(this),
+          index: $.inArray(this, images),
           loaded: count,
           total: src.length,
           percent: Math.round((count / src.length) * 100)
         });
       }
       firstLoaded = firstLoaded || (this === images[0]);
-      if (!completed && (count >= (targetCount || images.length)) && firstLoaded && (typeof opts.complete === 'function')) {
+      if (!completed && (count >= targetCount) && firstLoaded && (typeof opts.complete === 'function')) {
         completed = true;
         opts.complete(images);
       }
@@ -1147,9 +1147,9 @@
     var index = data.lane * data.frames + data.frame;
     var img = data.images[index];
     if (data.renderer === 'canvas'){
-      if (img){
+      if (img && img.complete !== false){
         data.context.clearRect(0, 0, data.width, data.height);
-        data.context.drawImage(data.images[index], 0, 0, data.width, data.height);
+        data.context.drawImage(img, 0, 0, data.width, data.height);
       }
     } else if (data.renderer === 'background') {
       data.stage.css({
