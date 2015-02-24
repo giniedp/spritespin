@@ -136,7 +136,7 @@
       count += 1;
       if (typeof opts.progress === 'function'){
         opts.progress({
-          index: images.indexOf(this),
+          index: $.inArray(this, images),
           loaded: count,
           total: src.length,
           percent: Math.round((count / src.length) * 100)
