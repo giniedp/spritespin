@@ -206,13 +206,24 @@
 
   // gets the original width and height of an image element
   function naturalSize(image){
-    // the given image element might have a css style applied already so img.width and img.height would return
-    // that css size. In order to get the original size create a new Image object and pass the src to that image.
-    // Assume that the src has already been downloaded, so no onload callback is needed.
-    // We could use img.naturalWidth but that is not available on IE < 9
+    // for browsers that support naturalWidth and naturalHeight properties
+    if (image.naturalWidth != null) {
+      return {
+        width: image.naturalWidth,
+        height: image.naturalHeight
+      };
+    }
+
+    // browsers that do not support naturalWidth and naturalHeight properties we have to fall back to the width and
+    // height properties. However, the image might have a css style applied so width and height would return the
+    // css size. We have to create a new Image object that is free of css rules and grab the values from that objet.
+    // Here we assume that the src has already been downloaded, so no onload callback is needed.
     var img = new Image();
     img.src = image.src;
-    return { width: img.width, height: img.height };
+    return {
+      width: img.width,
+      height: img.height
+    };
   }
 
   // Public Helper Functions
