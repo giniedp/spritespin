@@ -403,7 +403,11 @@
     }
     if (lane !== undefined){
       data.lane = lane;
-      data.lane = clamp(data.lane, 0, data.lanes - 1);
+      if (data.wrapLane){
+        data.lane = wrap(data.lane, 0, data.lanes - 1, data.lanes);
+      } else {
+        data.lane = clamp(data.lane, 0, data.lanes - 1);
+      }
     }
 
     data.target.trigger("onFrame", data);
@@ -996,7 +1000,7 @@
   }
 
   function exitFullscreen(){
-    return document[fn.exitFullscreen];
+    return document[fn.exitFullscreen]();
   }
 
   function fullscreenEnabled(){
@@ -1027,6 +1031,13 @@
     fullscreenEnabled: fullscreenEnabled,
     fullscreenElement: fullscreenElement,
     exitFullscreen: exitFullscreen,
+    toggleFullscreen: function(opts){
+      if (isFullscreen()) {
+        this.requestFullscreen(opts)
+      } else {
+        this.exitFullscreen()
+      }
+    },
     requestFullscreen: function(opts){
       opts = opts || {};
       var api = this;

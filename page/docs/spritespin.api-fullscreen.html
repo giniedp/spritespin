@@ -146,7 +146,7 @@
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">exitFullscreen</span><span class="hljs-params">()</span></span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>[fn.exitFullscreen];
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>[fn.exitFullscreen]();
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fullscreenEnabled</span><span class="hljs-params">()</span></span>{
@@ -177,6 +177,13 @@
     fullscreenEnabled: fullscreenEnabled,
     fullscreenElement: fullscreenElement,
     exitFullscreen: exitFullscreen,
+    toggleFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts)</span></span>{
+      <span class="hljs-keyword">if</span> (isFullscreen()) {
+        <span class="hljs-keyword">this</span>.requestFullscreen(opts)
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">this</span>.exitFullscreen()
+      }
+    },
     requestFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts)</span></span>{
       opts = opts || {};
       <span class="hljs-keyword">var</span> api = <span class="hljs-keyword">this</span>;
