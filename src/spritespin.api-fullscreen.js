@@ -76,7 +76,7 @@
   }
 
   function exitFullscreen(){
-    return document[fn.exitFullscreen];
+    return document[fn.exitFullscreen]();
   }
 
   function fullscreenEnabled(){
