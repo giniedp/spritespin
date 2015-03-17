@@ -1,0 +1,18 @@
+extends layouts/example.jade
+block content
+  .spritespin
+  a(onclick='goFullscreen(); return false;' href='') Fullscreen
+  script(type='text/javascript').
+    $('.spritespin').spritespin({
+      source: SpriteSpin.sourceArray('images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+      width: 240,
+      height: 164,
+      sense: -1,
+      mods: ['move', 'zoom', '360'],
+      autostart: false,
+      behavior: null,
+      module: null
+    });
+    function goFullscreen(){
+      $('.spritespin').spritespin('api').requestFullscreen();
+    }
