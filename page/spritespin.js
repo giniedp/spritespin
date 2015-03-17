@@ -46,6 +46,7 @@
     frames            : undefined,    // Total number of frames
     framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a spritesheet)
     lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
+    sizeMode          : undefined,    //
 
     module            : '360',        // The presentation module to use
     behavior          : 'drag',       // The interaction module to use
@@ -206,13 +207,24 @@
 
   // gets the original width and height of an image element
   function naturalSize(image){
-    // the given image element might have a css style applied already so img.width and img.height would return
-    // that css size. In order to get the original size create a new Image object and pass the src to that image.
-    // Assume that the src has already been downloaded, so no onload callback is needed.
-    // We could use img.naturalWidth but that is not available on IE < 9
+    // for browsers that support naturalWidth and naturalHeight properties
+    if (image.naturalWidth != null) {
+      return {
+        width: image.naturalWidth,
+        height: image.naturalHeight
+      };
+    }
+
+    // browsers that do not support naturalWidth and naturalHeight properties we have to fall back to the width and
+    // height properties. However, the image might have a css style applied so width and height would return the
+    // css size. We have to create a new Image object that is free of css rules and grab the values from that objet.
+    // Here we assume that the src has already been downloaded, so no onload callback is needed.
     var img = new Image();
     img.src = image.src;
-    return { width: img.width, height: img.height };
+    return {
+      width: img.width,
+      height: img.height
+    };
   }
 
   // Public Helper Functions
@@ -462,6 +474,67 @@
     }
   };
 
+  Spin.calculateInnerLayout = function(data){
+    // outer container size
+    var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
+    var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+    var a = w / h;
+
+    // inner container size
+    var w1 = data.frameWidth || w;
+    var h1 = data.frameHeight || h;
+    var a1 = w1 / h1;
+
+    // resulting layout
+    var css = {
+      width    : '100%',
+      height   : '100%',
+      top      : 0,
+      left     : 0,
+      bottom   : 0,
+      right    : 0,
+      position : 'absolute',
+      overflow : 'hidden'
+    };
+
+    // calculate size
+    var mode = data.sizeMode;
+    if (!mode || mode == 'scale'){
+      return css;
+    }
+
+    if (mode == 'original') {
+      css.width = w1;
+      css.height = h1;
+    } else if (mode == 'fit') {
+      if (a1 >= a) {
+        css.width = w;
+        css.height = w / a1;
+      } else {
+        css.height = h;
+        css.width = h * a1;
+      }
+    } else if (mode == 'fill') {
+      if (a1 >= a) {
+        css.height = h;
+        css.width = h * a1;
+      } else {
+        css.width = w;
+        css.height = w / a1;
+      }
+    }
+
+    css.width = css.width|0;
+    css.height = css.height|0;
+
+    // position in center
+    css.top = ((h - css.height) / 2)|0;
+    css.left = ((w - css.width) / 2)|0;
+    css.right = css.left;
+    css.bottom = css.top;
+    return css;
+  };
+
   /**
    * Applies css attributes to layout the SpriteSpin containers.
    * @param {object} data
@@ -487,15 +560,7 @@
       overflow : 'hidden'
     });
 
-    var css = {
-      width    : '100%',
-      height   : '100%',
-      top      : 0,
-      left     : 0,
-      bottom   : 0,
-      right    : 0,
-      position : 'absolute'
-    };
+    var css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     if (data.canvas){
       data.canvas[0].width = w;
@@ -853,6 +918,144 @@
 
 }(window.jQuery || window.Zepto || window.$));
 
+(function ($) {
+  "use strict";
+
+  // https://github.com/sindresorhus/screenfull.js/blob/gh-pages/src/screenfull.js
+  var fn = (function () {
+    var val;
+    var valLength;
+
+    var fnMap = [
+      [
+        'requestFullscreen',
+        'exitFullscreen',
+        'fullscreenElement',
+        'fullscreenEnabled',
+        'fullscreenchange',
+        'fullscreenerror'
+      ],
+      // new WebKit
+      [
+        'webkitRequestFullscreen',
+        'webkitExitFullscreen',
+        'webkitFullscreenElement',
+        'webkitFullscreenEnabled',
+        'webkitfullscreenchange',
+        'webkitfullscreenerror'
+
+      ],
+      // old WebKit (Safari 5.1)
+      [
+        'webkitRequestFullScreen',
+        'webkitCancelFullScreen',
+        'webkitCurrentFullScreenElement',
+        'webkitCancelFullScreen',
+        'webkitfullscreenchange',
+        'webkitfullscreenerror'
+
+      ],
+      [
+        'mozRequestFullScreen',
+        'mozCancelFullScreen',
+        'mozFullScreenElement',
+        'mozFullScreenEnabled',
+        'mozfullscreenchange',
+        'mozfullscreenerror'
+      ],
+      [
+        'msRequestFullscreen',
+        'msExitFullscreen',
+        'msFullscreenElement',
+        'msFullscreenEnabled',
+        'MSFullscreenChange',
+        'MSFullscreenError'
+      ]
+    ];
+
+    var i = 0;
+    var l = fnMap.length;
+    var ret = {};
+
+    for (; i < l; i++) {
+      val = fnMap[i];
+      if (val && val[1] in document) {
+        for (i = 0, valLength = val.length; i < valLength; i++) {
+          ret[fnMap[0][i]] = val[i];
+        }
+        return ret;
+      }
+    }
+
+    return false;
+  })();
+
+  function requestFullscreen(e){
+    e = e || document.documentElement;
+    e[fn.requestFullscreen]();
+  }
+
+  function exitFullscreen(){
+    return document[fn.exitFullscreen];
+  }
+
+  function fullscreenEnabled(){
+    return document[fn.fullscreenEnabled];
+  }
+
+  function fullscreenElement(){
+    return document[fn.fullscreenElement];
+  }
+
+  function isFullscreen(){
+    return !!fullscreenElement();
+  }
+
+  var SpriteSpin = window.SpriteSpin;
+  var changeEvent = fn.fullscreenchange + '.' + SpriteSpin.namespace;
+
+  function unbindChangeEvent(){
+    $(document).unbind(changeEvent);
+  }
+
+  function bindChangeEvent(callback){
+    unbindChangeEvent();
+    $(document).bind(changeEvent, callback);
+  }
+
+  SpriteSpin.extendApi({
+    fullscreenEnabled: fullscreenEnabled,
+    fullscreenElement: fullscreenElement,
+    exitFullscreen: exitFullscreen,
+    requestFullscreen: function(opts){
+      opts = opts || {};
+      var api = this;
+      var data = api.data;
+      var oWidth = data.width;
+      var oHeight = data.height;
+      var oSource = data.source;
+      bindChangeEvent(function(){
+        if (isFullscreen()){
+          // ENTER
+          data.width = window.screen.width;
+          data.height = window.screen.height;
+          data.source = opts.source || oSource;
+          SpriteSpin.boot(data);
+        } else {
+          // EXIT
+          unbindChangeEvent();
+          data.width = oWidth;
+          data.height = oHeight;
+          data.source = oSource;
+          SpriteSpin.boot(data);
+        }
+      });
+      requestFullscreen(data.target[0]);
+    }
+  });
+
+}(window.jQuery || window.Zepto || window.$));
+
 (function ($, SpriteSpin) {
   "use strict";
 
@@ -1147,9 +1350,9 @@
     var index = data.lane * data.frames + data.frame;
     var img = data.images[index];
     if (data.renderer === 'canvas'){
-      if (img){
+      if (img && img.complete !== false){
         data.context.clearRect(0, 0, data.width, data.height);
-        data.context.drawImage(data.images[index], 0, 0, data.width, data.height);
+        data.context.drawImage(img, 0, 0, data.width, data.height);
       }
     } else if (data.renderer === 'background') {
       data.stage.css({
