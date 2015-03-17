@@ -107,6 +107,13 @@
     fullscreenEnabled: fullscreenEnabled,
     fullscreenElement: fullscreenElement,
     exitFullscreen: exitFullscreen,
+    toggleFullscreen: function(opts){
+      if (isFullscreen()) {
+        this.requestFullscreen(opts)
+      } else {
+        this.exitFullscreen()
+      }
+    },
     requestFullscreen: function(opts){
       opts = opts || {};
       var api = this;
