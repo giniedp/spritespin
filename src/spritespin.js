@@ -46,6 +46,7 @@
     frames            : undefined,    // Total number of frames
     framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a spritesheet)
     lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
+    sizeMode          : undefined,    //
 
     module            : '360',        // The presentation module to use
     behavior          : 'drag',       // The interaction module to use
@@ -473,6 +474,67 @@
     }
   };
 
+  Spin.calculateInnerLayout = function(data){
+    // outer container size
+    var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
+    var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+    var a = w / h;
+
+    // inner container size
+    var w1 = data.frameWidth || w;
+    var h1 = data.frameHeight || h;
+    var a1 = w1 / h1;
+
+    // resulting layout
+    var css = {
+      width    : '100%',
+      height   : '100%',
+      top      : 0,
+      left     : 0,
+      bottom   : 0,
+      right    : 0,
+      position : 'absolute',
+      overflow : 'hidden'
+    };
+
+    // calculate size
+    var mode = data.sizeMode;
+    if (!mode || mode == 'scale'){
+      return css;
+    }
+
+    if (mode == 'original') {
+      css.width = w1;
+      css.height = h1;
+    } else if (mode == 'fit') {
+      if (a1 >= a) {
+        css.width = w;
+        css.height = w / a1;
+      } else {
+        css.height = h;
+        css.width = h * a1;
+      }
+    } else if (mode == 'fill') {
+      if (a1 >= a) {
+        css.height = h;
+        css.width = h * a1;
+      } else {
+        css.width = w;
+        css.height = w / a1;
+      }
+    }
+
+    css.width = css.width|0;
+    css.height = css.height|0;
+
+    // position in center
+    css.top = ((h - css.height) / 2)|0;
+    css.left = ((w - css.width) / 2)|0;
+    css.right = css.left;
+    css.bottom = css.top;
+    return css;
+  };
+
   /**
    * Applies css attributes to layout the SpriteSpin containers.
    * @param {object} data
@@ -498,15 +560,7 @@
       overflow : 'hidden'
     });
 
-    var css = {
-      width    : '100%',
-      height   : '100%',
-      top      : 0,
-      left     : 0,
-      bottom   : 0,
-      right    : 0,
-      position : 'absolute'
-    };
+    var css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     if (data.canvas){
       data.canvas[0].width = w;
