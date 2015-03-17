@@ -403,7 +403,11 @@
     }
     if (lane !== undefined){
       data.lane = lane;
-      data.lane = clamp(data.lane, 0, data.lanes - 1);
+      if (data.wrapLane){
+        data.lane = wrap(data.lane, 0, data.lanes - 1, data.lanes);
+      } else {
+        data.lane = clamp(data.lane, 0, data.lanes - 1);
+      }
     }
 
     data.target.trigger("onFrame", data);
