@@ -13,6 +13,7 @@
   var source = [
     'src/spritespin.js',
     'src/spritespin.api.js',
+    'src/spritespin.api-*.js',
     'src/spritespin.beh-*.js',
     'src/spritespin.mod-*.js'
   ];
