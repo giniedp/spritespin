@@ -21,7 +21,7 @@
     "less": "^2.2.0"
   },
   "description": "jQuery plugin for creating flipbook animations",
-  "main": "dist/spritespin.js",
+  "main": "release/spritespin.js",
   "dependencies": {},
   "repository": {
     "type": "git",
