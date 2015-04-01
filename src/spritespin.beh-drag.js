@@ -28,12 +28,14 @@
 
     SpriteSpin.updateInput(e, data);
 
-    // dont do anything if the drag distance exceeds the scroll threshold.
-    // this allows to use touch scroll on mobile devices.
-    if (Math.abs(data.ddX) + Math.abs(data.ddY) > data.scrollThreshold){
-      data.dragging = false;
-      SpriteSpin.resetInput(data);
-      return;
+    if (!SpriteSpin.Api.fsApi.fullscreenElement()){
+      // dont do anything if the drag distance exceeds the scroll threshold.
+      // this allows to use touch scroll on mobile devices.
+      if (Math.abs(data.ddX) + Math.abs(data.ddY) > data.scrollThreshold){
+        data.dragging = false;
+        SpriteSpin.resetInput(data);
+        return;
+      }
     }
 
     // disable touch scroll
@@ -57,12 +59,13 @@
     data.dragLane += data.lanes * y;
     // clamp accumulated values if wrap is disabled
     if (!data.wrap){
-      data.dragFrame = Math.min(data.dragFrame, data.frames);
-      data.dragFrame = Math.max(data.dragFrame, 0);
+      data.dragFrame = SpriteSpin.clamp(data.dragFrame, 0, data.frames);
+    }
+    if (data.minLane != null && data.maxLane != null){
+      data.dragLane = SpriteSpin.clamp(data.dragLane, data.minLane, data.maxLane);
     }
     if (!data.wrapLane){
-      data.dragLane = Math.min(data.dragLane, data.lanes);
-      data.dragLane = Math.max(data.dragLane, 0);
+      data.dragLane = SpriteSpin.clamp(data.dragLane, 0, data.lanes);
     }
 
     frame = Math.floor(data.dragFrame);

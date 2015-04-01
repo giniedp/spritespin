@@ -58,7 +58,9 @@
       <span class="hljs-keyword">return</span>;
     }
 
-    SpriteSpin.updateInput(e, data);</pre></div></div>
+    SpriteSpin.updateInput(e, data);
+
+    <span class="hljs-keyword">if</span> (!SpriteSpin.Api.fsApi.fullscreenElement()){</pre></div></div>
             
         </li>
         
@@ -74,10 +76,11 @@ this allows to use touch scroll on mobile devices.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.abs(data.ddX) + <span class="hljs-built_in">Math</span>.abs(data.ddY) &gt; data.scrollThreshold){
-      data.dragging = <span class="hljs-literal">false</span>;
-      SpriteSpin.resetInput(data);
-      <span class="hljs-keyword">return</span>;
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.abs(data.ddX) + <span class="hljs-built_in">Math</span>.abs(data.ddY) &gt; data.scrollThreshold){
+        data.dragging = <span class="hljs-literal">false</span>;
+        SpriteSpin.resetInput(data);
+        <span class="hljs-keyword">return</span>;
+      }
     }</pre></div></div>
             
         </li>
@@ -138,12 +141,13 @@ this allows to use touch scroll on mobile devices.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!data.wrap){
-      data.dragFrame = <span class="hljs-built_in">Math</span>.min(data.dragFrame, data.frames);
-      data.dragFrame = <span class="hljs-built_in">Math</span>.max(data.dragFrame, <span class="hljs-number">0</span>);
+      data.dragFrame = SpriteSpin.clamp(data.dragFrame, <span class="hljs-number">0</span>, data.frames);
+    }
+    <span class="hljs-keyword">if</span> (data.minLane != <span class="hljs-literal">null</span> &amp;&amp; data.maxLane != <span class="hljs-literal">null</span>){
+      data.dragLane = SpriteSpin.clamp(data.dragLane, data.minLane, data.maxLane);
     }
     <span class="hljs-keyword">if</span> (!data.wrapLane){
-      data.dragLane = <span class="hljs-built_in">Math</span>.min(data.dragLane, data.lanes);
-      data.dragLane = <span class="hljs-built_in">Math</span>.max(data.dragLane, <span class="hljs-number">0</span>);
+      data.dragLane = SpriteSpin.clamp(data.dragLane, <span class="hljs-number">0</span>, data.lanes);
     }
 
     frame = <span class="hljs-built_in">Math</span>.floor(data.dragFrame);

@@ -121,6 +121,8 @@ to the target element on which the plugin is called.</p>
     renderer          : <span class="hljs-string">'canvas'</span>,     <span class="hljs-comment">// The rendering mode to use</span>
 
     lane              : <span class="hljs-number">0</span>,            <span class="hljs-comment">// The initial sequence number to play</span>
+    minLane           : <span class="hljs-literal">undefined</span>,
+    maxLane           : <span class="hljs-literal">undefined</span>,
     frame             : <span class="hljs-number">0</span>,            <span class="hljs-comment">// Initial (and current) frame number</span>
     frameTime         : <span class="hljs-number">40</span>,           <span class="hljs-comment">// Time in ms between updates. 40 is exactly 25 FPS</span>
     animate           : <span class="hljs-literal">true</span>,         <span class="hljs-comment">// If true starts the animation on load</span>
@@ -233,12 +235,14 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
     e.preventDefault();
     <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
   }
+  Spin.prevent = prevent;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span><span class="hljs-params">()</span></span>{
     <span class="hljs-keyword">if</span> (<span class="hljs-built_in">window</span>.console &amp;&amp; <span class="hljs-built_in">window</span>.console.log){
       <span class="hljs-built_in">window</span>.console.log.apply(<span class="hljs-built_in">window</span>.console, <span class="hljs-built_in">arguments</span>);
     }
-  }</pre></div></div>
+  }
+  Spin.log = log;</pre></div></div>
             
         </li>
         
@@ -273,8 +277,64 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span><span class="hljs-params">(target)</span></span>{
-    target.unbind(<span class="hljs-string">'.'</span> + name);
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span><span class="hljs-params">(target, event, func)</span></span>{
+    <span class="hljs-keyword">var</span> type = (event ? event : <span class="hljs-string">''</span>) + <span class="hljs-string">'.'</span> + name;
+    <span class="hljs-keyword">if</span> (func){
+      target.unbind(type, func);
+    } <span class="hljs-keyword">else</span> {
+      target.unbind(type);
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">chainFunction</span><span class="hljs-params">(orig, chain)</span></span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      (orig || $.noop).apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+      <span class="hljs-keyword">return</span> (chain || $.noop).apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+    };
+  }
+  Spin.chainFunction = chainFunction;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">inArray</span><span class="hljs-params">(item, array)</span></span>{
+    <span class="hljs-keyword">return</span> $.inArray(item, array) &gt; -<span class="hljs-number">1</span>;
+  }
+  Spin.inArray = inArray;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">inRange</span><span class="hljs-params">(item, min, max)</span></span>{
+    <span class="hljs-keyword">return</span> item &gt;= min &amp;&amp; item &lt;= max;
+  }
+  Spin.inRange = inRange;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeFromArray</span><span class="hljs-params">(item, array)</span></span>{
+    <span class="hljs-keyword">var</span> index = $.inArray(item, array);
+    <span class="hljs-keyword">if</span> (index &gt; -<span class="hljs-number">1</span>){
+      array.splice(index, <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+  Spin.removeFromArray = removeFromArray;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">laneLoadOrder</span><span class="hljs-params">(start, total)</span> </span>{
+    start = clamp(start, <span class="hljs-number">0</span>, total - <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">var</span> result = [];
+    <span class="hljs-keyword">var</span> i, current = start;
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; total; i += <span class="hljs-number">1</span>){
+      <span class="hljs-keyword">if</span> (i % <span class="hljs-number">2</span>){
+        current += i;
+      } <span class="hljs-keyword">else</span> {
+        current -= i;
+      }
+      <span class="hljs-keyword">if</span> (inRange(current, <span class="hljs-number">0</span>, total-<span class="hljs-number">1</span>) &amp;&amp; !inArray(current, result)) {
+        result.push(current);
+      }
+    }
+    <span class="hljs-keyword">for</span> (i = start; i &lt; total; i += <span class="hljs-number">1</span>){
+      <span class="hljs-keyword">if</span> (!inArray(i, result)) result.push(i);
+    }
+    <span class="hljs-keyword">for</span> (i = start; i &gt;= <span class="hljs-number">0</span>; i -= <span class="hljs-number">1</span>){
+      <span class="hljs-keyword">if</span> (!inArray(i, result)) result.push(i);
+    }
+    <span class="hljs-keyword">return</span> result;
   }</pre></div></div>
             
         </li>
@@ -290,7 +350,9 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(opts)</span></span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(opts)</span></span>{
+    <span class="hljs-keyword">var</span> canceled = <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">var</span> target = opts.target;</pre></div></div>
             
         </li>
         
@@ -305,28 +367,7 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> src = (<span class="hljs-keyword">typeof</span> opts.source === <span class="hljs-string">'string'</span>) ? [opts.source] : opts.source;
-    <span class="hljs-keyword">var</span> i, count = <span class="hljs-number">0</span>, img, images = [], targetCount = (opts.preloadCount || src.length);
-    <span class="hljs-keyword">var</span> completed = <span class="hljs-literal">false</span>, firstLoaded = <span class="hljs-literal">false</span>;
-    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
-      count += <span class="hljs-number">1</span>;
-      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> opts.progress === <span class="hljs-string">'function'</span>){
-        opts.progress({
-          index: $.inArray(<span class="hljs-keyword">this</span>, images),
-          loaded: count,
-          total: src.length,
-          percent: <span class="hljs-built_in">Math</span>.round((count / src.length) * <span class="hljs-number">100</span>)
-        });
-      }
-      firstLoaded = firstLoaded || (<span class="hljs-keyword">this</span> === images[<span class="hljs-number">0</span>]);
-      <span class="hljs-keyword">if</span> (!completed &amp;&amp; (count &gt;= targetCount) &amp;&amp; firstLoaded &amp;&amp; (<span class="hljs-keyword">typeof</span> opts.complete === <span class="hljs-string">'function'</span>)) {
-        completed = <span class="hljs-literal">true</span>;
-        opts.complete(images);
-      }
-    };
-    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; src.length; i += <span class="hljs-number">1</span> ) {
-      img = <span class="hljs-keyword">new</span> Image();
-      images.push(img);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> src = (<span class="hljs-keyword">typeof</span> opts.source === <span class="hljs-string">'string'</span>) ? [opts.source] : opts.source;</pre></div></div>
             
         </li>
         
@@ -337,17 +378,13 @@ The SpriteSpin namespace is attached to the event name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>currently no care about error or aborting transfers</p>
+              <p>Number of frames to load before call the complete callback</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      img.onload = img.onabort = img.onerror = tick;
-      img.src = src[i];
-    }
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> opts.initiated === <span class="hljs-string">'function'</span>){
-      opts.initiated(images);
-    }
-  }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> totalCount = src.length;
+    <span class="hljs-keyword">var</span> targetCount = opts.preloadCount || totalCount;
+    <span class="hljs-keyword">var</span> loadedCount = <span class="hljs-number">0</span>;</pre></div></div>
             
         </li>
         
@@ -357,6 +394,125 @@ The SpriteSpin namespace is attached to the event name</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Loading may start on specific lane</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> startingLane = opts.lane || <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">var</span> totalLanes = opts.lanes || <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">var</span> framesPerLane = src.length / totalLanes;
+    <span class="hljs-keyword">var</span> minLane = startingLane;
+    <span class="hljs-keyword">var</span> maxLane = startingLane;
+
+    <span class="hljs-keyword">var</span> queue = {}, lanes = laneLoadOrder(startingLane, totalLanes);
+    <span class="hljs-keyword">var</span> loadNext = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      <span class="hljs-keyword">var</span> arr = queue[lanes.shift()];
+      <span class="hljs-keyword">if</span> (arr == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span>;
+      arr = arr.slice(<span class="hljs-number">0</span>);
+      <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; arr.length; i += <span class="hljs-number">1</span>){
+        img = arr[i];
+        img.src = src[img.index];
+      }
+    };
+
+    <span class="hljs-keyword">var</span> onComplete = opts.onComplete || $.noop;
+    <span class="hljs-keyword">var</span> onPreload = opts.onPreload || $.noop;
+    <span class="hljs-keyword">var</span> onProgress = chainFunction(opts.onProgress, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts)</span></span>{
+      <span class="hljs-keyword">var</span> arr = queue[opts.image.lane];
+      <span class="hljs-keyword">var</span> ind = $.inArray(opts.image, arr);
+      arr.splice(ind, <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">if</span> (arr.length == <span class="hljs-number">0</span>) loadNext();
+    });
+
+    <span class="hljs-keyword">var</span> images = [];
+    <span class="hljs-keyword">var</span> preloaded = <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">var</span> firstLoaded = <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      <span class="hljs-keyword">if</span> (canceled) {
+        <span class="hljs-keyword">return</span>;
+      }
+      loadedCount += <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">if</span> ((loadedCount % framesPerLane) == <span class="hljs-number">0</span>){
+        minLane = <span class="hljs-built_in">Math</span>.min(minLane, <span class="hljs-keyword">this</span>.lane);
+        maxLane = <span class="hljs-built_in">Math</span>.max(maxLane, <span class="hljs-keyword">this</span>.lane);
+      }
+      onProgress({
+        image: <span class="hljs-keyword">this</span>,
+        lane: <span class="hljs-keyword">this</span>.lane,
+        index: <span class="hljs-keyword">this</span>.index,
+        frame: <span class="hljs-keyword">this</span>.frame,
+        loaded: loadedCount,
+        total: src.length,
+        minLane: minLane,
+        maxLane: maxLane,
+        percent: <span class="hljs-built_in">Math</span>.round((loadedCount / totalCount) * <span class="hljs-number">100</span>),
+        percentPreload: <span class="hljs-built_in">Math</span>.min(<span class="hljs-built_in">Math</span>.round((loadedCount / targetCount) * <span class="hljs-number">100</span>), <span class="hljs-number">100</span>)
+      });
+      firstLoaded = firstLoaded || (<span class="hljs-keyword">this</span> === images[startingLane * framesPerLane]);
+      <span class="hljs-keyword">if</span> (!preloaded &amp;&amp; (loadedCount &gt;= targetCount) &amp;&amp; firstLoaded) {
+        preloaded = <span class="hljs-literal">true</span>;
+        onPreload(images.slice(<span class="hljs-number">0</span>));
+      }
+      <span class="hljs-keyword">if</span> (loadedCount === totalCount) {
+        cleanup();
+        onComplete();
+      }
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Build ordered image list</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> i, img;
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; src.length; i += <span class="hljs-number">1</span> ) {
+      img = <span class="hljs-keyword">new</span> Image();
+      img.index = i;
+      img.frame = i % framesPerLane;
+      img.lane = <span class="hljs-built_in">Math</span>.floor((img.index - img.frame) / framesPerLane);
+      img.onload = img.onabort = img.onerror = tick;
+      images.push(img);
+      (queue[img.lane] = queue[img.lane] || []).push(img);
+    }
+
+    <span class="hljs-keyword">var</span> cancel = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      canceled = <span class="hljs-literal">true</span>;
+      cleanup();
+    };
+
+    <span class="hljs-keyword">var</span> cleanup = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      images.length = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> queue){
+        <span class="hljs-keyword">if</span> (queue.hasOwnProperty(key)){
+          queue[key].length = <span class="hljs-number">0</span>;
+        }
+      }
+      unbind(target, <span class="hljs-string">'onReset'</span>, cancel);
+      unbind(target, <span class="hljs-string">'onDestroy'</span>, cancel);
+    };
+
+    bind(target, <span class="hljs-string">'onReset'</span>, cancel);
+    bind(target, <span class="hljs-string">'onDestroy'</span>, cancel);
+    loadNext();
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Idea taken from <a href="https://github.com/stomita/ios-imagefile-megapixel">https://github.com/stomita/ios-imagefile-megapixel</a>
 Detects whether the image has been sub sampled by the browser and does not have its original dimensions.
@@ -371,11 +527,11 @@ This method unfortunately does not work for images that have transparent backgro
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>sub sampling happens on images above 1 megapixel</p>
 
@@ -399,11 +555,11 @@ This method unfortunately does not work for images that have transparent backgro
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>set canvas to 1x1 pixel size and fill it with magenta color</p>
 
@@ -416,11 +572,11 @@ This method unfortunately does not work for images that have transparent backgro
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>render the image with a negative offset to the left so that it would
 fill the canvas pixel with the top right pixel of the image.</p>
@@ -432,11 +588,11 @@ fill the canvas pixel with the top right pixel of the image.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>check color value to confirm image is covering edge pixel or not.
 if color still magenta, the image is assumed to be sub sampled.</p>
@@ -452,11 +608,11 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>avoids cross origin exception for chrome when code runs without a server</p>
 
@@ -470,11 +626,11 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>gets the original width and height of an image element</p>
 
@@ -485,11 +641,11 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>for browsers that support naturalWidth and naturalHeight properties</p>
 
@@ -505,15 +661,15 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>browsers that do not support naturalWidth and naturalHeight properties we have to fall back to the width and
 height properties. However, the image might have a css style applied so width and height would return the
-css size. We have to create a new Image object that is free of css rules and grab the values from that objet.
+css size. We have to create a new Image object that is free of css rules and grab the values from that object.
 Here we assume that the src has already been downloaded, so no onload callback is needed.</p>
 
             </div>
@@ -529,11 +685,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-24">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <h2 id="public-helper-functions">Public Helper Functions</h2>
 
@@ -542,11 +698,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-25">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               
             </div>
@@ -590,8 +746,8 @@ Here we assume that the src has already been downloaded, so no onload callback i
    * Measures the image frames that are used in the given data object
    * @param {object} data
    */</span>
-  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
-    <span class="hljs-keyword">var</span> img = data.images[<span class="hljs-number">0</span>];
+  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data, img)</span></span>{
+    img = img || data.images[<span class="hljs-number">0</span>];
     <span class="hljs-keyword">var</span> size = naturalSize(img);
 
     <span class="hljs-keyword">if</span> (data.images.length === <span class="hljs-number">1</span>){
@@ -606,11 +762,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>calculate the number of frames packed in a row
 assume tightly packed images without any padding pixels</p>
@@ -622,11 +778,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>calculate size of a single frame</p>
 
@@ -675,11 +831,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>jQuery Event normalization does not preserve the ‘event.touches’
 try to grab touches from the original event</p>
@@ -693,11 +849,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>cache positions from previous frame</p>
 
@@ -709,11 +865,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>get current touch or mouse position</p>
 
@@ -730,11 +886,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Fix old position.</p>
 
@@ -748,11 +904,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Cache the initial click/touch position and store the frame number at which the click happened.
 Useful for different behavior implementations. This must be restored when the click/touch is released.</p>
@@ -769,11 +925,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-33">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Calculate the vector from start position to current pointer position.</p>
 
@@ -785,11 +941,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-34">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Calculate the vector from last frame position to current pointer position.</p>
 
@@ -801,11 +957,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-35">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Normalize vectors to range [-1:+1]</p>
 
@@ -837,11 +993,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-36">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>wrap the frame value to fit in range [0, data.frames]</p>
 
@@ -852,11 +1008,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-37">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>stop animation if loop is disabled and the stopFrame is reached</p>
 
@@ -870,11 +1026,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-38">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>wrap/clamp the frame value to fit in range [0, data.frames]</p>
 
@@ -927,11 +1083,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-39">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>another frame has been already requested</p>
 
@@ -943,11 +1099,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-40">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>cache the tick function</p>
 
@@ -962,11 +1118,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-41">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>The try catch block is a hack for Opera Browser
 Opera sometimes rises an exception here and
@@ -981,11 +1137,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               
             </div>
@@ -1017,11 +1173,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>outer container size</p>
 
@@ -1034,11 +1190,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>inner container size</p>
 
@@ -1051,11 +1207,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>resulting layout</p>
 
@@ -1075,11 +1231,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>calculate size</p>
 
@@ -1117,11 +1273,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>position in center</p>
 
@@ -1143,11 +1299,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>disable selection</p>
 
@@ -1191,11 +1347,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>Clear all SpriteSpin events on the target element</p>
 
@@ -1206,11 +1362,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>disable all default browser behavior on the following events
 mainly prevents image drag operation</p>
@@ -1224,11 +1380,11 @@ mainly prevents image drag operation</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>Bind module functions to SpriteSpin events</p>
 
@@ -1244,31 +1400,34 @@ mainly prevents image drag operation</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>bind</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      bind(target, <span class="hljs-string">'onInit'</span>,     mod.onInit);
-      bind(target, <span class="hljs-string">'onProgress'</span>, mod.onProgress);
-      bind(target, <span class="hljs-string">'onLoad'</span>,     mod.onLoad);
-      bind(target, <span class="hljs-string">'onFrame'</span>,    mod.onFrame);
-      bind(target, <span class="hljs-string">'onDraw'</span>,     mod.onDraw);
+            <div class="content"><div class='highlight'><pre>      bind(target, <span class="hljs-string">'onReset'</span>,        mod.onReset);
+      bind(target, <span class="hljs-string">'onInit'</span>,         mod.onInit);
+      bind(target, <span class="hljs-string">'onProgress'</span>,     mod.onProgress);
+      bind(target, <span class="hljs-string">'onLoad'</span>,         mod.onLoad);
+      bind(target, <span class="hljs-string">'onLoadComplete'</span>, mod.onLoadComplete);
+      bind(target, <span class="hljs-string">'onFrame'</span>,        mod.onFrame);
+      bind(target, <span class="hljs-string">'onDraw'</span>,         mod.onDraw);
+      bind(target, <span class="hljs-string">'onDestroy'</span>,      mod.onDestroy);
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-53">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>bind auto start function to load event.</p>
 
@@ -1276,26 +1435,32 @@ mainly prevents image drag operation</p>
             
             <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onLoad'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
       Spin.setAnimation(data);
+    });
+    bind(target, <span class="hljs-string">'onDestroy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+      Spin.stopAnimation(data);
     });</pre></div></div>
             
         </li>
         
         
-        <li id="section-54">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>bind all user events that have been passed on initialization</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onInit'</span>,     data.onInit);
-    bind(target, <span class="hljs-string">'onProgress'</span>, data.onProgress);
-    bind(target, <span class="hljs-string">'onLoad'</span>,     data.onLoad);
-    bind(target, <span class="hljs-string">'onFrame'</span>,    data.onFrame);
-    bind(target, <span class="hljs-string">'onDraw'</span>,     data.onDraw);
+            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onReset'</span>,        data.onReset);
+    bind(target, <span class="hljs-string">'onInit'</span>,         data.onInit);
+    bind(target, <span class="hljs-string">'onProgress'</span>,     data.onProgress);
+    bind(target, <span class="hljs-string">'onLoad'</span>,         data.onLoad);
+    bind(target, <span class="hljs-string">'onLoadComplete'</span>, data.onLoadComplete);
+    bind(target, <span class="hljs-string">'onFrame'</span>,        data.onFrame);
+    bind(target, <span class="hljs-string">'onDraw'</span>,         data.onDraw);
+    bind(target, <span class="hljs-string">'onDestroy'</span>,      data.onDestroy);
   };
 
   <span class="hljs-comment">/**
@@ -1303,27 +1468,39 @@ mainly prevents image drag operation</p>
    * @param {object} data
    */</span>
   Spin.boot = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+    <span class="hljs-keyword">if</span> (data.loaded || data.loading){
+      data.target.trigger(<span class="hljs-string">'onReset'</span>);
+    }
     Spin.setModules(data);
     Spin.setLayout(data);
     Spin.setEvents(data);
     data.target.addClass(<span class="hljs-string">'loading'</span>).trigger(<span class="hljs-string">'onInit'</span>, data);
     data.loading = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">var</span> reference = <span class="hljs-literal">null</span>;
     load({
+      target: data.target,
       source: data.source,
+      lane: data.lane,
+      lanes: data.lanes,
       preloadCount: data.preloadCount,
-      progress: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(progress)</span></span>{
+      onProgress: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(progress)</span></span>{
+        reference = reference || progress.image;
         data.target.trigger(<span class="hljs-string">'onProgress'</span>, [progress, data]);
       },
-      complete: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(images)</span></span>{
+      onPreload: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(images)</span></span>{
         data.images = images;
         data.loading = <span class="hljs-literal">false</span>;
-        Spin.measureSource(data);
+        data.loaded = <span class="hljs-literal">true</span>;
+        Spin.measureSource(data, reference);
         data.stage.show();
         data.target
           .removeClass(<span class="hljs-string">'loading'</span>)
           .trigger(<span class="hljs-string">'onLoad'</span>, data)
           .trigger(<span class="hljs-string">'onFrame'</span>, data)
           .trigger(<span class="hljs-string">'onDraw'</span>, data);
+      },
+      onComplete: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        data.target.trigger(<span class="hljs-string">'onLoadComplete'</span>, data);
       }
     });
   };
@@ -1335,17 +1512,18 @@ mainly prevents image drag operation</p>
   Spin.create = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
     <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = options.target;
     <span class="hljs-keyword">var</span> data  = $<span class="hljs-keyword">this</span>.data(name);
+    <span class="hljs-keyword">var</span> isReboot = <span class="hljs-literal">false</span>;
 
     <span class="hljs-keyword">if</span> (!data){</pre></div></div>
             
         </li>
         
         
-        <li id="section-55">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>SpriteSpin is not initialized
 Create default settings object and extend with given options</p>
@@ -1357,11 +1535,11 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>ensure that there is anything set as a source</p>
 
@@ -1372,11 +1550,11 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>if image tags are contained inside this DOM element
 use these images as the source files</p>
@@ -1390,11 +1568,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>build inner html</p>
 <div>
@@ -1412,11 +1590,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>add the canvas element if canvas rendering is enabled and supported</p>
 
@@ -1434,11 +1612,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>fallback to image rendering mode</p>
 
@@ -1451,11 +1629,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>setup references to DOM elements</p>
 
@@ -1467,27 +1645,28 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>store the data</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.data(name, data);
-    } <span class="hljs-keyword">else</span> {</pre></div></div>
+    } <span class="hljs-keyword">else</span> {
+      isReboot = <span class="hljs-literal">true</span>;</pre></div></div>
             
         </li>
         
         
-        <li id="section-63">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>just update the data object</p>
 
@@ -1499,11 +1678,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>convert string source to array of strings</p>
 
@@ -1516,11 +1695,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>behavior and module attributes tell us what additional modules must be loaded.</p>
 
@@ -1543,6 +1722,9 @@ use these images as the source files</p>
       <span class="hljs-keyword">delete</span> data.module;
     }
 
+    <span class="hljs-keyword">if</span> (isReboot){
+      data.target.trigger(<span class="hljs-string">'onReset'</span>);
+    }
     Spin.boot(data);
   };
 
@@ -1552,7 +1734,7 @@ use these images as the source files</p>
    */</span>
   Spin.destroy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
     <span class="hljs-keyword">if</span> (data){
-      Spin.stopAnimation(data);
+      data.target.trigger(<span class="hljs-string">'onDestroy'</span>);
       unbind(data.target);
       data.target.removeData(name);
     }

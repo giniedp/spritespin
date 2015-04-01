@@ -53,6 +53,8 @@
     renderer          : 'canvas',     // The rendering mode to use
 
     lane              : 0,            // The initial sequence number to play
+    minLane           : undefined,
+    maxLane           : undefined,
     frame             : 0,            // Initial (and current) frame number
     frameTime         : 40,           // Time in ms between updates. 40 is exactly 25 FPS
     animate           : true,         // If true starts the animation on load
@@ -107,12 +109,14 @@
     e.preventDefault();
     return false;
   }
+  Spin.prevent = prevent;
 
   function log(){
     if (window.console && window.console.log){
       window.console.log.apply(window.console, arguments);
     }
   }
+  Spin.log = log;
 
   // Binds on the given target and event the given function.
   // The SpriteSpin namespace is attached to the event name
@@ -123,42 +127,172 @@
   }
 
   // Unbinds all SpriteSpin events from given target element
-  function unbind(target){
-    target.unbind('.' + name);
+  function unbind(target, event, func){
+    var type = (event ? event : '') + '.' + name;
+    if (func){
+      target.unbind(type, func);
+    } else {
+      target.unbind(type);
+    }
+  }
+
+  function chainFunction(orig, chain){
+    return function(){
+      (orig || $.noop).apply(this, arguments);
+      return (chain || $.noop).apply(this, arguments);
+    };
+  }
+  Spin.chainFunction = chainFunction;
+
+  function inArray(item, array){
+    return $.inArray(item, array) > -1;
+  }
+  Spin.inArray = inArray;
+
+  function inRange(item, min, max){
+    return item >= min && item <= max;
+  }
+  Spin.inRange = inRange;
+
+  function removeFromArray(item, array){
+    var index = $.inArray(item, array);
+    if (index > -1){
+      array.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+  Spin.removeFromArray = removeFromArray;
+
+  function laneLoadOrder(start, total) {
+    start = clamp(start, 0, total - 1);
+    var result = [];
+    var i, current = start;
+    for (i = 0; i < total; i += 1){
+      if (i % 2){
+        current += i;
+      } else {
+        current -= i;
+      }
+      if (inRange(current, 0, total-1) && !inArray(current, result)) {
+        result.push(current);
+      }
+    }
+    for (i = start; i < total; i += 1){
+      if (!inArray(i, result)) result.push(i);
+    }
+    for (i = start; i >= 0; i -= 1){
+      if (!inArray(i, result)) result.push(i);
+    }
+    return result;
   }
 
   // Loads a set of image files. Yields the progress and the completion of the load operation.
   function load(opts){
+    var canceled = false;
+    var target = opts.target;
+
     // convert opts.source to an array of strings
     var src = (typeof opts.source === 'string') ? [opts.source] : opts.source;
-    var i, count = 0, img, images = [], targetCount = (opts.preloadCount || src.length);
-    var completed = false, firstLoaded = false;
-    var tick = function(){
-      count += 1;
-      if (typeof opts.progress === 'function'){
-        opts.progress({
-          index: $.inArray(this, images),
-          loaded: count,
-          total: src.length,
-          percent: Math.round((count / src.length) * 100)
-        });
-      }
-      firstLoaded = firstLoaded || (this === images[0]);
-      if (!completed && (count >= targetCount) && firstLoaded && (typeof opts.complete === 'function')) {
-        completed = true;
-        opts.complete(images);
+
+    // Number of frames to load before call the complete callback
+    var totalCount = src.length;
+    var targetCount = opts.preloadCount || totalCount;
+    var loadedCount = 0;
+
+    // Loading may start on specific lane
+    var startingLane = opts.lane || 0;
+    var totalLanes = opts.lanes || 1;
+    var framesPerLane = src.length / totalLanes;
+    var minLane = startingLane;
+    var maxLane = startingLane;
+
+    var queue = {}, lanes = laneLoadOrder(startingLane, totalLanes);
+    var loadNext = function(){
+      var arr = queue[lanes.shift()];
+      if (arr == null) return;
+      arr = arr.slice(0);
+      for (i = 0; i < arr.length; i += 1){
+        img = arr[i];
+        img.src = src[img.index];
       }
     };
+
+    var onComplete = opts.onComplete || $.noop;
+    var onPreload = opts.onPreload || $.noop;
+    var onProgress = chainFunction(opts.onProgress, function(opts){
+      var arr = queue[opts.image.lane];
+      var ind = $.inArray(opts.image, arr);
+      arr.splice(ind, 1);
+      if (arr.length == 0) loadNext();
+    });
+
+    var images = [];
+    var preloaded = false;
+    var firstLoaded = false;
+    var tick = function(){
+      if (canceled) {
+        return;
+      }
+      loadedCount += 1;
+      if ((loadedCount % framesPerLane) == 0){
+        minLane = Math.min(minLane, this.lane);
+        maxLane = Math.max(maxLane, this.lane);
+      }
+      onProgress({
+        image: this,
+        lane: this.lane,
+        index: this.index,
+        frame: this.frame,
+        loaded: loadedCount,
+        total: src.length,
+        minLane: minLane,
+        maxLane: maxLane,
+        percent: Math.round((loadedCount / totalCount) * 100),
+        percentPreload: Math.min(Math.round((loadedCount / targetCount) * 100), 100)
+      });
+      firstLoaded = firstLoaded || (this === images[startingLane * framesPerLane]);
+      if (!preloaded && (loadedCount >= targetCount) && firstLoaded) {
+        preloaded = true;
+        onPreload(images.slice(0));
+      }
+      if (loadedCount === totalCount) {
+        cleanup();
+        onComplete();
+      }
+    };
+
+    // Build ordered image list
+    var i, img;
     for (i = 0; i < src.length; i += 1 ) {
       img = new Image();
-      images.push(img);
-      // currently no care about error or aborting transfers
+      img.index = i;
+      img.frame = i % framesPerLane;
+      img.lane = Math.floor((img.index - img.frame) / framesPerLane);
       img.onload = img.onabort = img.onerror = tick;
-      img.src = src[i];
+      images.push(img);
+      (queue[img.lane] = queue[img.lane] || []).push(img);
     }
-    if (typeof opts.initiated === 'function'){
-      opts.initiated(images);
-    }
+
+    var cancel = function(){
+      canceled = true;
+      cleanup();
+    };
+
+    var cleanup = function(){
+      images.length = 0;
+      for(var key in queue){
+        if (queue.hasOwnProperty(key)){
+          queue[key].length = 0;
+        }
+      }
+      unbind(target, 'onReset', cancel);
+      unbind(target, 'onDestroy', cancel);
+    };
+
+    bind(target, 'onReset', cancel);
+    bind(target, 'onDestroy', cancel);
+    loadNext();
   }
 
   // Idea taken from https://github.com/stomita/ios-imagefile-megapixel
@@ -217,7 +351,7 @@
 
     // browsers that do not support naturalWidth and naturalHeight properties we have to fall back to the width and
     // height properties. However, the image might have a css style applied so width and height would return the
-    // css size. We have to create a new Image object that is free of css rules and grab the values from that objet.
+    // css size. We have to create a new Image object that is free of css rules and grab the values from that object.
     // Here we assume that the src has already been downloaded, so no onload callback is needed.
     var img = new Image();
     img.src = image.src;
@@ -268,8 +402,8 @@
    * Measures the image frames that are used in the given data object
    * @param {object} data
    */
-  Spin.measureSource = function(data){
-    var img = data.images[0];
+  Spin.measureSource = function(data, img){
+    img = img || data.images[0];
     var size = naturalSize(img);
 
     if (data.images.length === 1){
@@ -598,24 +732,33 @@
       }
 
       // bind
-      bind(target, 'onInit',     mod.onInit);
-      bind(target, 'onProgress', mod.onProgress);
-      bind(target, 'onLoad',     mod.onLoad);
-      bind(target, 'onFrame',    mod.onFrame);
-      bind(target, 'onDraw',     mod.onDraw);
+      bind(target, 'onReset',        mod.onReset);
+      bind(target, 'onInit',         mod.onInit);
+      bind(target, 'onProgress',     mod.onProgress);
+      bind(target, 'onLoad',         mod.onLoad);
+      bind(target, 'onLoadComplete', mod.onLoadComplete);
+      bind(target, 'onFrame',        mod.onFrame);
+      bind(target, 'onDraw',         mod.onDraw);
+      bind(target, 'onDestroy',      mod.onDestroy);
     }
 
     // bind auto start function to load event.
     bind(target, 'onLoad', function(e, data){
       Spin.setAnimation(data);
     });
+    bind(target, 'onDestroy', function(e, data){
+      Spin.stopAnimation(data);
+    });
 
     // bind all user events that have been passed on initialization
-    bind(target, 'onInit',     data.onInit);
-    bind(target, 'onProgress', data.onProgress);
-    bind(target, 'onLoad',     data.onLoad);
-    bind(target, 'onFrame',    data.onFrame);
-    bind(target, 'onDraw',     data.onDraw);
+    bind(target, 'onReset',        data.onReset);
+    bind(target, 'onInit',         data.onInit);
+    bind(target, 'onProgress',     data.onProgress);
+    bind(target, 'onLoad',         data.onLoad);
+    bind(target, 'onLoadComplete', data.onLoadComplete);
+    bind(target, 'onFrame',        data.onFrame);
+    bind(target, 'onDraw',         data.onDraw);
+    bind(target, 'onDestroy',      data.onDestroy);
   };
 
   /**
@@ -623,27 +766,39 @@
    * @param {object} data
    */
   Spin.boot = function(data){
+    if (data.loaded || data.loading){
+      data.target.trigger('onReset');
+    }
     Spin.setModules(data);
     Spin.setLayout(data);
     Spin.setEvents(data);
     data.target.addClass('loading').trigger('onInit', data);
     data.loading = true;
+    var reference = null;
     load({
+      target: data.target,
       source: data.source,
+      lane: data.lane,
+      lanes: data.lanes,
       preloadCount: data.preloadCount,
-      progress: function(progress){
+      onProgress: function(progress){
+        reference = reference || progress.image;
         data.target.trigger('onProgress', [progress, data]);
       },
-      complete: function(images){
+      onPreload: function(images){
         data.images = images;
         data.loading = false;
-        Spin.measureSource(data);
+        data.loaded = true;
+        Spin.measureSource(data, reference);
         data.stage.show();
         data.target
           .removeClass('loading')
           .trigger('onLoad', data)
           .trigger('onFrame', data)
           .trigger('onDraw', data);
+      },
+      onComplete: function(){
+        data.target.trigger('onLoadComplete', data);
       }
     });
   };
@@ -655,6 +810,7 @@
   Spin.create = function(options){
     var $this = options.target;
     var data  = $this.data(name);
+    var isReboot = false;
 
     if (!data){
       // SpriteSpin is not initialized
@@ -701,6 +857,7 @@
       // store the data
       $this.data(name, data);
     } else {
+      isReboot = true;
       // just update the data object
       $.extend(data, options);
     }
@@ -728,6 +885,9 @@
       delete data.module;
     }
 
+    if (isReboot){
+      data.target.trigger('onReset');
+    }
     Spin.boot(data);
   };
 
@@ -737,7 +897,7 @@
    */
   Spin.destroy = function(data){
     if (data){
-      Spin.stopAnimation(data);
+      data.target.trigger('onDestroy');
       unbind(data.target);
       data.target.removeData(name);
     }

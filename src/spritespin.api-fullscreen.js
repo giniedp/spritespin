@@ -103,30 +103,49 @@
     $(document).bind(changeEvent, callback);
   }
 
+  SpriteSpin.Api.fsApi = {
+    fullscreenEnabled: fullscreenEnabled,
+    fullscreenElement: fullscreenElement,
+    exitFullscreen: exitFullscreen,
+    requestFullscreen: requestFullscreen,
+    isFullscreen: isFullscreen
+  };
+
   SpriteSpin.extendApi({
     fullscreenEnabled: fullscreenEnabled,
     fullscreenElement: fullscreenElement,
     exitFullscreen: exitFullscreen,
+    isFullscreen: isFullscreen,
     toggleFullscreen: function(opts){
       if (isFullscreen()) {
-        this.requestFullscreen(opts)
-      } else {
         this.exitFullscreen()
+      } else {
+        this.requestFullscreen(opts)
       }
     },
     requestFullscreen: function(opts){
       opts = opts || {};
+
       var api = this;
       var data = api.data;
+
+      var fsSource = opts.source || data.source;
+      var fsWidth = opts.width || window.screen.width;
+      var fsHeight = opts.height || window.screen.height;
+      var fsSizeMode = opts.sizeMode || data.sizeMode;
+
       var oWidth = data.width;
       var oHeight = data.height;
       var oSource = data.source;
+      var oSizeMode = data.sizeMode;
+
       bindChangeEvent(function(){
         if (isFullscreen()){
           // ENTER
-          data.width = window.screen.width;
-          data.height = window.screen.height;
-          data.source = opts.source || oSource;
+          data.width = fsWidth;
+          data.height = fsHeight;
+          data.source = fsSource || oSource;
+          data.sizeMode = fsSizeMode || oSizeMode;
           SpriteSpin.boot(data);
         } else {
           // EXIT
@@ -134,6 +153,7 @@
           data.width = oWidth;
           data.height = oHeight;
           data.source = oSource;
+          data.sizeMode = oSizeMode;
           SpriteSpin.boot(data);
         }
       });

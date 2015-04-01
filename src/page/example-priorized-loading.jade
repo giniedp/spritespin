@@ -1,0 +1,29 @@
+extends layouts/example.jade
+block content
+  .spritespin
+  a(href='#' onclick='load(); return false;') reload
+  script(type='text/javascript').
+    SpriteSpin.registerModule('myModule', {
+      onProgress: function (e, progress, data) {
+        data.minLane = progress.minLane;
+        data.maxLane = progress.maxLane;
+      }
+    });
+
+    function load(){
+      window.spinapi = $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+        width: 800,
+        height: 450,
+        frames: 24,
+        lane: 5,
+        lanes: 12,
+        preloadCount: 24,
+        sense: 1,
+        senseLane: -2,
+        mods: ['move', 'myModule', '360'],
+        renderer: 'canvas'
+      }).spritespin('api');
+    }
+    load();
+
