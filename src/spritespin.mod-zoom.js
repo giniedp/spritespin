@@ -44,10 +44,9 @@
     SpriteSpin.updateFrame(data);
   }
 
-  function onclick(e){
+  function onclick(e, data){
     e.preventDefault();
 
-    var data = $(this).spritespin('data');
     var now = new Date().getTime();
     delete data.zoomPX;
     delete data.zoomPY;
@@ -68,14 +67,28 @@
     }
   }
 
-  function onmove(e){
-    var data = $(this).spritespin('data');
-    if (!data.zoomStage.is(':visible')){
-      return;
+  function onmove(e, data){
+    if (data.zoomStage.is(':visible')){
+      updateInput(e, data);
     }
-    updateInput(e, data);
   }
 
+  function toggleZoom(){
+    var data = this.data;
+    if (!data.zoomStage){
+      $.error('zoom module is not initialized or is not available.');
+      return false;
+    }
+    if (data.zoomStage.is(':visible')){
+      data.zoomStage.fadeOut();
+      data.stage.fadeIn();
+    } else {
+      data.zoomStage.fadeIn();
+      data.stage.fadeOut();
+      return true;
+    }
+    return false;
+  }
 
   SpriteSpin.registerModule('zoom', {
     mousedown: onclick,
@@ -120,22 +133,7 @@
   });
 
   SpriteSpin.extendApi({
-    toggleZoom: function(){
-      var data = this.data;
-      if (!data.zoomStage){
-        $.error('zoom module is not initialized or is not available.');
-        return false;
-      }
-      if (data.zoomStage.is(':visible')){
-        data.zoomStage.fadeOut();
-        data.stage.fadeIn();
-      } else {
-        data.zoomStage.fadeIn();
-        data.stage.fadeOut();
-        return true;
-      }
-      return false;
-    }
+    toggleZoom: toggleZoom
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
