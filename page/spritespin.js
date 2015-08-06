@@ -2,18 +2,12 @@
 (function($) {
   "use strict";
 
-  // The namespace that is used for data storage and event binding
   var name = 'spritespin';
 
-  // Event names that are recognized by SpriteSpin. A module may implement any of these and they will be bound
-  // to the target element on which the plugin is called.
-  var modEvents = [
-    'mousedown', 'mousemove', 'mouseup', 'mouseenter', 'mouseover', 'mouseleave', 'dblclick',
-    'touchstart', 'touchmove', 'touchend', 'touchcancel',
-    'selectstart', 'gesturestart', 'gesturechange', 'gestureend'];
-  var preventEvents = ['dragstart'];
-
-  // The SpriteSpin object. This object wraps the core logic of SpriteSpin
+  /**
+   * The SpriteSpin object.
+   * @type {object}
+   */
   var Spin = {};
 
   /**
@@ -23,16 +17,48 @@
   window.SpriteSpin = Spin;
 
   /**
-   * The namespace that is used to bind functions to DOM events and set the data object to DOM elements
+   * The namespace that is used to bind functions to DOM events and store the data object
    * @type {string}
    */
   Spin.namespace = name;
 
   /**
-   * Collection of modules that can be used to extend the functionality of SpriteSpin.
+   * Collection of registered modules that can be used to extend the functionality of SpriteSpin.
    * @type {object}
    */
   Spin.mods = {};
+
+  /**
+   * Event names that are recognized by SpriteSpin. A module can implement any of these and they will be bound
+   * to the target element on which the plugin is called.
+   * @type {string[]}
+   */
+  Spin.eventNames = [
+    'mousedown',
+    'mousemove',
+    'mouseup',
+    'mouseenter',
+    'mouseover',
+    'mouseleave',
+    'dblclick',
+    'mousewheel',
+    'touchstart',
+    'touchmove',
+    'touchend',
+    'touchcancel',
+    'selectstart',
+    'gesturestart',
+    'gesturechange',
+    'gestureend'
+  ];
+
+  /**
+   * Names of events for that the default behavior should be prevented.
+   * @type {string[]}
+   */
+  Spin.eventsToPrevent = [
+    'dragstart'
+  ];
 
   /**
    * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
@@ -76,6 +102,46 @@
     onDraw            : undefined     // Occurs when all update is complete and frame can be drawn
   };
 
+  //
+  // ----------
+
+  var idCounter = 0;
+  var instances = {};
+  Spin.instances = instances;
+
+  function simulateEvent(name, e) {
+    for (var id in instances) {
+      if (!instances.hasOwnProperty(id)) continue;
+      var data = instances[id];
+      var i, module;
+      for (i = 0; i < data.mods.length; i += 1) {
+        module = data.mods[i];
+        if (typeof module[name] != 'function') continue;
+        module[name].apply(data.target, [e, data]);
+      }
+    }
+  }
+
+  function bindSimulatedEvent(eName){
+    $(window.document).bind(eName + '.' + name, function(e){
+      simulateEvent('document' + eName, e);
+    });
+  }
+
+  for (var i = 0; i < Spin.eventNames.length; i += 1) {
+    bindSimulatedEvent(Spin.eventNames[i]);
+  }
+
+  function pushInstance(data) {
+    idCounter += 1;
+    data.id = idCounter;
+    instances[idCounter] = data;
+  }
+
+  function popInstance(data) {
+    delete instances[data.id];
+  }
+
   // Internal Helper Functions
   // ----------
 
@@ -118,7 +184,9 @@
   // The SpriteSpin namespace is attached to the event name
   function bind(target, event, func){
     if (func) {
-      target.bind(event + '.' + name, func);
+      target.bind(event + '.' + name, function(e){
+        func.apply(target, [e, target.spritespin('data')]);
+      });
     }
   }
 
@@ -382,6 +450,9 @@
    */
   Spin.updateFrame = function(data, frame, lane){
 
+    data.lastFrame = data.frame;
+    data.lastLane = data.lane;
+
     if (frame !== undefined){
       data.frame = Number(frame);
     } else if (data.animation) {
@@ -410,6 +481,9 @@
       }
     }
 
+    if (data.lastFrame != data.frame || data.lastLane != data.lane) {
+      data.target.trigger("onFrameChanged", data);  
+    }
     data.target.trigger("onFrame", data);
     data.target.trigger("onDraw", data);
   };
@@ -536,6 +610,7 @@
     css.left = ((w - css.width) / 2)|0;
     css.right = css.left;
     css.bottom = css.top;
+
     return css;
   };
 
@@ -585,22 +660,23 @@
 
     // disable all default browser behavior on the following events
     // mainly prevents image drag operation
-    for (j = 0; j < preventEvents.length; j += 1){
-      bind(target, preventEvents[j],  prevent);
+    for (j = 0; j < Spin.eventsToPrevent.length; j += 1){
+      bind(target, Spin.eventsToPrevent[j],  prevent);
     }
 
     // Bind module functions to SpriteSpin events
     for (i = 0; i < data.mods.length; i += 1){
       mod = data.mods[i];
 
-      for (j = 0; j < modEvents.length; j += 1){
-        bind(target, modEvents[j],  mod[modEvents[j]]);
+      for (j = 0; j < Spin.eventNames.length; j += 1){
+        bind(target, Spin.eventNames[j], mod[Spin.eventNames[j]]);
       }
 
       // bind
       bind(target, 'onInit',     mod.onInit);
       bind(target, 'onProgress', mod.onProgress);
       bind(target, 'onLoad',     mod.onLoad);
+      bind(target, 'onFrameChanged', mod.onFrameChanged);
       bind(target, 'onFrame',    mod.onFrame);
       bind(target, 'onDraw',     mod.onDraw);
     }
@@ -614,6 +690,7 @@
     bind(target, 'onInit',     data.onInit);
     bind(target, 'onProgress', data.onProgress);
     bind(target, 'onLoad',     data.onLoad);
+    bind(target, 'onFrameChanged', mod.onFrameChanged);
     bind(target, 'onFrame',    data.onFrame);
     bind(target, 'onDraw',     data.onDraw);
   };
@@ -638,6 +715,7 @@
         data.images = images;
         data.loading = false;
         Spin.measureSource(data);
+        Spin.setLayout(data);
         data.stage.show();
         data.target
           .removeClass('loading')
@@ -700,6 +778,7 @@
 
       // store the data
       $this.data(name, data);
+      pushInstance(data);
     } else {
       // just update the data object
       $.extend(data, options);
@@ -737,6 +816,7 @@
    */
   Spin.destroy = function(data){
     if (data){
+      popInstance(data);
       Spin.stopAnimation(data);
       unbind(data.target);
       data.target.removeData(name);
@@ -1015,7 +1095,6 @@
     return !!fullscreenElement();
   }
 
-  var SpriteSpin = window.SpriteSpin;
   var changeEvent = fn.fullscreenchange + '.' + SpriteSpin.namespace;
 
   function unbindChangeEvent(){
@@ -1065,28 +1144,29 @@
     }
   });
 
-}(window.jQuery || window.Zepto || window.$));
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
 
 (function ($, SpriteSpin) {
   "use strict";
 
-  function click(e) {
-    var $this = $(this), data = $this.data('spritespin');
-
+  function click(e, data) {
+    if (data.loading || !data.stage.is(':visible')){
+      return;
+    }
     SpriteSpin.updateInput(e, data);
 
-    var half, pos;
+    var half, pos, target = data.target, offset = target.offset();
     if (data.orientation === "horizontal") {
-      half = data.target.innerWidth() / 2;
-      pos = data.currentX - data.target.offset().left;
+      half = target.innerWidth() / 2;
+      pos = data.currentX - offset.left;
     } else {
-      half = data.target.innerHeight() / 2;
-      pos = data.currentY - data.target.offset().top;
+      half = target.innerHeight() / 2;
+      pos = data.currentY - offset.top;
     }
     if (pos > half) {
-      $this.spritespin("next");
+      SpriteSpin.updateFrame(data, data.frame + 1);
     } else {
-      $this.spritespin("prev");
+      SpriteSpin.updateFrame(data, data.frame - 1);
     }
   }
 
@@ -1099,31 +1179,27 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function dragStart(e) {
-    var data = $(this).spritespin('data');
+  function dragStart(e, data) {
     if (data.loading || data.dragging || !data.stage.is(':visible')){
       return;
     }
     data.dragFrame = data.frame || 0;
     data.dragLane = data.lane || 0;
-    SpriteSpin.updateInput(e, data);
     data.dragging = true;
+    SpriteSpin.updateInput(e, data);
   }
 
-  function dragEnd(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    data.dragging = false;
-    if (data.stage.is(':visible')){
+  function dragEnd(e, data) {
+    if (data.dragging) {
+      data.dragging = false;
       SpriteSpin.resetInput(data);
     }
   }
 
-  function drag(e) {
-    var lane, frame, $this = $(this), data = $this.spritespin('data');
+  function drag(e, data) {
     if (!data.dragging) {
       return;
     }
-
     SpriteSpin.updateInput(e, data);
 
     // dont do anything if the drag distance exceeds the scroll threshold.
@@ -1153,20 +1229,10 @@
     // accumulate
     data.dragFrame += data.frames * x;
     data.dragLane += data.lanes * y;
-    // clamp accumulated values if wrap is disabled
-    if (!data.wrap){
-      data.dragFrame = Math.min(data.dragFrame, data.frames);
-      data.dragFrame = Math.max(data.dragFrame, 0);
-    }
-    if (!data.wrapLane){
-      data.dragLane = Math.min(data.dragLane, data.lanes);
-      data.dragLane = Math.max(data.dragLane, 0);
-    }
 
-    frame = Math.floor(data.dragFrame);
-    lane = Math.floor(data.dragLane);
+    var frame = Math.floor(data.dragFrame);
+    var lane = Math.floor(data.dragLane);
     SpriteSpin.updateFrame(data, frame, lane);
-    // Stop the running animation (auto frame update) if there is any.
     SpriteSpin.stopAnimation(data);
   }
 
@@ -1182,10 +1248,25 @@
     touchcancel: dragEnd
   });
 
+  SpriteSpin.registerModule('dragDoc', {
+    mousedown: dragStart,
+    mousemove: drag,
+
+    mouseup: dragEnd,
+
+    documentmousemove: drag,
+    documentmouseup: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
+  });
+
   SpriteSpin.registerModule('move', {
-    mousemove: function(e){
-      dragStart.call(this, e);
-      drag.call(this, e);
+    mousemove: function(e, data){
+      dragStart.call(this, e, data);
+      drag.call(this, e, data);
     },
     mouseleave: dragEnd,
 
@@ -1199,59 +1280,158 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function startAnimation(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    if (data.loading){
+  function init(e, data){
+    data.easeAbortAfterMs = Math.max(data.easeAbortAfterMs || 250, 0);
+    data.easeDamping = Math.max(Math.min(data.easeDamping || 0.9, 0.999), 0);
+    data.easeSamples = Math.max(data.easeSamples || 5, 1);
+    data.easeUpdateTime = Math.max(data.easeUpdateTime || data.frameTime, 16);
+    data.easeScope = { samples: [], steps: [] };
+  }
+
+  function update(e, data) {
+    if (data.dragging) sampleInput(data, data.easeScope);
+  }
+
+  function end(e, data) {
+    var ease = data.easeScope;
+    if (!data.dragging) sampleInput(data, ease);
+    var last, sample, samples = ease.samples;
+    var lanes = 0, frames = 0, time = 0;
+
+    for(var i = 0; i < samples.length; i += 1) {
+      sample = samples[i];
+      if (last) {
+        var dt = sample.time - last.time;
+        if (dt > data.easeAbortAfterMs) {
+          lanes = frames = time = 0;
+        } else {
+          frames += sample.frame - last.frame;
+          lanes += sample.lane - last.lane;
+          time += dt;
+        }
+      }
+      last = sample;
+    }
+    samples.length = 0;
+    
+    if (time <= 0) return;
+
+    ease.ms = data.easeUpdateTime;
+    ease.laneStep = lanes / time * ease.ms;
+    ease.frameStep = frames / time * ease.ms;
+    ease.lane = data.lane;
+    ease.lanes = 0;
+    ease.frame = data.frame;
+    ease.frames = 0;
+    loop(data, ease);
+  }
+
+  function sampleInput(data, ease) {
+    if (ease.timeout) {
+      window.clearTimeout(ease.timeout);
+      delete ease.timeout;
+    }
+
+    ease.samples.push({
+      time: new Date().getTime(),
+      frame: data.dragFrame,
+      lane: data.dragLane
+    });
+    while (ease.samples.length > data.easeSamples) {
+      ease.samples.shift();
+    }
+  }
+
+  function loop(data, ease) {
+    ease.timeout = window.setTimeout(function(){
+      tick(data, ease);
+    }, ease.ms);
+  }
+
+  function tick(data, ease){
+    ease.lanes += ease.laneStep;
+    ease.frames += ease.frameStep;
+    ease.laneStep *= data.easeDamping;
+    ease.frameStep *= data.easeDamping;
+    var frame = Math.floor(ease.frame + ease.frames);
+    var lane = Math.floor(ease.lane + ease.lanes);
+    SpriteSpin.updateFrame(data, frame, lane);
+    if (data.dragging) {
+      return;
+    }
+    if (Math.abs(ease.frameStep) > 0.005 || Math.abs(ease.laneStep) > 0.005) {
+      loop(data, ease);
+    }
+  }
+
+  SpriteSpin.registerModule('ease', {
+    onLoad: init,
+
+    mousemove: update,
+    mouseup: end,
+    mouseleave: end,
+
+    touchmove: update,
+    touchend: end,
+    touchcancel: end
+  });
+
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
+
+(function ($, SpriteSpin) {
+  "use strict";
+
+  function start(e, data) {
+    if (data.loading || data.dragging || !data.stage.is(':visible')){
       return;
     }
     SpriteSpin.updateInput(e, data);
     data.dragging = true;
-    $this.spritespin("api").startAnimation();
+    data.animate = true;
+    SpriteSpin.setAnimation(data);
   }
 
-  function stopAnimation(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    SpriteSpin.resetInput(data);
+  function stop(e, data) {
     data.dragging = false;
-    $this.spritespin("api").stopAnimation();
+    SpriteSpin.resetInput(data);
+    SpriteSpin.stopAnimation(data);
   }
 
-  function updateInput(e) {
-    var $this = $(this), data = $this.spritespin('data');
+  function update(e, data) {
+    if (!data.dragging){
+      return;
+    }
+    SpriteSpin.updateInput(e, data);
 
-    if (data.dragging) {
-      SpriteSpin.updateInput(e, data);
+    var half, delta, target = data.target, offset = target.offset();
+    if (data.orientation === "horizontal") {
+      half = target.innerWidth() / 2;
+      delta = (data.currentX - offset().left - half) / half;
+    } else {
+      half = (data.height / 2);
+      delta = (data.currentY - offset().top - half) / half;
+    }
+    data.reverse = delta < 0;
+    delta = delta < 0 ? -delta : delta;
+    data.frameTime = 80 * (1 - delta) + 20;
 
-      var half, delta;
-      if (data.orientation === "horizontal") {
-        half = (data.target.innerWidth() / 2);
-        delta = (data.currentX - data.target.offset().left - half) / half;
-      } else {
-        half = (data.height / 2);
-        delta = (data.currentY - data.target.offset().top - half) / half;
-      }
-      data.reverse = delta < 0;
-      delta = delta < 0 ? -delta : delta;
-      data.frameTime = 80 * (1 - delta) + 20;
-
-      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
-        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
-        e.preventDefault();
-      }
+    if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+      ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+      e.preventDefault();
     }
   }
 
   SpriteSpin.registerModule('hold', {
 
-    mousedown: startAnimation,
-    mousemove: updateInput,
-    mouseup: stopAnimation,
-    mouseleave: stopAnimation,
+    mousedown: start,
+    mousemove: update,
+    mouseup: stop,
+    mouseleave: stop,
 
-    touchstart: startAnimation,
-    touchmove: updateInput,
-    touchend: stopAnimation,
-    touchcancel: stopAnimation,
+    touchstart: start,
+    touchmove: update,
+    touchend: stop,
+    touchcancel: stop,
 
     onFrame: function () {
       $(this).spritespin("api").startAnimation();
@@ -1263,66 +1443,65 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function dragStart(e) {
-    var data = $(this).spritespin('data');
-    if (data.loading){
-      return;
-    }
-    SpriteSpin.updateInput(e, data);
-    data.dragging = true;
+  function init(e, data) {
+    data.swipeFling = data.swipeFling || 10;
+    data.swipeSnap = data.swipeSnap || 0.50;
   }
 
-  function dragEnd() {
-    var data = $(this).spritespin('data');
-    data.dragging = false;
-    SpriteSpin.resetInput(data);
-  }
-
-  function drag(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    if (data.dragging) {
+  function start(e, data) {
+    if (!data.loading && !data.dragging){
       SpriteSpin.updateInput(e, data);
-
-      var frame = data.frame;
-      var snap = data.snap || 0.25;
-      var d, s;
-
-      if (data.orientation === "horizontal") {
-        d = data.dX;
-        s = data.target.innerWidth() * snap;
-      } else {
-        d = data.dY;
-        s = data.target.innerHeight() * snap;
-      }
-
-      if (d > s) {
-        frame = data.frame - 1;
-        data.dragging = false;
-      } else if (d < -s) {
-        frame = data.frame + 1;
-        data.dragging = false;
-      }
-
-      $this.spritespin("update", frame);  // update to frame
-      $this.spritespin("animate", false); // stop animation
-
-      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
-        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
-        e.preventDefault();
-      }
+      data.dragging = true;
     }
+  }
+
+  function update(e, data) {
+    if (!data.dragging) return;
+    SpriteSpin.updateInput(e, data);
+    var frame = data.frame;
+    var lane = data.lane;
+    SpriteSpin.updateFrame(data, frame, lane);
+  }
+
+  function end(e, data) {
+    if (!data.dragging) return;
+    data.dragging = false;
+
+    var frame = data.frame;
+    var lane = data.lane;
+    var snap = data.swipeSnap;
+    var fling = data.swipeFling;
+    var dS, dF;
+    if (data.orientation === "horizontal") {
+      dS = data.ndX;
+      dF = data.ddX;
+    } else {
+      dS = data.ndY;
+      dF = data.ddY;
+    }
+
+    if (dS > snap || dF > fling) {
+      frame = data.frame - 1;
+    } else if (dS < -snap || dF < -fling) {
+      frame = data.frame + 1;
+    }
+
+    SpriteSpin.resetInput(data);
+    SpriteSpin.updateFrame(data, frame, lane);
+    SpriteSpin.stopAnimation(data);
   }
 
   SpriteSpin.registerModule('swipe', {
-    mousedown: dragStart,
-    mousemove: drag,
-    mouseup: dragEnd,
-    mouseleave: dragEnd,
+    onLoad: init,
+    mousedown: start,
+    mousemove: update,
+    mouseup: end,
+    mouseleave: end,
 
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
+    touchstart: start,
+    touchmove: update,
+    touchend: end,
+    touchcancel: end
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
@@ -1438,7 +1617,6 @@
     },
 
     onDraw: function(e, data){
-      
       if (data.sourceIsSprite){
         drawSprite(data);
       } else{
@@ -1449,58 +1627,166 @@
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
 
-(function($) {
+(function ($, SpriteSpin) {
   "use strict";
 
-  var Module = window.SpriteSpin.mods.gallery = {};
+  function init(e, data) {
+    data.blurCanvas = data.blurCanvas || $("<canvas class='blur-layer'></canvas>");
+    data.blurContext = data.blurCanvas[0].getContext("2d");
+    data.blurSteps = data.blurSteps || [];
+    data.blurEffectTime = Math.max(data.blurEffectTime || 240, 0);
+    data.blurUpdateTime = Math.max(data.blurUpdateTime || data.frameTime, 16);
+    if (data.blurCss == null) {
+      data.blurCss = true;
+    }
 
-  Module.onLoad = function(e, data){
-    data.images = [];
-    data.offsets = [];
-    data.stage.empty();
-    data.speed = 500;
-    data.opacity = 0.25;
-    data.oldFrame = 0;
+    var canvas = data.blurCanvas;
+    var css = SpriteSpin.calculateInnerLayout(data);
+    canvas[0].width = data.width;
+    canvas[0].height = data.height;
+    canvas.css(css).show();
+    data.target.append(canvas);
+  }
+
+  function addFrame(e, data){
+    var d = Math.abs(data.frame - data.lastFrame);
+    data.blurSteps.unshift({
+      frame: data.frame,
+      lane: data.lane,
+      t: data.blurEffectTime,
+      d: d
+    });
+
+    if (!data.blurTimeout) {
+      loop(data);
+    }
+  }
+
+  function loop(data) {
+    data.blurTimeout = window.setTimeout(function(){ tick(data); }, data.blurUpdateTime);
+  }
+
+  function tick(data) {
+    delete data.blurTimeout;
+    if (!data.blurContext) {
+      return;
+    }
+
+    var animation, i, context = data.blurContext, d = 0;
+    var toRemove = [];
+    context.clearRect(0, 0, data.width, data.height);
+    for (i = 0; i < data.blurSteps.length; i += 1) {
+
+      animation = data.blurSteps[i];
+      animation.t -= data.blurUpdateTime;
+      if (animation.t < 0) {
+        animation.t = 0;
+        toRemove.push(animation);
+      }
+
+      var index = data.lane * data.frames + animation.frame;
+      var img = data.images[index];
+      
+      if (img && img.complete !== false){
+        context.globalAlpha = Math.max(0, animation.t / data.blurEffectTime - 0.25);
+        d += context.globalAlpha + animation.d;
+        if (data.sourceIsSprite){
+          var x = data.frameWidth * (index % data.framesX);
+          var y = data.frameHeight * Math.floor(index / data.framesX);
+          data.context.drawImage(data.images[0], x, y, data.frameWidth, data.frameHeight, 0, 0, data.width, data.height);
+        } else{
+          context.drawImage(img, 0, 0, data.width, data.height);
+        }
+      }
+    }
+
+    if (data.blurCss) {
+      d = Math.min(Math.max((d / 2) - 4, 0), 1.5);
+      data.blurCanvas.css({
+        '-webkit-filter': 'blur(' + d + 'px)',
+        'filter': 'blur(' + d + 'px)'
+      });
+    }
+    
+    for (i = 0; i < toRemove.length; i += 1) {
+      index = $.inArray(toRemove[i], data.blurSteps);
+      if (index >= 0) {
+        data.blurSteps.splice(index, 1);
+      }
+    }
+
+    if (data.blurSteps.length) {
+      loop(data);
+    }
+  }
+
+  SpriteSpin.registerModule('blur', {
+    onLoad: init,
+    onFrameChanged: addFrame
+  });
+
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
+
+(function ($, SpriteSpin) {
+  "use strict";
+
+  function load(e, data){
+    data.galleryImages = [];
+    data.galleryOffsets = [];
+    data.gallerySpeed = 500;
+    data.galleryOpacity = 0.25;
+    data.galleryFrame = 0;
+    data.galleryStage = data.galleryStage || $('<div/>');
+    data.stage.prepend(data.galleryStage);
+    data.galleryStage.empty();
+
     var size = 0, i;
     for(i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");
-      data.stage.append(img);
-      data.images.push(img);
-      data.offsets.push(-size + (data.width - img[0].width) / 2);
-      size += img[0].width;
-      
-      img.css({ opacity : 0.25 });
-    }
-    data.stage.css({ width : size });
-    data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
-  };
-  
-  Module.onDraw = function(e, data){
-    if ((data.oldFrame !== data.frame) && data.offsets){
-      data.stage.stop(true, false);
-      data.stage.animate({ 
-        "left" : data.offsets[data.frame]
-      }, data.speed);
-      
-      data.images[data.oldFrame].animate({ opacity : data.opacity }, data.speed);
-      data.oldFrame = data.frame;
-      data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
-    } else {
-      //console.log(data.dX);
-      data.stage.css({
-        "left" : data.offsets[data.frame] + data.dX
+      data.galleryStage.append(img);
+      data.galleryImages.push(img);
+      var scale = data.height / img[0].height;
+      data.galleryOffsets.push(-size + (data.width - img[0].width * scale) / 2);
+      size += data.width;
+      img.css({
+        opacity : data.galleryOpacity,
+        width: data.width,
+        height: data.height
       });
     }
-  };
+    var css = SpriteSpin.calculateInnerLayout(data);
+    data.galleryStage.css(css).css({
+      width: size
+    });
+    data.galleryImages[data.galleryFrame].animate({
+      opacity : 1
+    }, data.gallerySpeed);
+  }
   
-  Module.resetInput = function(e, data){
-    if (!data.onDrag){
-      data.stage.animate({
-        "left" : data.offsets[data.frame]
+  function draw(e, data){
+    if (data.galleryFrame !== data.frame && !data.dragging){
+      data.galleryStage.stop(true, false);
+      data.galleryStage.animate({
+        "left" : data.galleryOffsets[data.frame]
+      }, data.gallerySpeed);
+      
+      data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed);
+      data.galleryFrame = data.frame;
+      data.galleryImages[data.galleryFrame].animate({ opacity : 1 }, data.gallerySpeed);
+    } else if (data.dragging || data.dX != data.gallerydX) {
+      data.galleryDX = data.DX;
+      data.galleryDDX = data.DDX;
+      data.galleryStage.stop(true, true).animate({
+        "left" : data.galleryOffsets[data.frame] + data.dX
       });
     }
-  };
-}(window.jQuery || window.Zepto || window.$));
+  }
+
+  SpriteSpin.registerModule('gallery', {
+    onLoad: load,
+    onDraw: draw
+  });
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
 (function ($, SpriteSpin) {
   "use strict";
 
@@ -1593,10 +1879,9 @@
     SpriteSpin.updateFrame(data);
   }
 
-  function onclick(e){
+  function onclick(e, data){
     e.preventDefault();
 
-    var data = $(this).spritespin('data');
     var now = new Date().getTime();
     delete data.zoomPX;
     delete data.zoomPY;
@@ -1617,14 +1902,28 @@
     }
   }
 
-  function onmove(e){
-    var data = $(this).spritespin('data');
-    if (!data.zoomStage.is(':visible')){
-      return;
+  function onmove(e, data){
+    if (data.zoomStage.is(':visible')){
+      updateInput(e, data);
     }
-    updateInput(e, data);
   }
 
+  function toggleZoom(){
+    var data = this.data;
+    if (!data.zoomStage){
+      $.error('zoom module is not initialized or is not available.');
+      return false;
+    }
+    if (data.zoomStage.is(':visible')){
+      data.zoomStage.fadeOut();
+      data.stage.fadeIn();
+    } else {
+      data.zoomStage.fadeIn();
+      data.stage.fadeOut();
+      return true;
+    }
+    return false;
+  }
 
   SpriteSpin.registerModule('zoom', {
     mousedown: onclick,
@@ -1669,22 +1968,7 @@
   });
 
   SpriteSpin.extendApi({
-    toggleZoom: function(){
-      var data = this.data;
-      if (!data.zoomStage){
-        $.error('zoom module is not initialized or is not available.');
-        return false;
-      }
-      if (data.zoomStage.is(':visible')){
-        data.zoomStage.fadeOut();
-        data.stage.fadeIn();
-      } else {
-        data.zoomStage.fadeIn();
-        data.stage.fadeOut();
-        return true;
-      }
-      return false;
-    }
+    toggleZoom: toggleZoom
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));

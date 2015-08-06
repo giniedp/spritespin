@@ -30,69 +30,68 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
-    <span class="hljs-keyword">if</span> (data.loading){
-      <span class="hljs-keyword">return</span>;
-    }
-    SpriteSpin.updateInput(e, data);
-    data.dragging = <span class="hljs-literal">true</span>;
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params">e, data</span>) </span>{
+    data.swipeFling = data.swipeFling || <span class="hljs-number">10</span>;
+    data.swipeSnap = data.swipeSnap || <span class="hljs-number">0.50</span>;
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragEnd</span><span class="hljs-params">()</span> </span>{
-    <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
-    data.dragging = <span class="hljs-literal">false</span>;
-    SpriteSpin.resetInput(data);
-  }
-
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drag</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">'data'</span>);
-    <span class="hljs-keyword">if</span> (data.dragging) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">start</span>(<span class="hljs-params">e, data</span>) </span>{
+    <span class="hljs-keyword">if</span> (!data.loading &amp;&amp; !data.dragging){
       SpriteSpin.updateInput(e, data);
-
-      <span class="hljs-keyword">var</span> frame = data.frame;
-      <span class="hljs-keyword">var</span> snap = data.snap || <span class="hljs-number">0.25</span>;
-      <span class="hljs-keyword">var</span> d, s;
-
-      <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>) {
-        d = data.dX;
-        s = data.target.innerWidth() * snap;
-      } <span class="hljs-keyword">else</span> {
-        d = data.dY;
-        s = data.target.innerHeight() * snap;
-      }
-
-      <span class="hljs-keyword">if</span> (d &gt; s) {
-        frame = data.frame - <span class="hljs-number">1</span>;
-        data.dragging = <span class="hljs-literal">false</span>;
-      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (d &lt; -s) {
-        frame = data.frame + <span class="hljs-number">1</span>;
-        data.dragging = <span class="hljs-literal">false</span>;
-      }
-
-      $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">"update"</span>, frame);  <span class="hljs-comment">// update to frame</span>
-      $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">"animate"</span>, <span class="hljs-literal">false</span>); <span class="hljs-comment">// stop animation</span>
-
-      <span class="hljs-keyword">if</span> (((data.orientation === <span class="hljs-string">'horizontal'</span>) &amp;&amp; (data.dX &lt; data.dY)) ||
-        ((data.orientation === <span class="hljs-string">'vertical'</span>) &amp;&amp; (data.dX &lt; data.dY))) {
-        e.preventDefault();
-      }
+      data.dragging = <span class="hljs-literal">true</span>;
     }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params">e, data</span>) </span>{
+    <span class="hljs-keyword">if</span> (!data.dragging) <span class="hljs-keyword">return</span>;
+    SpriteSpin.updateInput(e, data);
+    <span class="hljs-keyword">var</span> frame = data.frame;
+    <span class="hljs-keyword">var</span> lane = data.lane;
+    SpriteSpin.updateFrame(data, frame, lane);
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">end</span>(<span class="hljs-params">e, data</span>) </span>{
+    <span class="hljs-keyword">if</span> (!data.dragging) <span class="hljs-keyword">return</span>;
+    data.dragging = <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">var</span> frame = data.frame;
+    <span class="hljs-keyword">var</span> lane = data.lane;
+    <span class="hljs-keyword">var</span> snap = data.swipeSnap;
+    <span class="hljs-keyword">var</span> fling = data.swipeFling;
+    <span class="hljs-keyword">var</span> dS, dF;
+    <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>) {
+      dS = data.ndX;
+      dF = data.ddX;
+    } <span class="hljs-keyword">else</span> {
+      dS = data.ndY;
+      dF = data.ddY;
+    }
+
+    <span class="hljs-keyword">if</span> (dS &gt; snap || dF &gt; fling) {
+      frame = data.frame - <span class="hljs-number">1</span>;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (dS &lt; -snap || dF &lt; -fling) {
+      frame = data.frame + <span class="hljs-number">1</span>;
+    }
+
+    SpriteSpin.resetInput(data);
+    SpriteSpin.updateFrame(data, frame, lane);
+    SpriteSpin.stopAnimation(data);
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'swipe'</span>, {
-    mousedown: dragStart,
-    mousemove: drag,
-    mouseup: dragEnd,
-    mouseleave: dragEnd,
+    onLoad: init,
+    mousedown: start,
+    mousemove: update,
+    mouseup: end,
+    mouseleave: end,
 
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
+    touchstart: start,
+    touchmove: update,
+    touchend: end,
+    touchcancel: end
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

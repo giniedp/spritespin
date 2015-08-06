@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>spritespin.mod-blur.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>spritespin.mod-blur.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
+<span class="hljs-pi">  "use strict"</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params">e, data</span>) </span>{
+    data.blurCanvas = data.blurCanvas || $(<span class="hljs-string">"&lt;canvas class='blur-layer'&gt;&lt;/canvas&gt;"</span>);
+    data.blurContext = data.blurCanvas[<span class="hljs-number">0</span>].getContext(<span class="hljs-string">"2d"</span>);
+    data.blurSteps = data.blurSteps || [];
+    data.blurEffectTime = <span class="hljs-built_in">Math</span>.max(data.blurEffectTime || <span class="hljs-number">240</span>, <span class="hljs-number">0</span>);
+    data.blurUpdateTime = <span class="hljs-built_in">Math</span>.max(data.blurUpdateTime || data.frameTime, <span class="hljs-number">16</span>);
+    <span class="hljs-keyword">if</span> (data.blurCss == <span class="hljs-literal">null</span>) {
+      data.blurCss = <span class="hljs-literal">true</span>;
+    }
+
+    <span class="hljs-keyword">var</span> canvas = data.blurCanvas;
+    <span class="hljs-keyword">var</span> css = SpriteSpin.calculateInnerLayout(data);
+    canvas[<span class="hljs-number">0</span>].width = data.width;
+    canvas[<span class="hljs-number">0</span>].height = data.height;
+    canvas.css(css).show();
+    data.target.append(canvas);
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addFrame</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-keyword">var</span> d = <span class="hljs-built_in">Math</span>.abs(data.frame - data.lastFrame);
+    data.blurSteps.unshift({
+      frame: data.frame,
+      lane: data.lane,
+      t: data.blurEffectTime,
+      d: d
+    });
+
+    <span class="hljs-keyword">if</span> (!data.blurTimeout) {
+      loop(data);
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loop</span>(<span class="hljs-params">data</span>) </span>{
+    data.blurTimeout = <span class="hljs-built_in">window</span>.setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{ tick(data); }, data.blurUpdateTime);
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tick</span>(<span class="hljs-params">data</span>) </span>{
+    <span class="hljs-keyword">delete</span> data.blurTimeout;
+    <span class="hljs-keyword">if</span> (!data.blurContext) {
+      <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">var</span> animation, i, context = data.blurContext, d = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">var</span> toRemove = [];
+    context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; data.blurSteps.length; i += <span class="hljs-number">1</span>) {
+
+      animation = data.blurSteps[i];
+      animation.t -= data.blurUpdateTime;
+      <span class="hljs-keyword">if</span> (animation.t &lt; <span class="hljs-number">0</span>) {
+        animation.t = <span class="hljs-number">0</span>;
+        toRemove.push(animation);
+      }
+
+      <span class="hljs-keyword">var</span> index = data.lane * data.frames + animation.frame;
+      <span class="hljs-keyword">var</span> img = data.images[index];
+      
+      <span class="hljs-keyword">if</span> (img &amp;&amp; img.complete !== <span class="hljs-literal">false</span>){
+        context.globalAlpha = <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">0</span>, animation.t / data.blurEffectTime - <span class="hljs-number">0.25</span>);
+        d += context.globalAlpha + animation.d;
+        <span class="hljs-keyword">if</span> (data.sourceIsSprite){
+          <span class="hljs-keyword">var</span> x = data.frameWidth * (index % data.framesX);
+          <span class="hljs-keyword">var</span> y = data.frameHeight * <span class="hljs-built_in">Math</span>.floor(index / data.framesX);
+          data.context.drawImage(data.images[<span class="hljs-number">0</span>], x, y, data.frameWidth, data.frameHeight, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        } <span class="hljs-keyword">else</span>{
+          context.drawImage(img, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        }
+      }
+    }
+
+    <span class="hljs-keyword">if</span> (data.blurCss) {
+      d = <span class="hljs-built_in">Math</span>.min(<span class="hljs-built_in">Math</span>.max((d / <span class="hljs-number">2</span>) - <span class="hljs-number">4</span>, <span class="hljs-number">0</span>), <span class="hljs-number">1.5</span>);
+      data.blurCanvas.css({
+        <span class="hljs-string">'-webkit-filter'</span>: <span class="hljs-string">'blur('</span> + d + <span class="hljs-string">'px)'</span>,
+        <span class="hljs-string">'filter'</span>: <span class="hljs-string">'blur('</span> + d + <span class="hljs-string">'px)'</span>
+      });
+    }
+    
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; toRemove.length; i += <span class="hljs-number">1</span>) {
+      index = $.inArray(toRemove[i], data.blurSteps);
+      <span class="hljs-keyword">if</span> (index &gt;= <span class="hljs-number">0</span>) {
+        data.blurSteps.splice(index, <span class="hljs-number">1</span>);
+      }
+    }
+
+    <span class="hljs-keyword">if</span> (data.blurSteps.length) {
+      loop(data);
+    }
+  }
+
+  SpriteSpin.registerModule(<span class="hljs-string">'blur'</span>, {
+    onLoad: init,
+    onFrameChanged: addFrame
+  });
+
+}(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

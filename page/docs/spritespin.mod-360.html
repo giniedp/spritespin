@@ -30,12 +30,12 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> floor = <span class="hljs-built_in">Math</span>.floor;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawSprite</span><span class="hljs-params">(data)</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawSprite</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
 
     <span class="hljs-keyword">var</span> x = data.frameWidth * (index % data.framesX);
@@ -60,7 +60,7 @@
     }
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawFrames</span><span class="hljs-params">(data)</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawFrames</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> index = data.lane * data.frames + data.frame;
     <span class="hljs-keyword">var</span> img = data.images[index];
     <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
@@ -81,7 +81,7 @@
 
   SpriteSpin.registerModule(<span class="hljs-string">'360'</span>, {
 
-    onLoad: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+    onLoad: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">var</span> w, h;</pre></div></div>
             
         </li>
@@ -228,8 +228,7 @@ clear and enable the canvas container</p>
       }
     },
 
-    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
-      
+    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">if</span> (data.sourceIsSprite){
         drawSprite(data);
       } <span class="hljs-keyword">else</span>{

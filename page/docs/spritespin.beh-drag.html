@@ -30,34 +30,30 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (data.loading || data.dragging || !data.stage.is(<span class="hljs-string">':visible'</span>)){
       <span class="hljs-keyword">return</span>;
     }
     data.dragFrame = data.frame || <span class="hljs-number">0</span>;
     data.dragLane = data.lane || <span class="hljs-number">0</span>;
-    SpriteSpin.updateInput(e, data);
     data.dragging = <span class="hljs-literal">true</span>;
+    SpriteSpin.updateInput(e, data);
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragEnd</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">'data'</span>);
-    data.dragging = <span class="hljs-literal">false</span>;
-    <span class="hljs-keyword">if</span> (data.stage.is(<span class="hljs-string">':visible'</span>)){
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragEnd</span>(<span class="hljs-params">e, data</span>) </span>{
+    <span class="hljs-keyword">if</span> (data.dragging) {
+      data.dragging = <span class="hljs-literal">false</span>;
       SpriteSpin.resetInput(data);
     }
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drag</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> lane, frame, $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">'data'</span>);
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drag</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (!data.dragging) {
       <span class="hljs-keyword">return</span>;
     }
-
     SpriteSpin.updateInput(e, data);</pre></div></div>
             
         </li>
@@ -122,48 +118,12 @@ this allows to use touch scroll on mobile devices.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    data.dragFrame += data.frames * x;
-    data.dragLane += data.lanes * y;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p>clamp accumulated values if wrap is disabled</p>
+    data.dragLane += data.lanes * y;
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!data.wrap){
-      data.dragFrame = <span class="hljs-built_in">Math</span>.min(data.dragFrame, data.frames);
-      data.dragFrame = <span class="hljs-built_in">Math</span>.max(data.dragFrame, <span class="hljs-number">0</span>);
-    }
-    <span class="hljs-keyword">if</span> (!data.wrapLane){
-      data.dragLane = <span class="hljs-built_in">Math</span>.min(data.dragLane, data.lanes);
-      data.dragLane = <span class="hljs-built_in">Math</span>.max(data.dragLane, <span class="hljs-number">0</span>);
-    }
-
-    frame = <span class="hljs-built_in">Math</span>.floor(data.dragFrame);
-    lane = <span class="hljs-built_in">Math</span>.floor(data.dragLane);
-    SpriteSpin.updateFrame(data, frame, lane);</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
-              </div>
-              <p>Stop the running animation (auto frame update) if there is any.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    SpriteSpin.stopAnimation(data);
+    <span class="hljs-keyword">var</span> frame = <span class="hljs-built_in">Math</span>.floor(data.dragFrame);
+    <span class="hljs-keyword">var</span> lane = <span class="hljs-built_in">Math</span>.floor(data.dragLane);
+    SpriteSpin.updateFrame(data, frame, lane);
+    SpriteSpin.stopAnimation(data);
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'drag'</span>, {
@@ -178,10 +138,25 @@ this allows to use touch scroll on mobile devices.</p>
     touchcancel: dragEnd
   });
 
+  SpriteSpin.registerModule(<span class="hljs-string">'dragDoc'</span>, {
+    mousedown: dragStart,
+    mousemove: drag,
+
+    mouseup: dragEnd,
+
+    documentmousemove: drag,
+    documentmouseup: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
+  });
+
   SpriteSpin.registerModule(<span class="hljs-string">'move'</span>, {
-    mousemove: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span></span>{
-      dragStart.call(<span class="hljs-keyword">this</span>, e);
-      drag.call(<span class="hljs-keyword">this</span>, e);
+    mousemove: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+      dragStart.call(<span class="hljs-keyword">this</span>, e, data);
+      drag.call(<span class="hljs-keyword">this</span>, e, data);
     },
     mouseleave: dragEnd,
 

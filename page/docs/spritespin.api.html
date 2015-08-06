@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;</pre></div></div>
             
         </li>
@@ -63,7 +63,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    isPlaying: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    isPlaying: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data.animation !== <span class="hljs-literal">null</span>;
     },</pre></div></div>
             
@@ -80,7 +80,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    isLooping: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    isLooping: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data.loop;
     },</pre></div></div>
             
@@ -97,7 +97,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    toggleAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    toggleAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">this</span>.data.animate = !<span class="hljs-keyword">this</span>.data.animate;
       SpriteSpin.setAnimation(<span class="hljs-keyword">this</span>.data);
     },</pre></div></div>
@@ -115,7 +115,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    stopAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    stopAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">this</span>.data.animate = <span class="hljs-literal">false</span>;
       SpriteSpin.setAnimation(<span class="hljs-keyword">this</span>.data);
     },</pre></div></div>
@@ -133,7 +133,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    startAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    startAnimation: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">this</span>.data.animate = <span class="hljs-literal">true</span>;
       SpriteSpin.setAnimation(<span class="hljs-keyword">this</span>.data);
     },</pre></div></div>
@@ -152,7 +152,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    loop: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span></span>{
+            <div class="content"><div class='highlight'><pre>    loop: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>)</span>{
       <span class="hljs-keyword">this</span>.data.loop = value;
       SpriteSpin.setAnimation(<span class="hljs-keyword">this</span>.data);
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
@@ -171,7 +171,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    currentFrame: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    currentFrame: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data.frame;
     },</pre></div></div>
             
@@ -188,7 +188,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    updateFrame: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(frame)</span></span>{
+            <div class="content"><div class='highlight'><pre>    updateFrame: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">frame</span>)</span>{
       SpriteSpin.updateFrame(<span class="hljs-keyword">this</span>.data, frame);
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
     },</pre></div></div>
@@ -206,7 +206,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    skipFrames: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(step)</span></span>{
+            <div class="content"><div class='highlight'><pre>    skipFrames: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">step</span>)</span>{
       <span class="hljs-keyword">var</span> data = <span class="hljs-keyword">this</span>.data;
       SpriteSpin.updateFrame(data, data.frame + (data.reverse ? - step : + step));
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
@@ -225,7 +225,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    nextFrame: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    nextFrame: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.skipFrames(<span class="hljs-number">1</span>);
     },</pre></div></div>
             
@@ -242,7 +242,7 @@ This might start the animation (if the ‘animate’ data attribute is set to tr
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    prevFrame: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>    prevFrame: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.skipFrames(-<span class="hljs-number">1</span>);
     },</pre></div></div>
             
@@ -262,7 +262,7 @@ options:
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    playTo: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(frame, options)</span></span>{
+            <div class="content"><div class='highlight'><pre>    playTo: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">frame, options</span>)</span>{
       <span class="hljs-keyword">var</span> data = <span class="hljs-keyword">this</span>.data;
       options = options || {};
       <span class="hljs-keyword">if</span> (!options.force &amp;&amp; data.frame === frame){

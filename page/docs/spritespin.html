@@ -31,58 +31,16 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>
-(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($)</span> </span>{
-<span class="hljs-pi">  "use strict"</span>;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>The namespace that is used for data storage and event binding</p>
+(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">$</span>) </span>{
+<span class="hljs-pi">  "use strict"</span>;
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> name = <span class="hljs-string">'spritespin'</span>;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>Event names that are recognized by SpriteSpin. A module may implement any of these and they will be bound
-to the target element on which the plugin is called.</p>
+  <span class="hljs-keyword">var</span> name = <span class="hljs-string">'spritespin'</span>;
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> modEvents = [
-    <span class="hljs-string">'mousedown'</span>, <span class="hljs-string">'mousemove'</span>, <span class="hljs-string">'mouseup'</span>, <span class="hljs-string">'mouseenter'</span>, <span class="hljs-string">'mouseover'</span>, <span class="hljs-string">'mouseleave'</span>, <span class="hljs-string">'dblclick'</span>,
-    <span class="hljs-string">'touchstart'</span>, <span class="hljs-string">'touchmove'</span>, <span class="hljs-string">'touchend'</span>, <span class="hljs-string">'touchcancel'</span>,
-    <span class="hljs-string">'selectstart'</span>, <span class="hljs-string">'gesturestart'</span>, <span class="hljs-string">'gesturechange'</span>, <span class="hljs-string">'gestureend'</span>];
-  <span class="hljs-keyword">var</span> preventEvents = [<span class="hljs-string">'dragstart'</span>];</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <p>The SpriteSpin object. This object wraps the core logic of SpriteSpin</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> Spin = {};
+  <span class="hljs-comment">/**
+   * The SpriteSpin object.
+   * @type {object}
+   */</span>
+  <span class="hljs-keyword">var</span> Spin = {};
 
   <span class="hljs-comment">/**
    * @module SpriteSpin
@@ -91,16 +49,48 @@ to the target element on which the plugin is called.</p>
   <span class="hljs-built_in">window</span>.SpriteSpin = Spin;
 
   <span class="hljs-comment">/**
-   * The namespace that is used to bind functions to DOM events and set the data object to DOM elements
+   * The namespace that is used to bind functions to DOM events and store the data object
    * @type {string}
    */</span>
   Spin.namespace = name;
 
   <span class="hljs-comment">/**
-   * Collection of modules that can be used to extend the functionality of SpriteSpin.
+   * Collection of registered modules that can be used to extend the functionality of SpriteSpin.
    * @type {object}
    */</span>
   Spin.mods = {};
+
+  <span class="hljs-comment">/**
+   * Event names that are recognized by SpriteSpin. A module can implement any of these and they will be bound
+   * to the target element on which the plugin is called.
+   * @type {string[]}
+   */</span>
+  Spin.eventNames = [
+    <span class="hljs-string">'mousedown'</span>,
+    <span class="hljs-string">'mousemove'</span>,
+    <span class="hljs-string">'mouseup'</span>,
+    <span class="hljs-string">'mouseenter'</span>,
+    <span class="hljs-string">'mouseover'</span>,
+    <span class="hljs-string">'mouseleave'</span>,
+    <span class="hljs-string">'dblclick'</span>,
+    <span class="hljs-string">'mousewheel'</span>,
+    <span class="hljs-string">'touchstart'</span>,
+    <span class="hljs-string">'touchmove'</span>,
+    <span class="hljs-string">'touchend'</span>,
+    <span class="hljs-string">'touchcancel'</span>,
+    <span class="hljs-string">'selectstart'</span>,
+    <span class="hljs-string">'gesturestart'</span>,
+    <span class="hljs-string">'gesturechange'</span>,
+    <span class="hljs-string">'gestureend'</span>
+  ];
+
+  <span class="hljs-comment">/**
+   * Names of events for that the default behavior should be prevented.
+   * @type {string[]}
+   */</span>
+  Spin.eventsToPrevent = [
+    <span class="hljs-string">'dragstart'</span>
+  ];
 
   <span class="hljs-comment">/**
    * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
@@ -147,14 +137,89 @@ to the target element on which the plugin is called.</p>
         </li>
         
         
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+  <span class="hljs-keyword">var</span> idCounter = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">var</span> instances = {};
+  Spin.instances = instances;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">simulateEvent</span>(<span class="hljs-params">name, e</span>) </span>{
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> id <span class="hljs-keyword">in</span> instances) {
+      <span class="hljs-keyword">if</span> (!instances.hasOwnProperty(id)) <span class="hljs-keyword">continue</span>;
+      <span class="hljs-keyword">var</span> data = instances[id];
+      <span class="hljs-keyword">var</span> i, <span class="hljs-built_in">module</span>;
+      <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; data.mods.length; i += <span class="hljs-number">1</span>) {
+        <span class="hljs-built_in">module</span> = data.mods[i];
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">module</span>[name] != <span class="hljs-string">'function'</span>) <span class="hljs-keyword">continue</span>;
+        <span class="hljs-built_in">module</span>[name].apply(data.target, [e, data]);
+      }
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindSimulatedEvent</span>(<span class="hljs-params">eName</span>)</span>{
+    $(<span class="hljs-built_in">window</span>.document).bind(eName + <span class="hljs-string">'.'</span> + name, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+      simulateEvent(<span class="hljs-string">'document'</span> + eName, e);
+    });
+  }
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; Spin.eventNames.length; i += <span class="hljs-number">1</span>) {
+    bindSimulatedEvent(Spin.eventNames[i]);
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">pushInstance</span>(<span class="hljs-params">data</span>) </span>{
+    idCounter += <span class="hljs-number">1</span>;
+    data.id = idCounter;
+    instances[idCounter] = data;
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">popInstance</span>(<span class="hljs-params">data</span>) </span>{
+    <span class="hljs-keyword">delete</span> instances[data.id];
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h2 id="internal-helper-functions">Internal Helper Functions</h2>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="internal-helper-functions">Internal Helper Functions</h2>
-
+              
             </div>
             
         </li>
@@ -166,24 +231,12 @@ to the target element on which the plugin is called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
               <p>converts the given number to string and pads it to match at least the given length.
 The pad value is added in front of the string. This padNumber(4, 5, 0) would convert 4 to ‘00004’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">padNumber</span><span class="hljs-params">(num, length, pad)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">padNumber</span>(<span class="hljs-params">num, length, pad</span>)</span>{
     num = <span class="hljs-built_in">String</span>(num);
     <span class="hljs-keyword">while</span> (num.length &lt; length){
       num = <span class="hljs-built_in">String</span>(pad) + num;
@@ -194,27 +247,51 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
         </li>
         
         
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>clamps the given value by the given min and max values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clamp</span>(<span class="hljs-params">value, min, max</span>)</span>{
+    <span class="hljs-keyword">return</span> (value &gt; max ? max : (value &lt; min ? min : value));
+  }
+  Spin.clamp = clamp;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrap</span>(<span class="hljs-params">value, min, max, size</span>)</span>{
+    <span class="hljs-keyword">while</span> (value &gt; max){ value -= size; }
+    <span class="hljs-keyword">while</span> (value &lt; min){ value += size; }
+    <span class="hljs-keyword">return</span> value;
+  }
+  Spin.wrap = wrap;</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>clamps the given value by the given min and max values</p>
+              <p>prevents default action on the given event</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clamp</span><span class="hljs-params">(value, min, max)</span></span>{
-    <span class="hljs-keyword">return</span> (value &gt; max ? max : (value &lt; min ? min : value));
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prevent</span>(<span class="hljs-params">e</span>)</span>{
+    e.preventDefault();
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
   }
-  Spin.clamp = clamp;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrap</span><span class="hljs-params">(value, min, max, size)</span></span>{
-    <span class="hljs-keyword">while</span> (value &gt; max){ value -= size; }
-    <span class="hljs-keyword">while</span> (value &lt; min){ value += size; }
-    <span class="hljs-keyword">return</span> value;
-  }
-  Spin.wrap = wrap;</pre></div></div>
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span>(<span class="hljs-params"></span>)</span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">window</span>.console &amp;&amp; <span class="hljs-built_in">window</span>.console.log){
+      <span class="hljs-built_in">window</span>.console.log.apply(<span class="hljs-built_in">window</span>.console, <span class="hljs-built_in">arguments</span>);
+    }
+  }</pre></div></div>
             
         </li>
         
@@ -225,18 +302,16 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>prevents default action on the given event</p>
+              <p>Binds on the given target and event the given function.
+The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prevent</span><span class="hljs-params">(e)</span></span>{
-    e.preventDefault();
-    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-  }
-
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span><span class="hljs-params">()</span></span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">window</span>.console &amp;&amp; <span class="hljs-built_in">window</span>.console.log){
-      <span class="hljs-built_in">window</span>.console.log.apply(<span class="hljs-built_in">window</span>.console, <span class="hljs-built_in">arguments</span>);
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bind</span>(<span class="hljs-params">target, event, func</span>)</span>{
+    <span class="hljs-keyword">if</span> (func) {
+      target.bind(event + <span class="hljs-string">'.'</span> + name, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+        func.apply(target, [e, target.spritespin(<span class="hljs-string">'data'</span>)]);
+      });
     }
   }</pre></div></div>
             
@@ -249,15 +324,12 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Binds on the given target and event the given function.
-The SpriteSpin namespace is attached to the event name</p>
+              <p>Unbinds all SpriteSpin events from given target element</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bind</span><span class="hljs-params">(target, event, func)</span></span>{
-    <span class="hljs-keyword">if</span> (func) {
-      target.bind(event + <span class="hljs-string">'.'</span> + name, func);
-    }
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span>(<span class="hljs-params">target</span>)</span>{
+    target.unbind(<span class="hljs-string">'.'</span> + name);
   }</pre></div></div>
             
         </li>
@@ -269,13 +341,11 @@ The SpriteSpin namespace is attached to the event name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Unbinds all SpriteSpin events from given target element</p>
+              <p>Loads a set of image files. Yields the progress and the completion of the load operation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span><span class="hljs-params">(target)</span></span>{
-    target.unbind(<span class="hljs-string">'.'</span> + name);
-  }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span>(<span class="hljs-params">opts</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -286,21 +356,6 @@ The SpriteSpin namespace is attached to the event name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Loads a set of image files. Yields the progress and the completion of the load operation.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(opts)</span></span>{</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
-              </div>
               <p>convert opts.source to an array of strings</p>
 
             </div>
@@ -308,7 +363,7 @@ The SpriteSpin namespace is attached to the event name</p>
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> src = (<span class="hljs-keyword">typeof</span> opts.source === <span class="hljs-string">'string'</span>) ? [opts.source] : opts.source;
     <span class="hljs-keyword">var</span> i, count = <span class="hljs-number">0</span>, img, images = [], targetCount = (opts.preloadCount || src.length);
     <span class="hljs-keyword">var</span> completed = <span class="hljs-literal">false</span>, firstLoaded = <span class="hljs-literal">false</span>;
-    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       count += <span class="hljs-number">1</span>;
       <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> opts.progress === <span class="hljs-string">'function'</span>){
         opts.progress({
@@ -331,11 +386,11 @@ The SpriteSpin namespace is attached to the event name</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>currently no care about error or aborting transfers</p>
 
@@ -352,11 +407,11 @@ The SpriteSpin namespace is attached to the event name</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Idea taken from <a href="https://github.com/stomita/ios-imagefile-megapixel">https://github.com/stomita/ios-imagefile-megapixel</a>
 Detects whether the image has been sub sampled by the browser and does not have its original dimensions.
@@ -364,18 +419,18 @@ This method unfortunately does not work for images that have transparent backgro
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">detectSubsampling</span><span class="hljs-params">(img, size)</span> </span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">detectSubsampling</span>(<span class="hljs-params">img, size</span>) </span>{
     <span class="hljs-keyword">var</span> iw = (size || img).width;
     <span class="hljs-keyword">var</span> ih = (size || img).height;</pre></div></div>
             
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>sub sampling happens on images above 1 megapixel</p>
 
@@ -399,11 +454,11 @@ This method unfortunately does not work for images that have transparent backgro
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>set canvas to 1x1 pixel size and fill it with magenta color</p>
 
@@ -416,11 +471,11 @@ This method unfortunately does not work for images that have transparent backgro
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>render the image with a negative offset to the left so that it would
 fill the canvas pixel with the top right pixel of the image.</p>
@@ -432,11 +487,11 @@ fill the canvas pixel with the top right pixel of the image.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>check color value to confirm image is covering edge pixel or not.
 if color still magenta, the image is assumed to be sub sampled.</p>
@@ -452,11 +507,11 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>avoids cross origin exception for chrome when code runs without a server</p>
 
@@ -470,26 +525,26 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>gets the original width and height of an image element</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">naturalSize</span><span class="hljs-params">(image)</span></span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">naturalSize</span>(<span class="hljs-params">image</span>)</span>{</pre></div></div>
             
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>for browsers that support naturalWidth and naturalHeight properties</p>
 
@@ -505,11 +560,11 @@ if color still magenta, the image is assumed to be sub sampled.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>browsers that do not support naturalWidth and naturalHeight properties we have to fall back to the width and
 height properties. However, the image might have a css style applied so width and height would return the
@@ -529,11 +584,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <h2 id="public-helper-functions">Public Helper Functions</h2>
 
@@ -542,11 +597,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               
             </div>
@@ -565,7 +620,7 @@ Here we assume that the src has already been downloaded, so no onload callback i
    * @param opts
    * @returns {Array}
    */</span>
-  Spin.sourceArray = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, opts)</span></span>{
+  Spin.sourceArray = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">path, opts</span>)</span>{
     <span class="hljs-keyword">var</span> fStart = <span class="hljs-number">0</span>, fEnd = <span class="hljs-number">0</span>, lStart = <span class="hljs-number">0</span>, lEnd = <span class="hljs-number">0</span>, digits = opts.digits || <span class="hljs-number">2</span>;
     <span class="hljs-keyword">if</span> (opts.frame) {
       fStart = opts.frame[<span class="hljs-number">0</span>];
@@ -590,7 +645,7 @@ Here we assume that the src has already been downloaded, so no onload callback i
    * Measures the image frames that are used in the given data object
    * @param {object} data
    */</span>
-  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> img = data.images[<span class="hljs-number">0</span>];
     <span class="hljs-keyword">var</span> size = naturalSize(img);
 
@@ -606,11 +661,11 @@ Here we assume that the src has already been downloaded, so no onload callback i
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>calculate the number of frames packed in a row
 assume tightly packed images without any padding pixels</p>
@@ -622,11 +677,11 @@ assume tightly packed images without any padding pixels</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>calculate size of a single frame</p>
 
@@ -657,7 +712,7 @@ assume tightly packed images without any padding pixels</p>
    * Resets the input state of the SpriteSpin data.
    * @param {object} data
    */</span>
-  Spin.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     data.startX = data.startY = <span class="hljs-literal">undefined</span>;      <span class="hljs-comment">// initial touch/click position</span>
     data.currentX = data.currentY = <span class="hljs-literal">undefined</span>;  <span class="hljs-comment">// touch/click position in current frame</span>
     data.oldX = data.oldY = <span class="hljs-literal">undefined</span>;          <span class="hljs-comment">// touch/click position in last frame</span>
@@ -670,16 +725,16 @@ assume tightly packed images without any padding pixels</p>
    * @param {*} e
    * @param {object} data
    */</span>
-  Spin.updateInput = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{</pre></div></div>
+  Spin.updateInput = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{</pre></div></div>
             
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>jQuery Event normalization does not preserve the ‘event.touches’
 try to grab touches from the original event</p>
@@ -693,11 +748,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>cache positions from previous frame</p>
 
@@ -709,11 +764,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>get current touch or mouse position</p>
 
@@ -730,11 +785,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Fix old position.</p>
 
@@ -748,11 +803,11 @@ try to grab touches from the original event</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Cache the initial click/touch position and store the frame number at which the click happened.
 Useful for different behavior implementations. This must be restored when the click/touch is released.</p>
@@ -769,11 +824,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-33">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Calculate the vector from start position to current pointer position.</p>
 
@@ -785,11 +840,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Calculate the vector from last frame position to current pointer position.</p>
 
@@ -801,11 +856,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Normalize vectors to range [-1:+1]</p>
 
@@ -824,7 +879,10 @@ Useful for different behavior implementations. This must be restored when the cl
    * @param {number} [frame]
    * @param {number} [lane]
    */</span>
-  Spin.updateFrame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data, frame, lane)</span></span>{
+  Spin.updateFrame = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, frame, lane</span>)</span>{
+
+    data.lastFrame = data.frame;
+    data.lastLane = data.lane;
 
     <span class="hljs-keyword">if</span> (frame !== <span class="hljs-literal">undefined</span>){
       data.frame = <span class="hljs-built_in">Number</span>(frame);
@@ -837,11 +895,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-36">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>wrap the frame value to fit in range [0, data.frames]</p>
 
@@ -852,11 +910,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-37">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>stop animation if loop is disabled and the stopFrame is reached</p>
 
@@ -870,11 +928,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-38">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>wrap/clamp the frame value to fit in range [0, data.frames]</p>
 
@@ -893,6 +951,9 @@ Useful for different behavior implementations. This must be restored when the cl
       }
     }
 
+    <span class="hljs-keyword">if</span> (data.lastFrame != data.frame || data.lastLane != data.lane) {
+      data.target.trigger(<span class="hljs-string">"onFrameChanged"</span>, data);  
+    }
     data.target.trigger(<span class="hljs-string">"onFrame"</span>, data);
     data.target.trigger(<span class="hljs-string">"onDraw"</span>, data);
   };
@@ -901,7 +962,7 @@ Useful for different behavior implementations. This must be restored when the cl
    * Stops the running animation on given SpriteSpin data.
    * @param {object} data
    */</span>
-  Spin.stopAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.stopAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     data.animate = <span class="hljs-literal">false</span>;
     <span class="hljs-keyword">if</span> (data.animation){
       <span class="hljs-built_in">window</span>.clearInterval(data.animation);
@@ -913,7 +974,7 @@ Useful for different behavior implementations. This must be restored when the cl
    * Starts animation on given SpriteSpin data if animation is enabled.
    * @param {object} data
    */</span>
-  Spin.setAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data.animate){
       Spin.requestFrame(data);
     } <span class="hljs-keyword">else</span> {
@@ -921,17 +982,17 @@ Useful for different behavior implementations. This must be restored when the cl
     }
   };
 
-  Spin.requestFrame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.requestFrame = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data.animation){</pre></div></div>
             
         </li>
         
         
-        <li id="section-39">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>another frame has been already requested</p>
 
@@ -943,18 +1004,18 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-40">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>cache the tick function</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (data.frameFunction === <span class="hljs-literal">undefined</span>){
-      data.frameFunction = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      data.frameFunction = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         <span class="hljs-keyword">try</span> {
           Spin.updateFrame(data);
         } <span class="hljs-keyword">catch</span>(ignore){</pre></div></div>
@@ -962,11 +1023,11 @@ Useful for different behavior implementations. This must be restored when the cl
         </li>
         
         
-        <li id="section-41">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>The try catch block is a hack for Opera Browser
 Opera sometimes rises an exception here and
@@ -981,11 +1042,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               
             </div>
@@ -997,7 +1058,7 @@ stops performing the script</p>
    * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
    * @param {object} data
    */</span>
-  Spin.setModules = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setModules = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> i, modName, mod;
     <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; data.mods.length; i += <span class="hljs-number">1</span>){
       modName = data.mods[i];
@@ -1012,16 +1073,16 @@ stops performing the script</p>
     }
   };
 
-  Spin.calculateInnerLayout = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{</pre></div></div>
+  Spin.calculateInnerLayout = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{</pre></div></div>
             
         </li>
         
         
-        <li id="section-43">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>outer container size</p>
 
@@ -1034,11 +1095,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>inner container size</p>
 
@@ -1051,11 +1112,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>resulting layout</p>
 
@@ -1075,11 +1136,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>calculate size</p>
 
@@ -1117,11 +1178,11 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>position in center</p>
 
@@ -1131,6 +1192,7 @@ stops performing the script</p>
     css.left = ((w - css.width) / <span class="hljs-number">2</span>)|<span class="hljs-number">0</span>;
     css.right = css.left;
     css.bottom = css.top;
+
     <span class="hljs-keyword">return</span> css;
   };
 
@@ -1138,16 +1200,16 @@ stops performing the script</p>
    * Applies css attributes to layout the SpriteSpin containers.
    * @param {object} data
    */</span>
-  Spin.setLayout = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{</pre></div></div>
+  Spin.setLayout = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{</pre></div></div>
             
         </li>
         
         
-        <li id="section-48">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>disable selection</p>
 
@@ -1185,17 +1247,17 @@ stops performing the script</p>
    * (re)binds all spritespin events on the target element
    * @param data
    */</span>
-  Spin.setEvents = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setEvents = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> i, j, mod, target = data.target;</pre></div></div>
             
         </li>
         
         
-        <li id="section-49">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>Clear all SpriteSpin events on the target element</p>
 
@@ -1206,20 +1268,40 @@ stops performing the script</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>disable all default browser behavior on the following events
 mainly prevents image drag operation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; preventEvents.length; j += <span class="hljs-number">1</span>){
-      bind(target, preventEvents[j],  prevent);
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; Spin.eventsToPrevent.length; j += <span class="hljs-number">1</span>){
+      bind(target, Spin.eventsToPrevent[j],  prevent);
     }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>Bind module functions to SpriteSpin events</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; data.mods.length; i += <span class="hljs-number">1</span>){
+      mod = data.mods[i];
+
+      <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; Spin.eventNames.length; j += <span class="hljs-number">1</span>){
+        bind(target, Spin.eventNames[j], mod[Spin.eventNames[j]]);
+      }</pre></div></div>
             
         </li>
         
@@ -1230,16 +1312,17 @@ mainly prevents image drag operation</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
-              <p>Bind module functions to SpriteSpin events</p>
+              <p>bind</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; data.mods.length; i += <span class="hljs-number">1</span>){
-      mod = data.mods[i];
-
-      <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; modEvents.length; j += <span class="hljs-number">1</span>){
-        bind(target, modEvents[j],  mod[modEvents[j]]);
-      }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      bind(target, <span class="hljs-string">'onInit'</span>,     mod.onInit);
+      bind(target, <span class="hljs-string">'onProgress'</span>, mod.onProgress);
+      bind(target, <span class="hljs-string">'onLoad'</span>,     mod.onLoad);
+      bind(target, <span class="hljs-string">'onFrameChanged'</span>, mod.onFrameChanged);
+      bind(target, <span class="hljs-string">'onFrame'</span>,    mod.onFrame);
+      bind(target, <span class="hljs-string">'onDraw'</span>,     mod.onDraw);
+    }</pre></div></div>
             
         </li>
         
@@ -1250,16 +1333,13 @@ mainly prevents image drag operation</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
-              <p>bind</p>
+              <p>bind auto start function to load event.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      bind(target, <span class="hljs-string">'onInit'</span>,     mod.onInit);
-      bind(target, <span class="hljs-string">'onProgress'</span>, mod.onProgress);
-      bind(target, <span class="hljs-string">'onLoad'</span>,     mod.onLoad);
-      bind(target, <span class="hljs-string">'onFrame'</span>,    mod.onFrame);
-      bind(target, <span class="hljs-string">'onDraw'</span>,     mod.onDraw);
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onLoad'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+      Spin.setAnimation(data);
+    });</pre></div></div>
             
         </li>
         
@@ -1270,23 +1350,6 @@ mainly prevents image drag operation</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
-              <p>bind auto start function to load event.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onLoad'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
-      Spin.setAnimation(data);
-    });</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-54">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
-              </div>
               <p>bind all user events that have been passed on initialization</p>
 
             </div>
@@ -1294,6 +1357,7 @@ mainly prevents image drag operation</p>
             <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onInit'</span>,     data.onInit);
     bind(target, <span class="hljs-string">'onProgress'</span>, data.onProgress);
     bind(target, <span class="hljs-string">'onLoad'</span>,     data.onLoad);
+    bind(target, <span class="hljs-string">'onFrameChanged'</span>, mod.onFrameChanged);
     bind(target, <span class="hljs-string">'onFrame'</span>,    data.onFrame);
     bind(target, <span class="hljs-string">'onDraw'</span>,     data.onDraw);
   };
@@ -1302,7 +1366,7 @@ mainly prevents image drag operation</p>
    * Runs the boot process. (re)creates modules, (re)sets the layout, (re)binds all events and loads source images.
    * @param {object} data
    */</span>
-  Spin.boot = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.boot = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     Spin.setModules(data);
     Spin.setLayout(data);
     Spin.setEvents(data);
@@ -1311,13 +1375,14 @@ mainly prevents image drag operation</p>
     load({
       source: data.source,
       preloadCount: data.preloadCount,
-      progress: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(progress)</span></span>{
+      progress: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">progress</span>)</span>{
         data.target.trigger(<span class="hljs-string">'onProgress'</span>, [progress, data]);
       },
-      complete: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(images)</span></span>{
+      complete: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">images</span>)</span>{
         data.images = images;
         data.loading = <span class="hljs-literal">false</span>;
         Spin.measureSource(data);
+        Spin.setLayout(data);
         data.stage.show();
         data.target
           .removeClass(<span class="hljs-string">'loading'</span>)
@@ -1332,7 +1397,7 @@ mainly prevents image drag operation</p>
    * Initializes the target element with spritespin data.
    * @param {object} options
    */</span>
-  Spin.create = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
+  Spin.create = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">options</span>)</span>{
     <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = options.target;
     <span class="hljs-keyword">var</span> data  = $<span class="hljs-keyword">this</span>.data(name);
 
@@ -1341,11 +1406,11 @@ mainly prevents image drag operation</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>SpriteSpin is not initialized
 Create default settings object and extend with given options</p>
@@ -1357,11 +1422,11 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>ensure that there is anything set as a source</p>
 
@@ -1372,29 +1437,29 @@ Create default settings object and extend with given options</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>if image tags are contained inside this DOM element
 use these images as the source files</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.find(<span class="hljs-string">'img'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.find(<span class="hljs-string">'img'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         data.source.push($(<span class="hljs-keyword">this</span>).attr(<span class="hljs-string">'src'</span>));
       });</pre></div></div>
             
         </li>
         
         
-        <li id="section-58">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>build inner html</p>
 <div>
@@ -1412,11 +1477,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>add the canvas element if canvas rendering is enabled and supported</p>
 
@@ -1434,11 +1499,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>fallback to image rendering mode</p>
 
@@ -1451,11 +1516,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>setup references to DOM elements</p>
 
@@ -1467,27 +1532,28 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>store the data</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.data(name, data);
+      pushInstance(data);
     } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
         
-        <li id="section-63">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>just update the data object</p>
 
@@ -1499,11 +1565,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>convert string source to array of strings</p>
 
@@ -1516,11 +1582,11 @@ use these images as the source files</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>behavior and module attributes tell us what additional modules must be loaded.</p>
 
@@ -1550,8 +1616,9 @@ use these images as the source files</p>
    * Stops running animation, unbinds all events and deletes the data on the target element of the given data object.
    * @param {object} data The spritespin data object.
    */</span>
-  Spin.destroy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.destroy = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data){
+      popInstance(data);
       Spin.stopAnimation(data);
       unbind(data.target);
       data.target.removeData(name);
@@ -1565,7 +1632,7 @@ use these images as the source files</p>
    * @param {object} [module] the module implementation
    * @returns {object} the given module
    */</span>
-  Spin.registerModule = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(name, module)</span></span>{
+  Spin.registerModule = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, module</span>)</span>{
     <span class="hljs-keyword">if</span> (Spin.mods[name]){
       $.error(<span class="hljs-string">'Module name is already taken: '</span> + name);
     }
@@ -1580,7 +1647,7 @@ use these images as the source files</p>
    * @class SpriteSpin.Api
    * @constructor
    */</span>
-  Spin.Api = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.Api = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">this</span>.data = data;
   };
 
@@ -1590,7 +1657,7 @@ use these images as the source files</p>
    * @param methods
    * @returns {SpriteSpin.Api.prototype}
    */</span>
-  Spin.extendApi = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(methods)</span></span>{
+  Spin.extendApi = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">methods</span>)</span>{
     <span class="hljs-keyword">var</span> key, api = Spin.Api.prototype;
     <span class="hljs-keyword">for</span>(key <span class="hljs-keyword">in</span> methods) {
       <span class="hljs-keyword">if</span> (methods.hasOwnProperty(key)) {
@@ -1610,7 +1677,7 @@ use these images as the source files</p>
    * @param {*} [value]
    * @returns {*}
    */</span>
-  $.fn.spritespin = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(obj, value)</span> </span>{
+  $.fn.spritespin = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">obj, value</span>) </span>{
     <span class="hljs-keyword">if</span> (obj === <span class="hljs-string">"data"</span>){
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data(name);
     }
@@ -1620,7 +1687,7 @@ use these images as the source files</p>
       <span class="hljs-keyword">return</span> data.api;
     }
     <span class="hljs-keyword">if</span> (obj === <span class="hljs-string">"destroy"</span>){
-      <span class="hljs-keyword">return</span> $(<span class="hljs-keyword">this</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      <span class="hljs-keyword">return</span> $(<span class="hljs-keyword">this</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         Spin.destroy($(<span class="hljs-keyword">this</span>).data(name));
       });
     }

@@ -8,7 +8,7 @@
     <meta property="og:url" content="http://spritespin.ginie.eu/">
     <meta property="og:description" content="jQuery plugin for creating flip book like animations.">
     <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="/spritespin.min.js"></script>
+    <script src="/spritespin.js"></script>
     <script src="https://code.angularjs.org/1.2.9/angular.min.js"></script>
     <script src="https://code.angularjs.org/1.2.9/angular-route.min.js"></script>
     <link type="text/css" rel="stylesheet" media="all" href="/style.css">
@@ -80,7 +80,10 @@
   source : "sprites/panorama/panorama.jpg",
   width  : 205,        // width in pixels of the window
   height : 140,        // height in pixels of the window
-  module : 'panorama'  // rendering implementation to use
+  mods   : [
+    'drag',            // the interaction behavior
+    'panorama'         // the rendering implementation
+  ]
 });</code></pre>
     <div class="container">
       <div id="panorama-example"></div>
@@ -91,7 +94,7 @@
             source: './images/panorama.jpg',
             width: 480,
             height: 200,
-            module: "panorama"
+            mods: ["drag", "panorama"]
           });
         };
       </script>
@@ -122,7 +125,7 @@
       <script type="text/javascript">
         showLanesExample = function () {
           $('#lanes-example').spritespin({
-                    // fill source array using a helper function
+            // fill source array using a helper function
             source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
               lane: [0, 11],
               frame: [0, 23],
@@ -137,6 +140,44 @@
             sense: 1,
             senseLane: -2,
             renderer: 'canvas'
+          });
+        };
+        
+      </script>
+    </div>
+    <hr>
+    <div class="container">
+      <h1>Easing and blur</h1>
+      <p>Add easing motion and blur effects</p>
+    </div>
+    <pre><code class="language-javascript">$('#sprite-ease-blur-example').spritespin({
+  source: './images/bike6x6_big.jpg',
+  width: 480,
+  height: 327,
+  frames: 34,
+  framesX: 6,
+  sense: -1,
+  mods: ['drag', 'ease', '360', 'blur'],
+  // easeDamping: 0.92,
+  // easeSamples: 5,
+  // blurCss: true
+});</code></pre>
+    <div class="container">
+      <div id="sprite-ease-blur-example"></div>
+      <button onclick="showEaseBlurExample(); $(this).remove(); return false;" class="btn btn-blue">Show Example</button>
+      <script type="text/javascript">
+        showEaseBlurExample = function () {
+          $('#sprite-ease-blur-example').spritespin({
+            source: './images/bike6x6_big.jpg',
+            width: 480,
+            height: 327,
+            frames: 34,
+            framesX: 6,
+            sense: -1,
+            mods: ['drag', 'ease', '360', 'blur'],
+            // easeDamping: 0.92,
+            // easeSamples: 5,
+            // blurCss: true
           });
         };
       </script>

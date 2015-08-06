@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;</pre></div></div>
             
         </li>
@@ -46,7 +46,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> fn = (<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> fn = (<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">var</span> val;
     <span class="hljs-keyword">var</span> valLength;
 
@@ -140,35 +140,34 @@
     <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
   })();
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">requestFullscreen</span><span class="hljs-params">(e)</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">requestFullscreen</span>(<span class="hljs-params">e</span>)</span>{
     e = e || <span class="hljs-built_in">document</span>.documentElement;
     e[fn.requestFullscreen]();
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">exitFullscreen</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">exitFullscreen</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>[fn.exitFullscreen]();
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fullscreenEnabled</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fullscreenEnabled</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>[fn.fullscreenEnabled];
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fullscreenElement</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fullscreenElement</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>[fn.fullscreenElement];
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isFullscreen</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isFullscreen</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">return</span> !!fullscreenElement();
   }
 
-  <span class="hljs-keyword">var</span> SpriteSpin = <span class="hljs-built_in">window</span>.SpriteSpin;
   <span class="hljs-keyword">var</span> changeEvent = fn.fullscreenchange + <span class="hljs-string">'.'</span> + SpriteSpin.namespace;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbindChangeEvent</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbindChangeEvent</span>(<span class="hljs-params"></span>)</span>{
     $(<span class="hljs-built_in">document</span>).unbind(changeEvent);
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindChangeEvent</span><span class="hljs-params">(callback)</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindChangeEvent</span>(<span class="hljs-params">callback</span>)</span>{
     unbindChangeEvent();
     $(<span class="hljs-built_in">document</span>).bind(changeEvent, callback);
   }
@@ -177,21 +176,21 @@
     fullscreenEnabled: fullscreenEnabled,
     fullscreenElement: fullscreenElement,
     exitFullscreen: exitFullscreen,
-    toggleFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts)</span></span>{
+    toggleFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">opts</span>)</span>{
       <span class="hljs-keyword">if</span> (isFullscreen()) {
         <span class="hljs-keyword">this</span>.requestFullscreen(opts)
       } <span class="hljs-keyword">else</span> {
         <span class="hljs-keyword">this</span>.exitFullscreen()
       }
     },
-    requestFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts)</span></span>{
+    requestFullscreen: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">opts</span>)</span>{
       opts = opts || {};
       <span class="hljs-keyword">var</span> api = <span class="hljs-keyword">this</span>;
       <span class="hljs-keyword">var</span> data = api.data;
       <span class="hljs-keyword">var</span> oWidth = data.width;
       <span class="hljs-keyword">var</span> oHeight = data.height;
       <span class="hljs-keyword">var</span> oSource = data.source;
-      bindChangeEvent(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      bindChangeEvent(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         <span class="hljs-keyword">if</span> (isFullscreen()){</pre></div></div>
             
         </li>
@@ -237,7 +236,7 @@
     }
   });
 
-}(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$));</pre></div></div>
+}(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
             
         </li>
         

@@ -10,14 +10,15 @@
     <script type="text/javascript">
       $('.spritespin').spritespin({
          source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
-         width: 800,
-         height: 450,
+         width: 400,
+         height: 225,
          frames: 24,
          lanes: 12,
          sense: 1,
          senseLane: -2,
-         behavior: 'move',
-         renderer: 'canvas'
+         mods: ['drag', 'ease', '360', 'blur'],
+         behavior: null,
+         module: null
       });
     </script>
   </body>

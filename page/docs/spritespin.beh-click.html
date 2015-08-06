@@ -30,26 +30,27 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">click</span><span class="hljs-params">(e)</span> </span>{
-    <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.data(<span class="hljs-string">'spritespin'</span>);
-
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">click</span>(<span class="hljs-params">e, data</span>) </span>{
+    <span class="hljs-keyword">if</span> (data.loading || !data.stage.is(<span class="hljs-string">':visible'</span>)){
+      <span class="hljs-keyword">return</span>;
+    }
     SpriteSpin.updateInput(e, data);
 
-    <span class="hljs-keyword">var</span> half, pos;
+    <span class="hljs-keyword">var</span> half, pos, target = data.target, offset = target.offset();
     <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>) {
-      half = data.target.innerWidth() / <span class="hljs-number">2</span>;
-      pos = data.currentX - data.target.offset().left;
+      half = target.innerWidth() / <span class="hljs-number">2</span>;
+      pos = data.currentX - offset.left;
     } <span class="hljs-keyword">else</span> {
-      half = data.target.innerHeight() / <span class="hljs-number">2</span>;
-      pos = data.currentY - data.target.offset().top;
+      half = target.innerHeight() / <span class="hljs-number">2</span>;
+      pos = data.currentY - offset.top;
     }
     <span class="hljs-keyword">if</span> (pos &gt; half) {
-      $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">"next"</span>);
+      SpriteSpin.updateFrame(data, data.frame + <span class="hljs-number">1</span>);
     } <span class="hljs-keyword">else</span> {
-      $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">"prev"</span>);
+      SpriteSpin.updateFrame(data, data.frame - <span class="hljs-number">1</span>);
     }
   }
 
