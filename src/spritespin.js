@@ -102,6 +102,46 @@
     onDraw            : undefined     // Occurs when all update is complete and frame can be drawn
   };
 
+  //
+  // ----------
+
+  var idCounter = 0;
+  var instances = {};
+  Spin.instances = instances;
+
+  function simulateEvent(name, e) {
+    for (var id in instances) {
+      if (!instances.hasOwnProperty(id)) continue;
+      var data = instances[id];
+      var i, module;
+      for (i = 0; i < data.mods.length; i += 1) {
+        module = data.mods[i];
+        if (typeof module[name] != 'function') continue;
+        module[name].apply(data.target, [e, data]);
+      }
+    }
+  }
+
+  function bindSimulatedEvent(eName){
+    $(window.document).bind(eName + '.' + name, function(e){
+      simulateEvent('document' + eName, e);
+    });
+  }
+
+  for (var i = 0; i < Spin.eventNames.length; i += 1) {
+    bindSimulatedEvent(Spin.eventNames[i]);
+  }
+
+  function pushInstance(data) {
+    idCounter += 1;
+    data.id = idCounter;
+    instances[idCounter] = data;
+  }
+
+  function popInstance(data) {
+    delete instances[data.id];
+  }
+
   // Internal Helper Functions
   // ----------
 
@@ -144,7 +184,9 @@
   // The SpriteSpin namespace is attached to the event name
   function bind(target, event, func){
     if (func) {
-      target.bind(event + '.' + name, func);
+      target.bind(event + '.' + name, function(e){
+        func.apply(target, [e, target.spritespin('data')]);
+      });
     }
   }
 
@@ -408,6 +450,9 @@
    */
   Spin.updateFrame = function(data, frame, lane){
 
+    data.lastFrame = data.frame;
+    data.lastLane = data.lane;
+
     if (frame !== undefined){
       data.frame = Number(frame);
     } else if (data.animation) {
@@ -436,6 +481,9 @@
       }
     }
 
+    if (data.lastFrame != data.frame || data.lastLane != data.lane) {
+      data.target.trigger("onFrameChanged", data);  
+    }
     data.target.trigger("onFrame", data);
     data.target.trigger("onDraw", data);
   };
@@ -562,6 +610,7 @@
     css.left = ((w - css.width) / 2)|0;
     css.right = css.left;
     css.bottom = css.top;
+
     return css;
   };
 
@@ -611,22 +660,23 @@
 
     // disable all default browser behavior on the following events
     // mainly prevents image drag operation
-    for (j = 0; j < preventEvents.length; j += 1){
-      bind(target, preventEvents[j],  prevent);
+    for (j = 0; j < Spin.eventsToPrevent.length; j += 1){
+      bind(target, Spin.eventsToPrevent[j],  prevent);
     }
 
     // Bind module functions to SpriteSpin events
     for (i = 0; i < data.mods.length; i += 1){
       mod = data.mods[i];
 
-      for (j = 0; j < modEvents.length; j += 1){
-        bind(target, modEvents[j],  mod[modEvents[j]]);
+      for (j = 0; j < Spin.eventNames.length; j += 1){
+        bind(target, Spin.eventNames[j], mod[Spin.eventNames[j]]);
       }
 
       // bind
       bind(target, 'onInit',     mod.onInit);
       bind(target, 'onProgress', mod.onProgress);
       bind(target, 'onLoad',     mod.onLoad);
+      bind(target, 'onFrameChanged', mod.onFrameChanged);
       bind(target, 'onFrame',    mod.onFrame);
       bind(target, 'onDraw',     mod.onDraw);
     }
@@ -640,6 +690,7 @@
     bind(target, 'onInit',     data.onInit);
     bind(target, 'onProgress', data.onProgress);
     bind(target, 'onLoad',     data.onLoad);
+    bind(target, 'onFrameChanged', mod.onFrameChanged);
     bind(target, 'onFrame',    data.onFrame);
     bind(target, 'onDraw',     data.onDraw);
   };
@@ -664,6 +715,7 @@
         data.images = images;
         data.loading = false;
         Spin.measureSource(data);
+        Spin.setLayout(data);
         data.stage.show();
         data.target
           .removeClass('loading')
@@ -726,6 +778,7 @@
 
       // store the data
       $this.data(name, data);
+      pushInstance(data);
     } else {
       // just update the data object
       $.extend(data, options);
@@ -763,6 +816,7 @@
    */
   Spin.destroy = function(data){
     if (data){
+      popInstance(data);
       Spin.stopAnimation(data);
       unbind(data.target);
       data.target.removeData(name);
