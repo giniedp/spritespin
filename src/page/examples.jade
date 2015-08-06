@@ -53,7 +53,10 @@ block content
       |   source : "sprites/panorama/panorama.jpg",
       |   width  : 205,        // width in pixels of the window
       |   height : 140,        // height in pixels of the window
-      |   module : 'panorama'  // rendering implementation to use
+      |   mods   : [
+      |     'drag',            // the interaction behavior
+      |     'panorama'         // the rendering implementation
+      |   ]
       | });
   .container
     #panorama-example
@@ -64,7 +67,7 @@ block content
           source: './images/panorama.jpg',
           width: 480,
           height: 200,
-          module: "panorama"
+          mods: ["drag", "panorama"]
         });
       };
   hr
@@ -95,7 +98,7 @@ block content
     script(type='text/javascript').
       showLanesExample = function () {
         $('#lanes-example').spritespin({
-                  // fill source array using a helper function
+          // fill source array using a helper function
           source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', {
             lane: [0, 11],
             frame: [0, 23],
@@ -110,6 +113,44 @@ block content
           sense: 1,
           senseLane: -2,
           renderer: 'canvas'
+        });
+      };
+
+  hr
+  .container
+    h1 Easing and blur
+    p
+      | Add easing motion and blur effects
+  pre
+    code.language-javascript
+      | $('#sprite-ease-blur-example').spritespin({
+      |   source: './images/bike6x6_big.jpg',
+      |   width: 480,
+      |   height: 327,
+      |   frames: 34,
+      |   framesX: 6,
+      |   sense: -1,
+      |   mods: ['drag', 'ease', '360', 'blur'],
+      |   // easeDamping: 0.92,
+      |   // easeSamples: 5,
+      |   // blurCss: true
+      | });
+  .container
+    #sprite-ease-blur-example
+    button.btn.btn-blue(onclick='showEaseBlurExample(); $(this).remove(); return false;') Show Example
+    script(type='text/javascript').
+      showEaseBlurExample = function () {
+        $('#sprite-ease-blur-example').spritespin({
+          source: './images/bike6x6_big.jpg',
+          width: 480,
+          height: 327,
+          frames: 34,
+          framesX: 6,
+          sense: -1,
+          mods: ['drag', 'ease', '360', 'blur'],
+          // easeDamping: 0.92,
+          // easeSamples: 5,
+          // blurCss: true
         });
       };
   hr
