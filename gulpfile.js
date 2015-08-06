@@ -22,11 +22,12 @@
     gulp.src([
       'page/*.js',
       'page/*.css',
-      'page/*.html'
+      'page/*.html',
+      'release/*'
     ]).pipe(clean())
   });
 
-  gulp.task('concat', function(){
+  gulp.task('compile', function(){
     gulp.src(source)
       .pipe(concat("spritespin.js"))
       .pipe(gulp.dest('page'))
@@ -64,14 +65,14 @@
   });
 
   gulp.task('build', function(){
-    gulp.run('style', 'page', 'concat', 'uglify', 'doc');
+    gulp.run('style', 'page', 'concat', 'doc');
   });
 
   gulp.task('watch', function(){
     gulp.run('build');
 
     gulp.watch("src/*.js", function(){
-      gulp.run('concat', 'uglify', 'doc');
+      gulp.run('concat', 'doc');
     });
 
     gulp.watch("src/page/**/*.jade", function(){
