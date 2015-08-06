@@ -2,18 +2,12 @@
 (function($) {
   "use strict";
 
-  // The namespace that is used for data storage and event binding
   var name = 'spritespin';
 
-  // Event names that are recognized by SpriteSpin. A module may implement any of these and they will be bound
-  // to the target element on which the plugin is called.
-  var modEvents = [
-    'mousedown', 'mousemove', 'mouseup', 'mouseenter', 'mouseover', 'mouseleave', 'dblclick',
-    'touchstart', 'touchmove', 'touchend', 'touchcancel',
-    'selectstart', 'gesturestart', 'gesturechange', 'gestureend'];
-  var preventEvents = ['dragstart'];
-
-  // The SpriteSpin object. This object wraps the core logic of SpriteSpin
+  /**
+   * The SpriteSpin object.
+   * @type {object}
+   */
   var Spin = {};
 
   /**
@@ -23,16 +17,48 @@
   window.SpriteSpin = Spin;
 
   /**
-   * The namespace that is used to bind functions to DOM events and set the data object to DOM elements
+   * The namespace that is used to bind functions to DOM events and store the data object
    * @type {string}
    */
   Spin.namespace = name;
 
   /**
-   * Collection of modules that can be used to extend the functionality of SpriteSpin.
+   * Collection of registered modules that can be used to extend the functionality of SpriteSpin.
    * @type {object}
    */
   Spin.mods = {};
+
+  /**
+   * Event names that are recognized by SpriteSpin. A module can implement any of these and they will be bound
+   * to the target element on which the plugin is called.
+   * @type {string[]}
+   */
+  Spin.eventNames = [
+    'mousedown',
+    'mousemove',
+    'mouseup',
+    'mouseenter',
+    'mouseover',
+    'mouseleave',
+    'dblclick',
+    'mousewheel',
+    'touchstart',
+    'touchmove',
+    'touchend',
+    'touchcancel',
+    'selectstart',
+    'gesturestart',
+    'gesturechange',
+    'gestureend'
+  ];
+
+  /**
+   * Names of events for that the default behavior should be prevented.
+   * @type {string[]}
+   */
+  Spin.eventsToPrevent = [
+    'dragstart'
+  ];
 
   /**
    * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
