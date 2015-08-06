@@ -1,66 +1,65 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function dragStart(e) {
-    var data = $(this).spritespin('data');
-    if (data.loading){
-      return;
-    }
-    SpriteSpin.updateInput(e, data);
-    data.dragging = true;
+  function init(e, data) {
+    data.swipeFling = data.swipeFling || 10;
+    data.swipeSnap = data.swipeSnap || 0.50;
   }
 
-  function dragEnd() {
-    var data = $(this).spritespin('data');
-    data.dragging = false;
-    SpriteSpin.resetInput(data);
-  }
-
-  function drag(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    if (data.dragging) {
+  function start(e, data) {
+    if (!data.loading && !data.dragging){
       SpriteSpin.updateInput(e, data);
-
-      var frame = data.frame;
-      var snap = data.snap || 0.25;
-      var d, s;
-
-      if (data.orientation === "horizontal") {
-        d = data.dX;
-        s = data.target.innerWidth() * snap;
-      } else {
-        d = data.dY;
-        s = data.target.innerHeight() * snap;
-      }
-
-      if (d > s) {
-        frame = data.frame - 1;
-        data.dragging = false;
-      } else if (d < -s) {
-        frame = data.frame + 1;
-        data.dragging = false;
-      }
-
-      $this.spritespin("update", frame);  // update to frame
-      $this.spritespin("animate", false); // stop animation
-
-      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
-        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
-        e.preventDefault();
-      }
+      data.dragging = true;
     }
+  }
+
+  function update(e, data) {
+    if (!data.dragging) return;
+    SpriteSpin.updateInput(e, data);
+    var frame = data.frame;
+    var lane = data.lane;
+    SpriteSpin.updateFrame(data, frame, lane);
+  }
+
+  function end(e, data) {
+    if (!data.dragging) return;
+    data.dragging = false;
+
+    var frame = data.frame;
+    var lane = data.lane;
+    var snap = data.swipeSnap;
+    var fling = data.swipeFling;
+    var dS, dF;
+    if (data.orientation === "horizontal") {
+      dS = data.ndX;
+      dF = data.ddX;
+    } else {
+      dS = data.ndY;
+      dF = data.ddY;
+    }
+
+    if (dS > snap || dF > fling) {
+      frame = data.frame - 1;
+    } else if (dS < -snap || dF < -fling) {
+      frame = data.frame + 1;
+    }
+
+    SpriteSpin.resetInput(data);
+    SpriteSpin.updateFrame(data, frame, lane);
+    SpriteSpin.stopAnimation(data);
   }
 
   SpriteSpin.registerModule('swipe', {
-    mousedown: dragStart,
-    mousemove: drag,
-    mouseup: dragEnd,
-    mouseleave: dragEnd,
+    onLoad: init,
+    mousedown: start,
+    mousemove: update,
+    mouseup: end,
+    mouseleave: end,
 
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
+    touchstart: start,
+    touchmove: update,
+    touchend: end,
+    touchcancel: end
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
