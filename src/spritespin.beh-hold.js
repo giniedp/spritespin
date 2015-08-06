@@ -1,59 +1,57 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function startAnimation(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    if (data.loading){
+  function start(e, data) {
+    if (data.loading || data.dragging || !data.stage.is(':visible')){
       return;
     }
     SpriteSpin.updateInput(e, data);
     data.dragging = true;
-    $this.spritespin("api").startAnimation();
+    data.animate = true;
+    SpriteSpin.setAnimation(data);
   }
 
-  function stopAnimation(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    SpriteSpin.resetInput(data);
+  function stop(e, data) {
     data.dragging = false;
-    $this.spritespin("api").stopAnimation();
+    SpriteSpin.resetInput(data);
+    SpriteSpin.stopAnimation(data);
   }
 
-  function updateInput(e) {
-    var $this = $(this), data = $this.spritespin('data');
+  function update(e, data) {
+    if (!data.dragging){
+      return;
+    }
+    SpriteSpin.updateInput(e, data);
 
-    if (data.dragging) {
-      SpriteSpin.updateInput(e, data);
+    var half, delta, target = data.target, offset = target.offset();
+    if (data.orientation === "horizontal") {
+      half = target.innerWidth() / 2;
+      delta = (data.currentX - offset().left - half) / half;
+    } else {
+      half = (data.height / 2);
+      delta = (data.currentY - offset().top - half) / half;
+    }
+    data.reverse = delta < 0;
+    delta = delta < 0 ? -delta : delta;
+    data.frameTime = 80 * (1 - delta) + 20;
 
-      var half, delta;
-      if (data.orientation === "horizontal") {
-        half = (data.target.innerWidth() / 2);
-        delta = (data.currentX - data.target.offset().left - half) / half;
-      } else {
-        half = (data.height / 2);
-        delta = (data.currentY - data.target.offset().top - half) / half;
-      }
-      data.reverse = delta < 0;
-      delta = delta < 0 ? -delta : delta;
-      data.frameTime = 80 * (1 - delta) + 20;
-
-      if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
-        ((data.orientation === 'vertical') && (data.dX < data.dY))) {
-        e.preventDefault();
-      }
+    if (((data.orientation === 'horizontal') && (data.dX < data.dY)) ||
+      ((data.orientation === 'vertical') && (data.dX < data.dY))) {
+      e.preventDefault();
     }
   }
 
   SpriteSpin.registerModule('hold', {
 
-    mousedown: startAnimation,
-    mousemove: updateInput,
-    mouseup: stopAnimation,
-    mouseleave: stopAnimation,
+    mousedown: start,
+    mousemove: update,
+    mouseup: stop,
+    mouseleave: stop,
 
-    touchstart: startAnimation,
-    touchmove: updateInput,
-    touchend: stopAnimation,
-    touchcancel: stopAnimation,
+    touchstart: start,
+    touchmove: update,
+    touchend: stop,
+    touchcancel: stop,
 
     onFrame: function () {
       $(this).spritespin("api").startAnimation();

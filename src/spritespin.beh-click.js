@@ -1,23 +1,24 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function click(e) {
-    var $this = $(this), data = $this.data('spritespin');
-
+  function click(e, data) {
+    if (data.loading || !data.stage.is(':visible')){
+      return;
+    }
     SpriteSpin.updateInput(e, data);
 
-    var half, pos;
+    var half, pos, target = data.target, offset = target.offset();
     if (data.orientation === "horizontal") {
-      half = data.target.innerWidth() / 2;
-      pos = data.currentX - data.target.offset().left;
+      half = target.innerWidth() / 2;
+      pos = data.currentX - offset.left;
     } else {
-      half = data.target.innerHeight() / 2;
-      pos = data.currentY - data.target.offset().top;
+      half = target.innerHeight() / 2;
+      pos = data.currentY - offset.top;
     }
     if (pos > half) {
-      $this.spritespin("next");
+      SpriteSpin.updateFrame(data, data.frame + 1);
     } else {
-      $this.spritespin("prev");
+      SpriteSpin.updateFrame(data, data.frame - 1);
     }
   }
 

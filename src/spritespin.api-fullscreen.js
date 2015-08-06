@@ -91,7 +91,6 @@
     return !!fullscreenElement();
   }
 
-  var SpriteSpin = window.SpriteSpin;
   var changeEvent = fn.fullscreenchange + '.' + SpriteSpin.namespace;
 
   function unbindChangeEvent(){
@@ -141,4 +140,4 @@
     }
   });
 
-}(window.jQuery || window.Zepto || window.$));
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));

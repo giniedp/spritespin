@@ -1,31 +1,27 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function dragStart(e) {
-    var data = $(this).spritespin('data');
+  function dragStart(e, data) {
     if (data.loading || data.dragging || !data.stage.is(':visible')){
       return;
     }
     data.dragFrame = data.frame || 0;
     data.dragLane = data.lane || 0;
-    SpriteSpin.updateInput(e, data);
     data.dragging = true;
+    SpriteSpin.updateInput(e, data);
   }
 
-  function dragEnd(e) {
-    var $this = $(this), data = $this.spritespin('data');
-    data.dragging = false;
-    if (data.stage.is(':visible')){
+  function dragEnd(e, data) {
+    if (data.dragging) {
+      data.dragging = false;
       SpriteSpin.resetInput(data);
     }
   }
 
-  function drag(e) {
-    var lane, frame, $this = $(this), data = $this.spritespin('data');
+  function drag(e, data) {
     if (!data.dragging) {
       return;
     }
-
     SpriteSpin.updateInput(e, data);
 
     // dont do anything if the drag distance exceeds the scroll threshold.
@@ -55,20 +51,10 @@
     // accumulate
     data.dragFrame += data.frames * x;
     data.dragLane += data.lanes * y;
-    // clamp accumulated values if wrap is disabled
-    if (!data.wrap){
-      data.dragFrame = Math.min(data.dragFrame, data.frames);
-      data.dragFrame = Math.max(data.dragFrame, 0);
-    }
-    if (!data.wrapLane){
-      data.dragLane = Math.min(data.dragLane, data.lanes);
-      data.dragLane = Math.max(data.dragLane, 0);
-    }
 
-    frame = Math.floor(data.dragFrame);
-    lane = Math.floor(data.dragLane);
+    var frame = Math.floor(data.dragFrame);
+    var lane = Math.floor(data.dragLane);
     SpriteSpin.updateFrame(data, frame, lane);
-    // Stop the running animation (auto frame update) if there is any.
     SpriteSpin.stopAnimation(data);
   }
 
@@ -84,10 +70,25 @@
     touchcancel: dragEnd
   });
 
+  SpriteSpin.registerModule('dragDoc', {
+    mousedown: dragStart,
+    mousemove: drag,
+
+    mouseup: dragEnd,
+
+    documentmousemove: drag,
+    documentmouseup: dragEnd,
+
+    touchstart: dragStart,
+    touchmove: drag,
+    touchend: dragEnd,
+    touchcancel: dragEnd
+  });
+
   SpriteSpin.registerModule('move', {
-    mousemove: function(e){
-      dragStart.call(this, e);
-      drag.call(this, e);
+    mousemove: function(e, data){
+      dragStart.call(this, e, data);
+      drag.call(this, e, data);
     },
     mouseleave: dragEnd,
 
