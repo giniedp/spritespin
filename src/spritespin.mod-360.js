@@ -109,7 +109,6 @@
     },
 
     onDraw: function(e, data){
-      
       if (data.sourceIsSprite){
         drawSprite(data);
       } else{
