@@ -1,52 +1,60 @@
-(function($) {
+(function ($, SpriteSpin) {
   "use strict";
 
-  var Module = window.SpriteSpin.mods.gallery = {};
+  function load(e, data){
+    data.galleryImages = [];
+    data.galleryOffsets = [];
+    data.gallerySpeed = 500;
+    data.galleryOpacity = 0.25;
+    data.galleryFrame = 0;
+    data.galleryStage = data.galleryStage || $('<div/>');
+    data.stage.prepend(data.galleryStage);
+    data.galleryStage.empty();
 
-  Module.onLoad = function(e, data){
-    data.images = [];
-    data.offsets = [];
-    data.stage.empty();
-    data.speed = 500;
-    data.opacity = 0.25;
-    data.oldFrame = 0;
     var size = 0, i;
     for(i = 0; i < data.source.length; i+= 1){
       var img = $("<img src='" + data.source[i] + "'/>");
-      data.stage.append(img);
-      data.images.push(img);
-      data.offsets.push(-size + (data.width - img[0].width) / 2);
-      size += img[0].width;
-      
-      img.css({ opacity : 0.25 });
-    }
-    data.stage.css({ width : size });
-    data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
-  };
-  
-  Module.onDraw = function(e, data){
-    if ((data.oldFrame !== data.frame) && data.offsets){
-      data.stage.stop(true, false);
-      data.stage.animate({ 
-        "left" : data.offsets[data.frame]
-      }, data.speed);
-      
-      data.images[data.oldFrame].animate({ opacity : data.opacity }, data.speed);
-      data.oldFrame = data.frame;
-      data.images[data.oldFrame].animate({ opacity : 1 }, data.speed);
-    } else {
-      //console.log(data.dX);
-      data.stage.css({
-        "left" : data.offsets[data.frame] + data.dX
+      data.galleryStage.append(img);
+      data.galleryImages.push(img);
+      var scale = data.height / img[0].height;
+      data.galleryOffsets.push(-size + (data.width - img[0].width * scale) / 2);
+      size += data.width;
+      img.css({
+        opacity : data.galleryOpacity,
+        width: data.width,
+        height: data.height
       });
     }
-  };
+    var css = SpriteSpin.calculateInnerLayout(data);
+    data.galleryStage.css(css).css({
+      width: size
+    });
+    data.galleryImages[data.galleryFrame].animate({
+      opacity : 1
+    }, data.gallerySpeed);
+  }
   
-  Module.resetInput = function(e, data){
-    if (!data.onDrag){
-      data.stage.animate({
-        "left" : data.offsets[data.frame]
+  function draw(e, data){
+    if (data.galleryFrame !== data.frame && !data.dragging){
+      data.galleryStage.stop(true, false);
+      data.galleryStage.animate({
+        "left" : data.galleryOffsets[data.frame]
+      }, data.gallerySpeed);
+      
+      data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed);
+      data.galleryFrame = data.frame;
+      data.galleryImages[data.galleryFrame].animate({ opacity : 1 }, data.gallerySpeed);
+    } else if (data.dragging || data.dX != data.gallerydX) {
+      data.galleryDX = data.DX;
+      data.galleryDDX = data.DDX;
+      data.galleryStage.stop(true, true).animate({
+        "left" : data.galleryOffsets[data.frame] + data.dX
       });
     }
-  };
-}(window.jQuery || window.Zepto || window.$));
+  }
+
+  SpriteSpin.registerModule('gallery', {
+    onLoad: load,
+    onDraw: draw
+  });
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
