@@ -1,12 +1,11 @@
 (function(){
   'use strict';
 
+  var del = require('del');
   var gulp = require('gulp');
   var concat = require('gulp-concat');
   var uglify = require('gulp-uglify');
-  var clean = require('gulp-clean');
-  var less = require("gulp-less");
-  var shell = require('gulp-shell');
+  var sass = require("gulp-sass");
   var jade = require('gulp-jade');
   var docco = require('gulp-docco');
 
@@ -19,11 +18,10 @@
   ];
 
   gulp.task('clean', function(){
-    gulp.src([
-      'page/*.js',
-      'page/*.css',
-      'page/*.html'
-    ]).pipe(clean())
+    del([
+      'page/docs',
+      'page/*.*'
+    ])
   });
 
   gulp.task('concat', function(){
@@ -36,12 +34,17 @@
   gulp.task('uglify', function(){
     gulp.src(source)
       .pipe(concat("spritespin.min.js"))
-      .pipe(uglify("spritespin.min.js"))
+      .pipe(uglify({
+        mangle: false,
+        compress: true
+      }))
       .pipe(gulp.dest('page'))
       .pipe(gulp.dest('release'));
 
     gulp.src('src/page/highlight.js')
-      .pipe(uglify())
+      .pipe(uglify({
+
+      }))
       .pipe(gulp.dest('page'));
   });
 
@@ -52,8 +55,10 @@
   });
 
   gulp.task('style', function(){
-    gulp.src('src/page/style/style.less')
-      .pipe(less())
+    return gulp.src('src/page/style/style.scss')
+      .pipe(sass({
+        includePaths: ["bower_components/kube-scss/scss"]
+      }).on("error", sass.logError))
       .pipe(gulp.dest('page'));
   });
 
@@ -63,28 +68,14 @@
       .pipe(gulp.dest('page/docs'))
   });
 
-  gulp.task('build', function(){
-    gulp.run('style', 'page', 'concat', 'uglify', 'doc');
+  gulp.task('build', ['style', 'page', 'concat', 'uglify', 'doc']);
+
+  gulp.task('watch', ['build'], function(){
+    gulp.watch("src/*.js", ['concat', 'uglify', 'doc']);
+    gulp.watch("src/page/**/*.jade", ['page']);
+    gulp.watch("src/page/**/*.scss", ['style']);
   });
 
-  gulp.task('watch', function(){
-    gulp.run('build');
-
-    gulp.watch("src/*.js", function(){
-      gulp.run('concat', 'uglify', 'doc');
-    });
-
-    gulp.watch("src/page/**/*.jade", function(){
-      gulp.run('page');
-    });
-
-    gulp.watch("src/page/**/*.less", function(){
-      gulp.run('style');
-    });
-  });
-
-  gulp.task('default', function(){
-    gulp.run('build');
-  });
+  gulp.task('default', ['build']);
 
 }());
