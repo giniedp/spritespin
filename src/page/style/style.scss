@@ -1,18 +1,23 @@
-@import "kube/mixins.less";
-@import "kube/variables.less";
+@import "mixins";
+@import "variables";
 
-@import "kube/reset.less";
-@import "kube/typography.less";
+@import "normalize";
+@import "typography";
 
-@import "kube/grid.less";
-@import "kube/blocks.less";
+@import "grid";
+@import "blocks";
 
-@import "kube/navigation.less";
-@import "kube/buttons.less";
+@import "navigation";
 
-@import "kube/labels.less";
+@import "tables";
+@import "forms";
 
-@import "highlight.less";
+@import "buttons";
+
+@import "helpers";
+@import "prettyprint";
+
+@import "highlight";
 
 html, body{
   -webkit-font-smoothing: subpixel-antialiased;
@@ -49,4 +54,16 @@ button.example {
   background: url('images/ajax-loader.gif');
   background-position: 50% 50%;
   background-repeat: no-repeat;
+}
+
+.blocks-2 li,
+.blocks-3 li,
+.blocks-4 li,
+.blocks-5 li,
+.blocks-6 li {
+  li {
+    float: initial;
+    margin: 0;
+    padding: 0;
+  }
 }

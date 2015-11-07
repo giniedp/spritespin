@@ -30,10 +30,10 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($, SpriteSpin)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span><span class="hljs-params">(e)</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span>(<span class="hljs-params">e</span>) </span>{
     <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
     <span class="hljs-keyword">if</span> (data.loading){
       <span class="hljs-keyword">return</span>;
@@ -42,13 +42,13 @@
     data.dragging = <span class="hljs-literal">true</span>;
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragEnd</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragEnd</span>(<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">var</span> data = $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">'data'</span>);
     data.dragging = <span class="hljs-literal">false</span>;
     SpriteSpin.resetInput(data);
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drag</span><span class="hljs-params">(e)</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drag</span>(<span class="hljs-params">e</span>) </span>{
     <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.spritespin(<span class="hljs-string">'data'</span>);
     <span class="hljs-keyword">if</span> (data.dragging) {
       SpriteSpin.updateInput(e, data);

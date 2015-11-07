@@ -30,12 +30,12 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($)</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">$</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> Module = <span class="hljs-built_in">window</span>.SpriteSpin.mods.gallery = {};
 
-  Module.onLoad = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+  Module.onLoad = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
     data.images = [];
     data.offsets = [];
     data.stage.empty();
@@ -56,7 +56,7 @@
     data.images[data.oldFrame].animate({ opacity : <span class="hljs-number">1</span> }, data.speed);
   };
   
-  Module.onDraw = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+  Module.onDraw = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
     <span class="hljs-keyword">if</span> ((data.oldFrame !== data.frame) &amp;&amp; data.offsets){
       data.stage.stop(<span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>);
       data.stage.animate({ 
@@ -87,7 +87,7 @@
     }
   };
   
-  Module.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+  Module.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
     <span class="hljs-keyword">if</span> (!data.onDrag){
       data.stage.animate({
         <span class="hljs-string">"left"</span> : data.offsets[data.frame]

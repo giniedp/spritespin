@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>
-(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($)</span> </span>{
+(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">$</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;</pre></div></div>
             
         </li>
@@ -183,7 +183,7 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">padNumber</span><span class="hljs-params">(num, length, pad)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">padNumber</span>(<span class="hljs-params">num, length, pad</span>)</span>{
     num = <span class="hljs-built_in">String</span>(num);
     <span class="hljs-keyword">while</span> (num.length &lt; length){
       num = <span class="hljs-built_in">String</span>(pad) + num;
@@ -204,12 +204,12 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clamp</span><span class="hljs-params">(value, min, max)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clamp</span>(<span class="hljs-params">value, min, max</span>)</span>{
     <span class="hljs-keyword">return</span> (value &gt; max ? max : (value &lt; min ? min : value));
   }
   Spin.clamp = clamp;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrap</span><span class="hljs-params">(value, min, max, size)</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrap</span>(<span class="hljs-params">value, min, max, size</span>)</span>{
     <span class="hljs-keyword">while</span> (value &gt; max){ value -= size; }
     <span class="hljs-keyword">while</span> (value &lt; min){ value += size; }
     <span class="hljs-keyword">return</span> value;
@@ -229,12 +229,12 @@ The pad value is added in front of the string. This padNumber(4, 5, 0) would con
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prevent</span><span class="hljs-params">(e)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prevent</span>(<span class="hljs-params">e</span>)</span>{
     e.preventDefault();
     <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span><span class="hljs-params">()</span></span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">if</span> (<span class="hljs-built_in">window</span>.console &amp;&amp; <span class="hljs-built_in">window</span>.console.log){
       <span class="hljs-built_in">window</span>.console.log.apply(<span class="hljs-built_in">window</span>.console, <span class="hljs-built_in">arguments</span>);
     }
@@ -254,7 +254,7 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bind</span><span class="hljs-params">(target, event, func)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bind</span>(<span class="hljs-params">target, event, func</span>)</span>{
     <span class="hljs-keyword">if</span> (func) {
       target.bind(event + <span class="hljs-string">'.'</span> + name, func);
     }
@@ -273,7 +273,7 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span><span class="hljs-params">(target)</span></span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbind</span>(<span class="hljs-params">target</span>)</span>{
     target.unbind(<span class="hljs-string">'.'</span> + name);
   }</pre></div></div>
             
@@ -290,7 +290,7 @@ The SpriteSpin namespace is attached to the event name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(opts)</span></span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span>(<span class="hljs-params">opts</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -308,7 +308,7 @@ The SpriteSpin namespace is attached to the event name</p>
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> src = (<span class="hljs-keyword">typeof</span> opts.source === <span class="hljs-string">'string'</span>) ? [opts.source] : opts.source;
     <span class="hljs-keyword">var</span> i, count = <span class="hljs-number">0</span>, img, images = [], targetCount = (opts.preloadCount || src.length);
     <span class="hljs-keyword">var</span> completed = <span class="hljs-literal">false</span>, firstLoaded = <span class="hljs-literal">false</span>;
-    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+    <span class="hljs-keyword">var</span> tick = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
       count += <span class="hljs-number">1</span>;
       <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> opts.progress === <span class="hljs-string">'function'</span>){
         opts.progress({
@@ -364,7 +364,7 @@ This method unfortunately does not work for images that have transparent backgro
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">detectSubsampling</span><span class="hljs-params">(img, size)</span> </span>{
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">detectSubsampling</span>(<span class="hljs-params">img, size</span>) </span>{
     <span class="hljs-keyword">var</span> iw = (size || img).width;
     <span class="hljs-keyword">var</span> ih = (size || img).height;</pre></div></div>
             
@@ -480,7 +480,7 @@ if color still magenta, the image is assumed to be sub sampled.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">naturalSize</span><span class="hljs-params">(image)</span></span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">naturalSize</span>(<span class="hljs-params">image</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -565,7 +565,7 @@ Here we assume that the src has already been downloaded, so no onload callback i
    * @param opts
    * @returns {Array}
    */</span>
-  Spin.sourceArray = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, opts)</span></span>{
+  Spin.sourceArray = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">path, opts</span>)</span>{
     <span class="hljs-keyword">var</span> fStart = <span class="hljs-number">0</span>, fEnd = <span class="hljs-number">0</span>, lStart = <span class="hljs-number">0</span>, lEnd = <span class="hljs-number">0</span>, digits = opts.digits || <span class="hljs-number">2</span>;
     <span class="hljs-keyword">if</span> (opts.frame) {
       fStart = opts.frame[<span class="hljs-number">0</span>];
@@ -590,7 +590,7 @@ Here we assume that the src has already been downloaded, so no onload callback i
    * Measures the image frames that are used in the given data object
    * @param {object} data
    */</span>
-  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.measureSource = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> img = data.images[<span class="hljs-number">0</span>];
     <span class="hljs-keyword">var</span> size = naturalSize(img);
 
@@ -657,7 +657,7 @@ assume tightly packed images without any padding pixels</p>
    * Resets the input state of the SpriteSpin data.
    * @param {object} data
    */</span>
-  Spin.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.resetInput = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     data.startX = data.startY = <span class="hljs-literal">undefined</span>;      <span class="hljs-comment">// initial touch/click position</span>
     data.currentX = data.currentY = <span class="hljs-literal">undefined</span>;  <span class="hljs-comment">// touch/click position in current frame</span>
     data.oldX = data.oldY = <span class="hljs-literal">undefined</span>;          <span class="hljs-comment">// touch/click position in last frame</span>
@@ -670,7 +670,7 @@ assume tightly packed images without any padding pixels</p>
    * @param {*} e
    * @param {object} data
    */</span>
-  Spin.updateInput = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{</pre></div></div>
+  Spin.updateInput = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -824,7 +824,7 @@ Useful for different behavior implementations. This must be restored when the cl
    * @param {number} [frame]
    * @param {number} [lane]
    */</span>
-  Spin.updateFrame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data, frame, lane)</span></span>{
+  Spin.updateFrame = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, frame, lane</span>)</span>{
 
     <span class="hljs-keyword">if</span> (frame !== <span class="hljs-literal">undefined</span>){
       data.frame = <span class="hljs-built_in">Number</span>(frame);
@@ -901,7 +901,7 @@ Useful for different behavior implementations. This must be restored when the cl
    * Stops the running animation on given SpriteSpin data.
    * @param {object} data
    */</span>
-  Spin.stopAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.stopAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     data.animate = <span class="hljs-literal">false</span>;
     <span class="hljs-keyword">if</span> (data.animation){
       <span class="hljs-built_in">window</span>.clearInterval(data.animation);
@@ -913,7 +913,7 @@ Useful for different behavior implementations. This must be restored when the cl
    * Starts animation on given SpriteSpin data if animation is enabled.
    * @param {object} data
    */</span>
-  Spin.setAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setAnimation = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data.animate){
       Spin.requestFrame(data);
     } <span class="hljs-keyword">else</span> {
@@ -921,7 +921,7 @@ Useful for different behavior implementations. This must be restored when the cl
     }
   };
 
-  Spin.requestFrame = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.requestFrame = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data.animation){</pre></div></div>
             
         </li>
@@ -954,7 +954,7 @@ Useful for different behavior implementations. This must be restored when the cl
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (data.frameFunction === <span class="hljs-literal">undefined</span>){
-      data.frameFunction = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      data.frameFunction = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         <span class="hljs-keyword">try</span> {
           Spin.updateFrame(data);
         } <span class="hljs-keyword">catch</span>(ignore){</pre></div></div>
@@ -997,7 +997,7 @@ stops performing the script</p>
    * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
    * @param {object} data
    */</span>
-  Spin.setModules = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setModules = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> i, modName, mod;
     <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; data.mods.length; i += <span class="hljs-number">1</span>){
       modName = data.mods[i];
@@ -1012,7 +1012,7 @@ stops performing the script</p>
     }
   };
 
-  Spin.calculateInnerLayout = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{</pre></div></div>
+  Spin.calculateInnerLayout = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -1138,7 +1138,7 @@ stops performing the script</p>
    * Applies css attributes to layout the SpriteSpin containers.
    * @param {object} data
    */</span>
-  Spin.setLayout = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{</pre></div></div>
+  Spin.setLayout = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{</pre></div></div>
             
         </li>
         
@@ -1175,8 +1175,17 @@ stops performing the script</p>
     <span class="hljs-keyword">var</span> css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     <span class="hljs-keyword">if</span> (data.canvas){
-      data.canvas[<span class="hljs-number">0</span>].width = w;
-      data.canvas[<span class="hljs-number">0</span>].height = h;
+      <span class="hljs-keyword">var</span> context = data.context;
+      <span class="hljs-keyword">var</span> devicePixelRatio = <span class="hljs-built_in">window</span>.devicePixelRatio || <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">var</span> backingStoreRatio =
+        context.webkitBackingStorePixelRatio ||
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio || <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">var</span> ratio = devicePixelRatio / backingStoreRatio;
+      data.canvas[<span class="hljs-number">0</span>].width = w * ratio;
+      data.canvas[<span class="hljs-number">0</span>].height = h * ratio;
       data.canvas.css(css).hide();
     }
   };
@@ -1185,7 +1194,7 @@ stops performing the script</p>
    * (re)binds all spritespin events on the target element
    * @param data
    */</span>
-  Spin.setEvents = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.setEvents = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">var</span> i, j, mod, target = data.target;</pre></div></div>
             
         </li>
@@ -1274,7 +1283,7 @@ mainly prevents image drag operation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onLoad'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span></span>{
+            <div class="content"><div class='highlight'><pre>    bind(target, <span class="hljs-string">'onLoad'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       Spin.setAnimation(data);
     });</pre></div></div>
             
@@ -1302,7 +1311,7 @@ mainly prevents image drag operation</p>
    * Runs the boot process. (re)creates modules, (re)sets the layout, (re)binds all events and loads source images.
    * @param {object} data
    */</span>
-  Spin.boot = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.boot = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     Spin.setModules(data);
     Spin.setLayout(data);
     Spin.setEvents(data);
@@ -1311,10 +1320,10 @@ mainly prevents image drag operation</p>
     load({
       source: data.source,
       preloadCount: data.preloadCount,
-      progress: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(progress)</span></span>{
+      progress: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">progress</span>)</span>{
         data.target.trigger(<span class="hljs-string">'onProgress'</span>, [progress, data]);
       },
-      complete: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(images)</span></span>{
+      complete: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">images</span>)</span>{
         data.images = images;
         data.loading = <span class="hljs-literal">false</span>;
         Spin.measureSource(data);
@@ -1332,7 +1341,7 @@ mainly prevents image drag operation</p>
    * Initializes the target element with spritespin data.
    * @param {object} options
    */</span>
-  Spin.create = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
+  Spin.create = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">options</span>)</span>{
     <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = options.target;
     <span class="hljs-keyword">var</span> data  = $<span class="hljs-keyword">this</span>.data(name);
 
@@ -1383,7 +1392,7 @@ use these images as the source files</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.find(<span class="hljs-string">'img'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>      $<span class="hljs-keyword">this</span>.find(<span class="hljs-string">'img'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         data.source.push($(<span class="hljs-keyword">this</span>).attr(<span class="hljs-string">'src'</span>));
       });</pre></div></div>
             
@@ -1550,7 +1559,7 @@ use these images as the source files</p>
    * Stops running animation, unbinds all events and deletes the data on the target element of the given data object.
    * @param {object} data The spritespin data object.
    */</span>
-  Spin.destroy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.destroy = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">if</span> (data){
       Spin.stopAnimation(data);
       unbind(data.target);
@@ -1565,7 +1574,7 @@ use these images as the source files</p>
    * @param {object} [module] the module implementation
    * @returns {object} the given module
    */</span>
-  Spin.registerModule = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(name, module)</span></span>{
+  Spin.registerModule = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, module</span>)</span>{
     <span class="hljs-keyword">if</span> (Spin.mods[name]){
       $.error(<span class="hljs-string">'Module name is already taken: '</span> + name);
     }
@@ -1580,7 +1589,7 @@ use these images as the source files</p>
    * @class SpriteSpin.Api
    * @constructor
    */</span>
-  Spin.Api = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+  Spin.Api = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
     <span class="hljs-keyword">this</span>.data = data;
   };
 
@@ -1590,7 +1599,7 @@ use these images as the source files</p>
    * @param methods
    * @returns {SpriteSpin.Api.prototype}
    */</span>
-  Spin.extendApi = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(methods)</span></span>{
+  Spin.extendApi = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">methods</span>)</span>{
     <span class="hljs-keyword">var</span> key, api = Spin.Api.prototype;
     <span class="hljs-keyword">for</span>(key <span class="hljs-keyword">in</span> methods) {
       <span class="hljs-keyword">if</span> (methods.hasOwnProperty(key)) {
@@ -1610,7 +1619,7 @@ use these images as the source files</p>
    * @param {*} [value]
    * @returns {*}
    */</span>
-  $.fn.spritespin = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(obj, value)</span> </span>{
+  $.fn.spritespin = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">obj, value</span>) </span>{
     <span class="hljs-keyword">if</span> (obj === <span class="hljs-string">"data"</span>){
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.data(name);
     }
@@ -1620,7 +1629,7 @@ use these images as the source files</p>
       <span class="hljs-keyword">return</span> data.api;
     }
     <span class="hljs-keyword">if</span> (obj === <span class="hljs-string">"destroy"</span>){
-      <span class="hljs-keyword">return</span> $(<span class="hljs-keyword">this</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+      <span class="hljs-keyword">return</span> $(<span class="hljs-keyword">this</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         Spin.destroy($(<span class="hljs-keyword">this</span>).data(name));
       });
     }
