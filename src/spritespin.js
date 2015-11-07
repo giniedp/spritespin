@@ -642,8 +642,17 @@
     var css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     if (data.canvas){
-      data.canvas[0].width = w;
-      data.canvas[0].height = h;
+      var context = data.context;
+      var devicePixelRatio = window.devicePixelRatio || 1;
+      var backingStoreRatio =
+        context.webkitBackingStorePixelRatio ||
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio || 1;
+      var ratio = devicePixelRatio / backingStoreRatio;
+      data.canvas[0].width = w * ratio;
+      data.canvas[0].height = h * ratio;
       data.canvas.css(css).hide();
     }
   };

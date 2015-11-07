@@ -33,10 +33,9 @@
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">click</span>(<span class="hljs-params">e, data</span>) </span>{
-    <span class="hljs-keyword">if</span> (data.loading || !data.stage.is(<span class="hljs-string">':visible'</span>)){
-      <span class="hljs-keyword">return</span>;
-    }
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">click</span>(<span class="hljs-params">e</span>) </span>{
+    <span class="hljs-keyword">var</span> $<span class="hljs-keyword">this</span> = $(<span class="hljs-keyword">this</span>), data = $<span class="hljs-keyword">this</span>.data(<span class="hljs-string">'spritespin'</span>);
+
     SpriteSpin.updateInput(e, data);
 
     <span class="hljs-keyword">var</span> half, pos, target = data.target, offset = target.offset();

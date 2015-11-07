@@ -22,5 +22,8 @@
     "test",
     "tests",
     "page"
-  ]
+  ],
+  "dependencies": {
+    "kube-scss": "*"
+  }
 }
