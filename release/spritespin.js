@@ -128,6 +128,23 @@
     });
   }
 
+  function handleResizeEvent() {
+    for (var id in instances) {
+      if (instances.hasOwnProperty(id)) {
+        var data = instances[id];
+        if (data.responsive) {
+          Spin.boot(data);
+        }
+      }
+    }
+  }
+
+  var resizeTimeout = null;
+  $(window).on('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResizeEvent, 100);
+  });
+
   for (var i = 0; i < Spin.eventNames.length; i += 1) {
     bindSimulatedEvent(Spin.eventNames[i]);
   }
@@ -189,6 +206,7 @@
       });
     }
   }
+  Spin.bind = bind;
 
   // Unbinds all SpriteSpin events from given target element
   function unbind(target){
@@ -295,6 +313,17 @@
     };
   }
 
+  function pixelRatio(context) {
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio =
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio ||
+      context.msBackingStorePixelRatio ||
+      context.oBackingStorePixelRatio ||
+      context.backingStorePixelRatio || 1;
+    return devicePixelRatio / backingStoreRatio;
+  }
+
   // Public Helper Functions
   // ----------
 
@@ -340,8 +369,7 @@
     var img = data.images[0];
     var size = naturalSize(img);
 
-    if (data.images.length === 1){
-
+    if (data.images.length === 1) {
       data.sourceWidth = size.width;
       data.sourceHeight = size.height;
       if (data.detectSubsampling && detectSubsampling(img, size)){
@@ -480,9 +508,8 @@
         data.lane = clamp(data.lane, 0, data.lanes - 1);
       }
     }
-
     if (data.lastFrame != data.frame || data.lastLane != data.lane) {
-      data.target.trigger("onFrameChanged", data);  
+      data.target.trigger("onFrameChanged", data);
     }
     data.target.trigger("onFrame", data);
     data.target.trigger("onDraw", data);
@@ -623,6 +650,7 @@
     data.target
       .attr('unselectable', 'on')
       .css({
+        width: '', height: '',
         '-ms-user-select': 'none',
         '-moz-user-select': 'none',
         '-khtml-user-select': 'none',
@@ -632,6 +660,19 @@
 
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
     var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+
+    if (data.responsive && (typeof window.getComputedStyle === 'function')) {
+      var style = getComputedStyle(data.target[0]);
+      if (style.width) {
+        w = Number(style.width.replace('px', ''))|0;
+        if (style.height) {
+          h = Number(style.height.replace('px', ''))|0;
+        } else {
+          h = (data.frameHeight / data.frameWidth * w)|0;
+        }
+      }
+    }
+
     data.target.css({
       width    : w,
       height   : h,
@@ -642,18 +683,11 @@
     var css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     if (data.canvas){
-      var context = data.context;
-      var devicePixelRatio = window.devicePixelRatio || 1;
-      var backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio || 1;
-      var ratio = devicePixelRatio / backingStoreRatio;
-      data.canvas[0].width = w * ratio;
-      data.canvas[0].height = h * ratio;
+      data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
+      data.canvas[0].width = w * data.canvasRatio;
+      data.canvas[0].height = h * data.canvasRatio;
       data.canvas.css(css).hide();
+      data.context.scale(data.canvasRatio, data.canvasRatio);
     }
   };
 
@@ -1159,9 +1193,7 @@
   "use strict";
 
   function click(e, data) {
-    if (data.loading || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || !data.stage.is(':visible')) return;
     SpriteSpin.updateInput(e, data);
 
     var half, pos, target = data.target, offset = target.offset();
@@ -1172,11 +1204,7 @@
       half = target.innerHeight() / 2;
       pos = data.currentY - offset.top;
     }
-    if (pos > half) {
-      SpriteSpin.updateFrame(data, data.frame + 1);
-    } else {
-      SpriteSpin.updateFrame(data, data.frame - 1);
-    }
+    SpriteSpin.updateFrame(data, data.frame + (pos > half ? 1 : -1));
   }
 
   SpriteSpin.registerModule('click', {
@@ -1189,9 +1217,7 @@
   "use strict";
 
   function dragStart(e, data) {
-    if (data.loading || data.dragging || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || data.dragging || !data.stage.is(':visible')) return;
     data.dragFrame = data.frame || 0;
     data.dragLane = data.lane || 0;
     data.dragging = true;
@@ -1206,14 +1232,12 @@
   }
 
   function drag(e, data) {
-    if (!data.dragging) {
-      return;
-    }
+    if (!data.dragging) return;
     SpriteSpin.updateInput(e, data);
 
     // dont do anything if the drag distance exceeds the scroll threshold.
     // this allows to use touch scroll on mobile devices.
-    if (Math.abs(data.ddX) + Math.abs(data.ddY) > data.scrollThreshold){
+    if ((Math.abs(data.ddX) + Math.abs(data.ddY)) > data.scrollThreshold) {
       data.dragging = false;
       SpriteSpin.resetInput(data);
       return;
@@ -1249,19 +1273,6 @@
     mousedown: dragStart,
     mousemove: drag,
     mouseup: dragEnd,
-    mouseleave: dragEnd,
-
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
-  });
-
-  SpriteSpin.registerModule('dragDoc', {
-    mousedown: dragStart,
-    mousemove: drag,
-
-    mouseup: dragEnd,
 
     documentmousemove: drag,
     documentmouseup: dragEnd,
@@ -1289,111 +1300,8 @@
 (function ($, SpriteSpin) {
   "use strict";
 
-  function init(e, data){
-    data.easeAbortAfterMs = Math.max(data.easeAbortAfterMs || 250, 0);
-    data.easeDamping = Math.max(Math.min(data.easeDamping || 0.9, 0.999), 0);
-    data.easeSamples = Math.max(data.easeSamples || 5, 1);
-    data.easeUpdateTime = Math.max(data.easeUpdateTime || data.frameTime, 16);
-    data.easeScope = { samples: [], steps: [] };
-  }
-
-  function update(e, data) {
-    if (data.dragging) sampleInput(data, data.easeScope);
-  }
-
-  function end(e, data) {
-    var ease = data.easeScope;
-    if (!data.dragging) sampleInput(data, ease);
-    var last, sample, samples = ease.samples;
-    var lanes = 0, frames = 0, time = 0;
-
-    for(var i = 0; i < samples.length; i += 1) {
-      sample = samples[i];
-      if (last) {
-        var dt = sample.time - last.time;
-        if (dt > data.easeAbortAfterMs) {
-          lanes = frames = time = 0;
-        } else {
-          frames += sample.frame - last.frame;
-          lanes += sample.lane - last.lane;
-          time += dt;
-        }
-      }
-      last = sample;
-    }
-    samples.length = 0;
-    
-    if (time <= 0) return;
-
-    ease.ms = data.easeUpdateTime;
-    ease.laneStep = lanes / time * ease.ms;
-    ease.frameStep = frames / time * ease.ms;
-    ease.lane = data.lane;
-    ease.lanes = 0;
-    ease.frame = data.frame;
-    ease.frames = 0;
-    loop(data, ease);
-  }
-
-  function sampleInput(data, ease) {
-    if (ease.timeout) {
-      window.clearTimeout(ease.timeout);
-      delete ease.timeout;
-    }
-
-    ease.samples.push({
-      time: new Date().getTime(),
-      frame: data.dragFrame,
-      lane: data.dragLane
-    });
-    while (ease.samples.length > data.easeSamples) {
-      ease.samples.shift();
-    }
-  }
-
-  function loop(data, ease) {
-    ease.timeout = window.setTimeout(function(){
-      tick(data, ease);
-    }, ease.ms);
-  }
-
-  function tick(data, ease){
-    ease.lanes += ease.laneStep;
-    ease.frames += ease.frameStep;
-    ease.laneStep *= data.easeDamping;
-    ease.frameStep *= data.easeDamping;
-    var frame = Math.floor(ease.frame + ease.frames);
-    var lane = Math.floor(ease.lane + ease.lanes);
-    SpriteSpin.updateFrame(data, frame, lane);
-    if (data.dragging) {
-      return;
-    }
-    if (Math.abs(ease.frameStep) > 0.005 || Math.abs(ease.laneStep) > 0.005) {
-      loop(data, ease);
-    }
-  }
-
-  SpriteSpin.registerModule('ease', {
-    onLoad: init,
-
-    mousemove: update,
-    mouseup: end,
-    mouseleave: end,
-
-    touchmove: update,
-    touchend: end,
-    touchcancel: end
-  });
-
-}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
-
-(function ($, SpriteSpin) {
-  "use strict";
-
   function start(e, data) {
-    if (data.loading || data.dragging || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || data.dragging || !data.stage.is(':visible')) return;
     SpriteSpin.updateInput(e, data);
     data.dragging = true;
     data.animate = true;
@@ -1407,9 +1315,7 @@
   }
 
   function update(e, data) {
-    if (!data.dragging){
-      return;
-    }
+    if (!data.dragging) return;
     SpriteSpin.updateInput(e, data);
 
     var half, delta, target = data.target, offset = target.offset();
@@ -1541,12 +1447,13 @@
         "background-position" : [x, "px ", y, "px"].join("")
       });
     } else {
-      $(data.images).css({ top: y, left: x });
+      $(data.images).css({ top: y, left: x, "max-width" : 'initial' });
     }
   }
 
   function drawFrames(data){
     var index = data.lane * data.frames + data.frame;
+
     var img = data.images[index];
     if (data.renderer === 'canvas'){
       if (img && img.complete !== false){
@@ -1640,98 +1547,247 @@
   "use strict";
 
   function init(e, data) {
-    data.blurCanvas = data.blurCanvas || $("<canvas class='blur-layer'></canvas>");
-    data.blurContext = data.blurCanvas[0].getContext("2d");
-    data.blurSteps = data.blurSteps || [];
-    data.blurEffectTime = Math.max(data.blurEffectTime || 240, 0);
-    data.blurUpdateTime = Math.max(data.blurUpdateTime || data.frameTime, 16);
-    if (data.blurCss == null) {
-      data.blurCss = true;
-    }
-
-    var canvas = data.blurCanvas;
+    var scope = scopeFrom(data);
     var css = SpriteSpin.calculateInnerLayout(data);
-    canvas[0].width = data.width;
-    canvas[0].height = data.height;
-    canvas.css(css).show();
-    data.target.append(canvas);
+    scope.canvas[0].width = data.width * data.canvasRatio;
+    scope.canvas[0].height = data.height * data.canvasRatio;
+    scope.canvas.css(css).show();
+    scope.context.scale(data.canvasRatio, data.canvasRatio);
+    data.target.append(scope.canvas);
   }
 
-  function addFrame(e, data){
-    var d = Math.abs(data.frame - data.lastFrame);
-    data.blurSteps.unshift({
-      frame: data.frame,
-      lane: data.lane,
-      t: data.blurEffectTime,
+  function destroy(e, data) {
+    var scope = scopeFrom(data)
+    data.target.remove(data)
+    delete data.blurScope
+  }
+
+  function onFrame(e, data) {
+    var scope = scopeFrom(data);
+    trackFrame(data, scope)
+    if (scope.timeout == null) loop(data, scope);
+  }
+
+  function scopeFrom(data) {
+    data.blurScope = data.blurScope || {};
+    var scope = data.blurScope;
+    scope.canvas = scope.canvas || $("<canvas class='blur-layer'></canvas>");
+    scope.context = scope.context || scope.canvas[0].getContext("2d");
+    scope.steps = scope.steps || [];
+    scope.fadeTime = Math.max(data.blurFadeTime || 200, 1);
+    scope.frameTime = Math.max(data.blurFrameTime || data.frameTime, 16);
+    scope.trackTime = null;
+    scope.cssBlur = !!data.blurCss;
+    return scope;
+  }
+
+  function trackFrame(data, scope) {
+    var d = Math.abs(data.frame - data.lastFrame); // distance between frames
+    if (d >= data.frames / 2) d = data.frames - d; // get shortest distance
+    scope.steps.unshift({
+      index: data.lane * data.frames + data.frame,
+      live: 1,
+      step: scope.frameTime / scope.fadeTime,
       d: d
     });
-
-    if (!data.blurTimeout) {
-      loop(data);
-    }
   }
 
-  function loop(data) {
-    data.blurTimeout = window.setTimeout(function(){ tick(data); }, data.blurUpdateTime);
-  }
-
-  function tick(data) {
-    delete data.blurTimeout;
-    if (!data.blurContext) {
-      return;
+  var toRemove = []
+  function removeOldFrames(frames) {
+    toRemove.length = 0;
+    var i;
+    for (i = 0; i < frames.length; i += 1) {
+      if (frames[i].alpha <= 0) toRemove.push(i);
     }
-
-    var animation, i, context = data.blurContext, d = 0;
-    var toRemove = [];
-    context.clearRect(0, 0, data.width, data.height);
-    for (i = 0; i < data.blurSteps.length; i += 1) {
-
-      animation = data.blurSteps[i];
-      animation.t -= data.blurUpdateTime;
-      if (animation.t < 0) {
-        animation.t = 0;
-        toRemove.push(animation);
-      }
-
-      var index = data.lane * data.frames + animation.frame;
-      var img = data.images[index];
-      
-      if (img && img.complete !== false){
-        context.globalAlpha = Math.max(0, animation.t / data.blurEffectTime - 0.25);
-        d += context.globalAlpha + animation.d;
-        if (data.sourceIsSprite){
-          var x = data.frameWidth * (index % data.framesX);
-          var y = data.frameHeight * Math.floor(index / data.framesX);
-          data.context.drawImage(data.images[0], x, y, data.frameWidth, data.frameHeight, 0, 0, data.width, data.height);
-        } else{
-          context.drawImage(img, 0, 0, data.width, data.height);
-        }
-      }
-    }
-
-    if (data.blurCss) {
-      d = Math.min(Math.max((d / 2) - 4, 0), 1.5);
-      data.blurCanvas.css({
-        '-webkit-filter': 'blur(' + d + 'px)',
-        'filter': 'blur(' + d + 'px)'
-      });
-    }
-    
     for (i = 0; i < toRemove.length; i += 1) {
-      index = $.inArray(toRemove[i], data.blurSteps);
-      if (index >= 0) {
-        data.blurSteps.splice(index, 1);
-      }
+      frames.splice(toRemove[i], 1);
     }
+  }
 
-    if (data.blurSteps.length) {
-      loop(data);
+  function loop(data, scope) {
+    scope.timeout = window.setTimeout(function(){
+      tick(data, scope);
+    }, scope.frameTime);
+  }
+
+  function killLoop(data, scope) {
+    window.clearTimeout(scope.timeout);
+    scope.timeout = null;
+  }
+
+  function applyCssBlur(canvas, d) {
+    d = Math.min(Math.max((d / 2) - 4, 0), 1.5);
+    canvas.css({
+      '-webkit-filter': 'blur(' + d + 'px)',
+      'filter': 'blur(' + d + 'px)'
+    });
+  }
+
+  function drawFrame(data, scope, step) {
+    var context = scope.context;
+    var index = step.index;
+    var img = (data.sourceIsSprite ? data.images[0] : data.images[index]);
+
+    if (step.alpha <= 0) return;
+    if (!img || img.complete === false) return
+
+    context.globalAlpha = step.alpha;
+    if (data.sourceIsSprite){
+      var x = data.frameWidth * (index % data.framesX);
+      var y = data.frameHeight * Math.floor(index / data.framesX);
+      context.drawImage(img, x, y, data.frameWidth, data.frameHeight, 0, 0, data.width, data.height);
+    } else {
+      context.drawImage(img, 0, 0, data.width, data.height);
+    }
+  }
+
+  function tick(data, scope) {
+    killLoop(data, scope);
+    if (!scope.context) return;
+
+    var i, step, context = scope.context, d = 0;
+    context.clearRect(0, 0, data.width, data.height);
+    for (i = 0; i < scope.steps.length; i += 1) {
+      step = scope.steps[i];
+      step.live = Math.max(step.live - step.step, 0);
+      step.alpha = Math.max(step.live - 0.25, 0);
+      drawFrame(data, scope, step);
+      d += step.alpha + step.d;
+    }
+    if (scope.cssBlur) {
+      applyCssBlur(scope.canvas, d)
+    }
+    removeOldFrames(scope.steps);
+    if (scope.steps.length) {
+      loop(data, scope);
     }
   }
 
   SpriteSpin.registerModule('blur', {
     onLoad: init,
-    onFrameChanged: addFrame
+    onFrameChanged: onFrame
+  });
+
+}(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
+
+(function ($, SpriteSpin) {
+  "use strict";
+
+  var max = Math.max
+  var min = Math.min
+
+  function init(e, data){
+    data.easeAbortAfterMs = max(data.easeAbortAfterMs || 250, 0);
+    data.easeDamping = max(min(data.easeDamping || 0.9, 0.999), 0);
+    data.easeSamples = max(data.easeSamples || 5, 1);
+    data.easeUpdateTime = max(data.easeUpdateTime || data.frameTime, 16);
+    data.easeScope = { samples: [], steps: [] };
+  }
+
+  function update(e, data) {
+    if (data.dragging) {
+      killLoop(data, data.easeScope);
+      sampleInput(data, data.easeScope);
+    }
+  }
+
+  function end(e, data) {
+    var ease = data.easeScope;
+
+    var last, sample, samples = ease.samples;
+    var lanes = 0, frames = 0, time = 0;
+
+    for(var i = 0; i < samples.length; i += 1) {
+      sample = samples[i];
+
+      if (!last) {
+        last = sample;
+        continue
+      }
+
+      var dt = sample.time - last.time;
+      if (dt > data.easeAbortAfterMs) {
+        lanes = frames = time = 0;
+        return killLoop(data, ease);
+      }
+
+      frames += sample.frame - last.frame;
+      lanes += sample.lane - last.lane;
+      time += dt;
+      last = sample;
+    }
+    samples.length = 0;
+    if (!time) {
+      return
+    }
+
+    ease.ms = data.easeUpdateTime;
+
+    ease.lane = data.lane;
+    ease.lanes = 0;
+    ease.laneStep = lanes / time * ease.ms;
+
+    ease.frame = data.frame;
+    ease.frames = 0;
+    ease.frameStep = frames / time * ease.ms;
+
+    loop(data, ease);
+  }
+
+  function sampleInput(data, ease) {
+    // add a new sample
+    ease.samples.push({
+      time: new Date().getTime(),
+      frame: data.dragFrame,
+      lane: data.dragLane
+    });
+    // drop old samples
+    while (ease.samples.length > data.easeSamples) {
+      ease.samples.shift();
+    }
+  }
+
+  function killLoop(data, ease) {
+    if (ease.timeout != null) {
+      window.clearTimeout(ease.timeout);
+      ease.timeout = null;
+    }
+  }
+
+  function loop(data, ease) {
+    ease.timeout = window.setTimeout(function(){
+      tick(data, ease);
+    }, ease.ms);
+  }
+
+  function tick(data, ease){
+    ease.lanes += ease.laneStep;
+    ease.frames += ease.frameStep;
+    ease.laneStep *= data.easeDamping;
+    ease.frameStep *= data.easeDamping;
+    var frame = Math.floor(ease.frame + ease.frames);
+    var lane = Math.floor(ease.lane + ease.lanes);
+
+    SpriteSpin.updateFrame(data, frame, lane);
+    if (data.dragging) {
+      killLoop(data, ease);
+    } else if (Math.abs(ease.frameStep) > 0.005 || Math.abs(ease.laneStep) > 0.005) {
+      loop(data, ease);
+    } else {
+      killLoop(data, ease);
+    }
+  }
+
+  SpriteSpin.registerModule('ease', {
+    onLoad: init,
+
+    mousemove: update,
+    mouseup: end,
+    mouseleave: end,
+
+    touchmove: update,
+    touchend: end,
+    touchcancel: end
   });
 
 }(window.jQuery || window.Zepto || window.$, window.SpriteSpin));
@@ -1758,6 +1814,7 @@
       data.galleryOffsets.push(-size + (data.width - img[0].width * scale) / 2);
       size += data.width;
       img.css({
+        "max-width" : 'initial',
         opacity : data.galleryOpacity,
         width: data.width,
         height: data.height
@@ -1771,14 +1828,14 @@
       opacity : 1
     }, data.gallerySpeed);
   }
-  
+
   function draw(e, data){
     if (data.galleryFrame !== data.frame && !data.dragging){
       data.galleryStage.stop(true, false);
       data.galleryStage.animate({
         "left" : data.galleryOffsets[data.frame]
       }, data.gallerySpeed);
-      
+
       data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed);
       data.galleryFrame = data.frame;
       data.galleryImages[data.galleryFrame].animate({ opacity : 1 }, data.gallerySpeed);
@@ -1817,6 +1874,7 @@
       var h = floor(data.sourceHeight * data.scale);
       var background = [w, "px ", h, "px"].join("");
       data.stage.css({
+        "max-width"               : 'initial',
         "background-image"        : ["url('", data.source[0], "')"].join(""),
         "background-repeat"       : "repeat-both",
         // set custom background size to enable responsive rendering
@@ -1827,7 +1885,6 @@
       });
     },
 
-    // The function was stripped to do only necessary CSS updates
     onDraw: function(e, data){
       var x = 0, y = 0;
       if (data.orientation === "horizontal"){
@@ -1845,15 +1902,38 @@
 (function ($, SpriteSpin) {
   "use strict";
 
+  function onCreate(e, data) {
+    if (data.zoomStage) return
+    data.zoomStage = $("<div class='spritezoom-stage'></div>")
+      .css({
+        width    : '100%',
+        height   : '100%',
+        top      : 0,
+        left     : 0,
+        bottom   : 0,
+        right    : 0,
+        position : 'absolute'
+      }).appendTo(data.target).hide();
+  }
+
+  function onDestroy(e, data) {
+    if (!data.zoomStage) return
+    data.zoomStage.remove()
+  }
+
   function updateInput(e, data){
     e.preventDefault();
 
+    // hack into drag/move module and disable dragging
+    // prevents frame change during zoom mode
     data.dragging = false;
 
+    // access touch points from original event
     if (!e.touches && e.originalEvent){
       e.touches = e.originalEvent.touches;
     }
 
+    // grab touch/cursor position
     var x, y, dx, dy;
     if (e.touches && e.touches.length){
       x = e.touches[0].clientX || 0;
@@ -1862,6 +1942,8 @@
       x = e.clientX || 0;
       y = e.clientY || 0;
     }
+
+    // normalize cursor position into [0:1] range
     x /= data.width;
     y /= data.height;
 
@@ -1873,35 +1955,71 @@
       data.zoomX = x;
       data.zoomY = y;
     }
+
+    // calculate move delta since last frame and remember current position
     dx = x - data.zoomPX;
     dy = y - data.zoomPY;
     data.zoomPX = x;
     data.zoomPY = y;
 
+    // invert drag direction for touch events to enable 'natural' scrolling
     if (e.type.match(/touch/)){
       dx = -dx;
       dy = -dy;
     }
+
+    // accumulate display coordinates
     data.zoomX = SpriteSpin.clamp(data.zoomX + dx, 0, 1);
     data.zoomY = SpriteSpin.clamp(data.zoomY + dy, 0, 1);
 
     SpriteSpin.updateFrame(data);
   }
 
-  function onclick(e, data){
-    e.preventDefault();
+  function onDraw(e, data) {
+    // calculate the frame index
+    var index = data.lane * data.frames + data.frame;
 
-    var now = new Date().getTime();
-    delete data.zoomPX;
-    delete data.zoomPY;
-    if (!data.zoomClickTime){
-      data.zoomClickTime = now;
+    // get the zoom image. Use original frames as fallback. This won't work for spritesheets
+    var source = (data.zoomSource || data.source)[index];
+    if (!source) {
+      $.error("'zoomSource' option is missing or it contains unsufficient number of frames.")
       return;
     }
 
-    var timeDelta = now - data.zoomClickTime;
-    if(timeDelta > 500){
-      data.zoomClickTime = now;
+    // get display position
+    var x = data.zoomX;
+    var y = data.zoomY;
+    // fallback to centered position
+    if (x == null || y == null){
+      x = data.zoomX = 0.5;
+      y = data.zoomY = 0.5;
+    }
+    // scale up from [0:1] to [0:100] range
+    x = (x * 100)|0;
+    y = (y * 100)|0;
+    // update background image and position
+    data.zoomStage.css({
+      "background-repeat"   : "no-repeat",
+      "background-image"    : ["url('", source, "')"].join(""),
+      "background-position" : [x, "% ", y, "%"].join("")
+    });
+  }
+
+  function onClick(e, data){
+    e.preventDefault();
+
+    // simulate double click
+
+    var clickTime = new Date().getTime();
+    if (!data.zoomClickTime) {
+      data.zoomClickTime = clickTime;
+      return;
+    }
+
+    var timeDelta = clickTime - data.zoomClickTime;
+    var doubleClickTime = data.zoomDoubleClickTime || 500;
+    if(timeDelta > doubleClickTime) {
+      data.zoomClickTime = clickTime;
       return;
     }
 
@@ -1911,10 +2029,9 @@
     }
   }
 
-  function onmove(e, data){
-    if (data.zoomStage.is(':visible')){
-      updateInput(e, data);
-    }
+  function onMove(e, data){
+    if (!data.zoomStage.is(':visible')) return;
+    updateInput(e, data);
   }
 
   function toggleZoom(){
@@ -1935,45 +2052,14 @@
   }
 
   SpriteSpin.registerModule('zoom', {
-    mousedown: onclick,
-    touchstart: onclick,
-    mousemove: onmove,
-    touchmove: onmove,
-    onInit: function(e, data){
-      if (!data.zoomStage){
-        data.zoomStage = $("<div class='spritezoom-stage'></div>")
-          .css({
-            width    : '100%',
-            height   : '100%',
-            top      : 0,
-            left     : 0,
-            bottom   : 0,
-            right    : 0,
-            position : 'absolute'
-          }).appendTo(data.target).hide();
-      }
-    },
-    onDraw: function(e, data){
-      var index = data.lane * data.frames + data.frame;
-      var source = data.source[index];
-      if (data.zoomSource){
-        source = data.zoomSource[index];
-      }
-      if (!source){
-        return;
-      }
-      var x = data.zoomX;
-      var y = data.zoomY;
-      if (x == null || y == null){
-        x = data.zoomX = 0.5;
-        y = data.zoomY = 0.5;
-      }
-      data.zoomStage.css({
-        "background-repeat"   : "no-repeat",
-        "background-image"    : ["url('", source, "')"].join(""),
-        "background-position" : [(x * 100)|0, "% ", (y * 100)|0, "%"].join("")
-      });
-    }
+    mousedown: onClick,
+    touchstart: onClick,
+    mousemove: onMove,
+    touchmove: onMove,
+
+    onInit: onCreate,
+    onDestroy: onDestroy,
+    onDraw: onDraw
   });
 
   SpriteSpin.extendApi({
