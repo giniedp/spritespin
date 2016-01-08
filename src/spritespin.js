@@ -128,6 +128,23 @@
     });
   }
 
+  function handleResizeEvent() {
+    for (var id in instances) {
+      if (instances.hasOwnProperty(id)) {
+        var data = instances[id];
+        if (data.responsive) {
+          Spin.boot(data);
+        }
+      }
+    }
+  }
+
+  var resizeTimeout = null;
+  $(window).on('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResizeEvent, 100);
+  });
+
   for (var i = 0; i < Spin.eventNames.length; i += 1) {
     bindSimulatedEvent(Spin.eventNames[i]);
   }
