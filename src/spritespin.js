@@ -206,6 +206,7 @@
       });
     }
   }
+  Spin.bind = bind;
 
   // Unbinds all SpriteSpin events from given target element
   function unbind(target){
