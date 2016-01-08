@@ -19,6 +19,7 @@
       var h = floor(data.sourceHeight * data.scale);
       var background = [w, "px ", h, "px"].join("");
       data.stage.css({
+        "max-width"               : 'initial',
         "background-image"        : ["url('", data.source[0], "')"].join(""),
         "background-repeat"       : "repeat-both",
         // set custom background size to enable responsive rendering

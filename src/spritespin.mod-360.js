@@ -24,7 +24,7 @@
         "background-position" : [x, "px ", y, "px"].join("")
       });
     } else {
-      $(data.images).css({ top: y, left: x });
+      $(data.images).css({ top: y, left: x, "max-width" : 'initial' });
     }
   }
 

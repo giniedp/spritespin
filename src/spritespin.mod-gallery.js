@@ -20,6 +20,7 @@
       data.galleryOffsets.push(-size + (data.width - img[0].width * scale) / 2);
       size += data.width;
       img.css({
+        "max-width" : 'initial',
         opacity : data.galleryOpacity,
         width: data.width,
         height: data.height

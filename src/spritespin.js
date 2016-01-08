@@ -650,6 +650,7 @@
     data.target
       .attr('unselectable', 'on')
       .css({
+        width: '', height: '',
         '-ms-user-select': 'none',
         '-moz-user-select': 'none',
         '-khtml-user-select': 'none',
