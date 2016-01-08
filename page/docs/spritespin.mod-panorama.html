@@ -51,6 +51,7 @@
       <span class="hljs-keyword">var</span> h = floor(data.sourceHeight * data.scale);
       <span class="hljs-keyword">var</span> background = [w, <span class="hljs-string">"px "</span>, h, <span class="hljs-string">"px"</span>].join(<span class="hljs-string">""</span>);
       data.stage.css({
+        <span class="hljs-string">"max-width"</span>               : <span class="hljs-string">'initial'</span>,
         <span class="hljs-string">"background-image"</span>        : [<span class="hljs-string">"url('"</span>, data.source[<span class="hljs-number">0</span>], <span class="hljs-string">"')"</span>].join(<span class="hljs-string">""</span>),
         <span class="hljs-string">"background-repeat"</span>       : <span class="hljs-string">"repeat-both"</span>,</pre></div></div>
             
@@ -72,22 +73,9 @@
         <span class="hljs-string">"-o-background-size"</span>      : background, <span class="hljs-comment">/* Opera 9.5 */</span>
         <span class="hljs-string">"background-size"</span>         : background  <span class="hljs-comment">/* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */</span>
       });
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>The function was stripped to do only necessary CSS updates</p>
+    },
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>, y = <span class="hljs-number">0</span>;
       <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>){
         x = -floor((data.frame % data.frames) * data.scale);

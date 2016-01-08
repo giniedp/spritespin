@@ -32,18 +32,7 @@
             
             <div class="content"><div class='highlight'><pre>
 (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">$</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>The namespace that is used for data storage and event binding</p>
+<span class="hljs-pi">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> name = <span class="hljs-string">'spritespin'</span>;
 
@@ -194,6 +183,23 @@
     });
   }
 
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">handleResizeEvent</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> id <span class="hljs-keyword">in</span> instances) {
+      <span class="hljs-keyword">if</span> (instances.hasOwnProperty(id)) {
+        <span class="hljs-keyword">var</span> data = instances[id];
+        <span class="hljs-keyword">if</span> (data.responsive) {
+          Spin.boot(data);
+        }
+      }
+    }
+  }
+
+  <span class="hljs-keyword">var</span> resizeTimeout = <span class="hljs-literal">null</span>;
+  $(<span class="hljs-built_in">window</span>).on(<span class="hljs-string">'resize'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResizeEvent, <span class="hljs-number">100</span>);
+  });
+
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; Spin.eventNames.length; i += <span class="hljs-number">1</span>) {
     bindSimulatedEvent(Spin.eventNames[i]);
   }
@@ -324,7 +330,8 @@ The SpriteSpin namespace is attached to the event name</p>
         func.apply(target, [e, target.spritespin(<span class="hljs-string">'data'</span>)]);
       });
     }
-  }</pre></div></div>
+  }
+  Spin.bind = bind;</pre></div></div>
             
         </li>
         
@@ -590,6 +597,17 @@ Here we assume that the src has already been downloaded, so no onload callback i
       width: img.width,
       height: img.height
     };
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">pixelRatio</span>(<span class="hljs-params">context</span>) </span>{
+    <span class="hljs-keyword">var</span> devicePixelRatio = <span class="hljs-built_in">window</span>.devicePixelRatio || <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">var</span> backingStoreRatio =
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio ||
+      context.msBackingStorePixelRatio ||
+      context.oBackingStorePixelRatio ||
+      context.backingStorePixelRatio || <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">return</span> devicePixelRatio / backingStoreRatio;
   }</pre></div></div>
             
         </li>
@@ -660,8 +678,7 @@ Here we assume that the src has already been downloaded, so no onload callback i
     <span class="hljs-keyword">var</span> img = data.images[<span class="hljs-number">0</span>];
     <span class="hljs-keyword">var</span> size = naturalSize(img);
 
-    <span class="hljs-keyword">if</span> (data.images.length === <span class="hljs-number">1</span>){
-
+    <span class="hljs-keyword">if</span> (data.images.length === <span class="hljs-number">1</span>) {
       data.sourceWidth = size.width;
       data.sourceHeight = size.height;
       <span class="hljs-keyword">if</span> (data.detectSubsampling &amp;&amp; detectSubsampling(img, size)){
@@ -961,9 +978,8 @@ Useful for different behavior implementations. This must be restored when the cl
         data.lane = clamp(data.lane, <span class="hljs-number">0</span>, data.lanes - <span class="hljs-number">1</span>);
       }
     }
-
     <span class="hljs-keyword">if</span> (data.lastFrame != data.frame || data.lastLane != data.lane) {
-      data.target.trigger(<span class="hljs-string">"onFrameChanged"</span>, data);  
+      data.target.trigger(<span class="hljs-string">"onFrameChanged"</span>, data);
     }
     data.target.trigger(<span class="hljs-string">"onFrame"</span>, data);
     data.target.trigger(<span class="hljs-string">"onDraw"</span>, data);
@@ -1229,6 +1245,7 @@ stops performing the script</p>
             <div class="content"><div class='highlight'><pre>    data.target
       .attr(<span class="hljs-string">'unselectable'</span>, <span class="hljs-string">'on'</span>)
       .css({
+        width: <span class="hljs-string">''</span>, height: <span class="hljs-string">''</span>,
         <span class="hljs-string">'-ms-user-select'</span>: <span class="hljs-string">'none'</span>,
         <span class="hljs-string">'-moz-user-select'</span>: <span class="hljs-string">'none'</span>,
         <span class="hljs-string">'-khtml-user-select'</span>: <span class="hljs-string">'none'</span>,
@@ -1238,6 +1255,19 @@ stops performing the script</p>
 
     <span class="hljs-keyword">var</span> w = <span class="hljs-built_in">Math</span>.floor(data.width || data.frameWidth || data.target.innerWidth());
     <span class="hljs-keyword">var</span> h = <span class="hljs-built_in">Math</span>.floor(data.height || data.frameHeight || data.target.innerHeight());
+
+    <span class="hljs-keyword">if</span> (data.responsive &amp;&amp; (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span>.getComputedStyle === <span class="hljs-string">'function'</span>)) {
+      <span class="hljs-keyword">var</span> style = getComputedStyle(data.target[<span class="hljs-number">0</span>]);
+      <span class="hljs-keyword">if</span> (style.width) {
+        w = <span class="hljs-built_in">Number</span>(style.width.replace(<span class="hljs-string">'px'</span>, <span class="hljs-string">''</span>))|<span class="hljs-number">0</span>;
+        <span class="hljs-keyword">if</span> (style.height) {
+          h = <span class="hljs-built_in">Number</span>(style.height.replace(<span class="hljs-string">'px'</span>, <span class="hljs-string">''</span>))|<span class="hljs-number">0</span>;
+        } <span class="hljs-keyword">else</span> {
+          h = (data.frameHeight / data.frameWidth * w)|<span class="hljs-number">0</span>;
+        }
+      }
+    }
+
     data.target.css({
       width    : w,
       height   : h,
@@ -1248,18 +1278,11 @@ stops performing the script</p>
     <span class="hljs-keyword">var</span> css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     <span class="hljs-keyword">if</span> (data.canvas){
-      <span class="hljs-keyword">var</span> context = data.context;
-      <span class="hljs-keyword">var</span> devicePixelRatio = <span class="hljs-built_in">window</span>.devicePixelRatio || <span class="hljs-number">1</span>;
-      <span class="hljs-keyword">var</span> backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio || <span class="hljs-number">1</span>;
-      <span class="hljs-keyword">var</span> ratio = devicePixelRatio / backingStoreRatio;
-      data.canvas[<span class="hljs-number">0</span>].width = w * ratio;
-      data.canvas[<span class="hljs-number">0</span>].height = h * ratio;
+      data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
+      data.canvas[<span class="hljs-number">0</span>].width = w * data.canvasRatio;
+      data.canvas[<span class="hljs-number">0</span>].height = h * data.canvasRatio;
       data.canvas.css(css).hide();
+      data.context.scale(data.canvasRatio, data.canvasRatio);
     }
   };
 

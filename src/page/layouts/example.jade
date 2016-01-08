@@ -1,9 +1,32 @@
 doctype html
 html(lang="en")
   head
-    title SpriteSpin
+    title SpriteSpin Example
+    link(type="text/css" rel="stylesheet" media="all" href="/style.css")
     script(src = "http://code.jquery.com/jquery-1.11.1.js")
     script(src = "spritespin.js")
-    block head
+    script(src = "highlight.js")
+    script(src = "example.js")
   body
-    block content
+    .container
+      #html-block
+        block html
+          .spritespin
+      #readme-block
+        block readme
+      #style-block
+        block style
+      #script-block
+        block script
+
+    .container
+      h2 Javascript code
+    pre: code#script-code.language-javascript
+
+    .container
+      h2 HTML code
+    pre: code#html-code.language-html
+
+    .container
+      h2 CSS code
+    pre: code#style-code.language-css

@@ -16,6 +16,21 @@
       <div id="readme-block">
       </div>
       <div id="style-block">
+        <style>
+          .spritespin {
+            width: 250px;
+          }
+          @media (min-width: 500px) {
+            .spritespin {
+              width: 450px;
+            }
+          }
+          @media (min-width: 900px) {
+            .spritespin {
+              width: 700px;
+            }
+          }
+        </style>
       </div>
       <div id="script-block">
         <script type="text/javascript">
@@ -25,9 +40,8 @@
               width: 240,
               height: 164,
               sense: -1,
-              mods: ['move', 'zoom', '360'],
-              behavior: null,
-              module: null
+              responsive: true,
+              mods: ['move', 'zoom', '360']
             });
           });
         </script>

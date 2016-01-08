@@ -1,0 +1,32 @@
+extends layouts/example.jade
+block html
+  .spritespin
+block style
+  style.
+    .spritespin {
+      width: 250px;
+    }
+    @media (min-width: 500px) {
+      .spritespin {
+        width: 450px;
+      }
+    }
+    @media (min-width: 900px) {
+      .spritespin {
+        width: 700px;
+      }
+    }
+block script
+  script(type='text/javascript').
+    $(function(){
+      $('.spritespin').spritespin({
+        //source: 'images/bike6x6_big.jpg',
+        //frames: 34,
+        //framesX: 6,
+        source: SpriteSpin.sourceArray('images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        sense: -1,
+        responsive: true,
+        mods: ['move', 'zoom', '360'],
+        renderer: 'canvas'
+      });
+    });

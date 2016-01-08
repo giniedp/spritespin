@@ -1832,7 +1832,7 @@ input[type="submit"].btn {
 .fun {
   color: #990000; }
 
-/* http://prismjs.com/download.html?themes=prism-twilight&languages=markup+css+clike+javascript */
+/* http://prismjs.com/download.html?themes=prism-twilight&languages=css+clike+javascript&plugins=line-numbers */
 /**
  * prism.js Twilight theme
  * Based (more or less) on the Twilight theme originally of Textmate fame.
@@ -1842,12 +1842,13 @@ code[class*="language-"],
 pre[class*="language-"] {
   color: white;
   direction: ltr;
-  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   text-align: left;
   text-shadow: 0 -.1em .2em black;
   white-space: pre;
   word-spacing: normal;
   word-break: normal;
+  word-wrap: normal;
   line-height: 1.5;
   -moz-tab-size: 4;
   -o-tab-size: 4;
@@ -1859,10 +1860,12 @@ pre[class*="language-"] {
 
 pre[class*="language-"],
 :not(pre) > code[class*="language-"] {
-  background: #222; }
+  background: #141414;
+  /* #141414 */ }
 
 /* Code blocks */
 pre[class*="language-"] {
+  box-shadow: 1px 1px .5em black inset;
   margin: .5em 0;
   overflow: auto;
   padding: 1em; }
@@ -1896,7 +1899,8 @@ code[class*="language-"]::selection, code[class*="language-"] ::selection {
   border: 0.13em solid #545454;
   /* #545454 */
   box-shadow: 1px 1px .3em -.1em black inset;
-  padding: .15em .2em .05em; }
+  padding: .15em .2em .05em;
+  white-space: normal; }
 
 .token.comment,
 .token.prolog,
@@ -2025,6 +2029,41 @@ pre[data-line] {
   bottom: .4em;
   content: attr(data-end);
   top: auto; }
+
+pre.line-numbers {
+  position: relative;
+  padding-left: 3.8em;
+  counter-reset: linenumber; }
+
+pre.line-numbers > code {
+  position: relative; }
+
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: -3.8em;
+  width: 3em;
+  /* works for line-numbers below 1000 lines */
+  letter-spacing: -1px;
+  border-right: 1px solid #999;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.line-numbers-rows > span {
+  pointer-events: none;
+  display: block;
+  counter-increment: linenumber; }
+
+.line-numbers-rows > span:before {
+  content: counter(linenumber);
+  color: #999;
+  display: block;
+  padding-right: 0.8em;
+  text-align: right; }
 
 html, body {
   -webkit-font-smoothing: subpixel-antialiased; }

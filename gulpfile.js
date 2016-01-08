@@ -42,9 +42,11 @@
       .pipe(gulp.dest('release'));
 
     gulp.src('src/page/highlight.js')
-      .pipe(uglify({
+      .pipe(uglify({ }))
+      .pipe(gulp.dest('page'));
 
-      }))
+    gulp.src('src/page/example.js')
+      .pipe(uglify({ }))
       .pipe(gulp.dest('page'));
   });
 

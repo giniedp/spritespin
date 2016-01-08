@@ -1,25 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>SpriteSpin</title>
+    <title>SpriteSpin Example</title>
+    <link type="text/css" rel="stylesheet" media="all" href="/style.css">
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="spritespin.js"></script>
+    <script src="highlight.js"></script>
+    <script src="example.js"></script>
   </head>
   <body>
-    <div class="spritespin"></div>
-    <script type="text/javascript">
-      $('.spritespin').spritespin({
-         source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
-         width: 400,
-         height: 225,
-         frames: 24,
-         lanes: 12,
-         sense: 1,
-         senseLane: -2,
-         mods: ['drag', 'ease', '360', 'blur'],
-         behavior: null,
-         module: null
-      });
-    </script>
+    <div class="container">
+      <div id="html-block">
+        <div class="spritespin"></div>
+      </div>
+      <div id="readme-block">
+      </div>
+      <div id="style-block">
+      </div>
+      <div id="script-block">
+        <script type="text/javascript">
+          $(function(){
+            $('.spritespin').spritespin({
+               source: SpriteSpin.sourceArray('images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+               width: 400,
+               height: 225,
+               frames: 24,
+               lanes: 12,
+               sense: 1,
+               senseLane: -2,
+               mods: ['drag', 'ease', '360', 'blur'],
+               behavior: null,
+               module: null
+            });
+          });
+        </script>
+      </div>
+    </div>
+    <div class="container">
+      <h2>Javascript code</h2>
+    </div>
+    <pre><code id="script-code" class="language-javascript"></code></pre>
+    <div class="container">
+      <h2>HTML code</h2>
+    </div>
+    <pre><code id="html-code" class="language-html"></code></pre>
+    <div class="container">
+      <h2>CSS code</h2>
+    </div>
+    <pre><code id="style-code" class="language-css"></code></pre>
   </body>
 </html>

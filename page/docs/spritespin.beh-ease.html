@@ -33,65 +33,110 @@
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
 <span class="hljs-pi">  "use strict"</span>;
 
+  <span class="hljs-keyword">var</span> max = <span class="hljs-built_in">Math</span>.max
+  <span class="hljs-keyword">var</span> min = <span class="hljs-built_in">Math</span>.min
+
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params">e, data</span>)</span>{
-    data.easeAbortAfterMs = <span class="hljs-built_in">Math</span>.max(data.easeAbortAfterMs || <span class="hljs-number">250</span>, <span class="hljs-number">0</span>);
-    data.easeDamping = <span class="hljs-built_in">Math</span>.max(<span class="hljs-built_in">Math</span>.min(data.easeDamping || <span class="hljs-number">0.9</span>, <span class="hljs-number">0.999</span>), <span class="hljs-number">0</span>);
-    data.easeSamples = <span class="hljs-built_in">Math</span>.max(data.easeSamples || <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
-    data.easeUpdateTime = <span class="hljs-built_in">Math</span>.max(data.easeUpdateTime || data.frameTime, <span class="hljs-number">16</span>);
+    data.easeAbortAfterMs = max(data.easeAbortAfterMs || <span class="hljs-number">250</span>, <span class="hljs-number">0</span>);
+    data.easeDamping = max(min(data.easeDamping || <span class="hljs-number">0.9</span>, <span class="hljs-number">0.999</span>), <span class="hljs-number">0</span>);
+    data.easeSamples = max(data.easeSamples || <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
+    data.easeUpdateTime = max(data.easeUpdateTime || data.frameTime, <span class="hljs-number">16</span>);
     data.easeScope = { samples: [], steps: [] };
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params">e, data</span>) </span>{
-    <span class="hljs-keyword">if</span> (data.dragging) sampleInput(data, data.easeScope);
+    <span class="hljs-keyword">if</span> (data.dragging) {
+      killLoop(data, data.easeScope);
+      sampleInput(data, data.easeScope);
+    }
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">end</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">var</span> ease = data.easeScope;
-    <span class="hljs-keyword">if</span> (!data.dragging) sampleInput(data, ease);
+
     <span class="hljs-keyword">var</span> last, sample, samples = ease.samples;
     <span class="hljs-keyword">var</span> lanes = <span class="hljs-number">0</span>, frames = <span class="hljs-number">0</span>, time = <span class="hljs-number">0</span>;
 
     <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; samples.length; i += <span class="hljs-number">1</span>) {
       sample = samples[i];
-      <span class="hljs-keyword">if</span> (last) {
-        <span class="hljs-keyword">var</span> dt = sample.time - last.time;
-        <span class="hljs-keyword">if</span> (dt &gt; data.easeAbortAfterMs) {
-          lanes = frames = time = <span class="hljs-number">0</span>;
-        } <span class="hljs-keyword">else</span> {
-          frames += sample.frame - last.frame;
-          lanes += sample.lane - last.lane;
-          time += dt;
-        }
+
+      <span class="hljs-keyword">if</span> (!last) {
+        last = sample;
+        <span class="hljs-keyword">continue</span>
       }
+
+      <span class="hljs-keyword">var</span> dt = sample.time - last.time;
+      <span class="hljs-keyword">if</span> (dt &gt; data.easeAbortAfterMs) {
+        lanes = frames = time = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">return</span> killLoop(data, ease);
+      }
+
+      frames += sample.frame - last.frame;
+      lanes += sample.lane - last.lane;
+      time += dt;
       last = sample;
     }
     samples.length = <span class="hljs-number">0</span>;
-    
-    <span class="hljs-keyword">if</span> (time &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">if</span> (!time) {
+      <span class="hljs-keyword">return</span>
+    }
 
     ease.ms = data.easeUpdateTime;
-    ease.laneStep = lanes / time * ease.ms;
-    ease.frameStep = frames / time * ease.ms;
+
     ease.lane = data.lane;
     ease.lanes = <span class="hljs-number">0</span>;
+    ease.laneStep = lanes / time * ease.ms;
+
     ease.frame = data.frame;
     ease.frames = <span class="hljs-number">0</span>;
+    ease.frameStep = frames / time * ease.ms;
+
     loop(data, ease);
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sampleInput</span>(<span class="hljs-params">data, ease</span>) </span>{
-    <span class="hljs-keyword">if</span> (ease.timeout) {
-      <span class="hljs-built_in">window</span>.clearTimeout(ease.timeout);
-      <span class="hljs-keyword">delete</span> ease.timeout;
-    }
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sampleInput</span>(<span class="hljs-params">data, ease</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>add a new sample</p>
 
-    ease.samples.push({
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ease.samples.push({
       time: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime(),
       frame: data.dragFrame,
       lane: data.dragLane
-    });
-    <span class="hljs-keyword">while</span> (ease.samples.length &gt; data.easeSamples) {
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>drop old samples</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">while</span> (ease.samples.length &gt; data.easeSamples) {
       ease.samples.shift();
+    }
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">killLoop</span>(<span class="hljs-params">data, ease</span>) </span>{
+    <span class="hljs-keyword">if</span> (ease.timeout != <span class="hljs-literal">null</span>) {
+      <span class="hljs-built_in">window</span>.clearTimeout(ease.timeout);
+      ease.timeout = <span class="hljs-literal">null</span>;
     }
   }
 
@@ -108,12 +153,14 @@
     ease.frameStep *= data.easeDamping;
     <span class="hljs-keyword">var</span> frame = <span class="hljs-built_in">Math</span>.floor(ease.frame + ease.frames);
     <span class="hljs-keyword">var</span> lane = <span class="hljs-built_in">Math</span>.floor(ease.lane + ease.lanes);
+
     SpriteSpin.updateFrame(data, frame, lane);
     <span class="hljs-keyword">if</span> (data.dragging) {
-      <span class="hljs-keyword">return</span>;
-    }
-    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.abs(ease.frameStep) &gt; <span class="hljs-number">0.005</span> || <span class="hljs-built_in">Math</span>.abs(ease.laneStep) &gt; <span class="hljs-number">0.005</span>) {
+      killLoop(data, ease);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.abs(ease.frameStep) &gt; <span class="hljs-number">0.005</span> || <span class="hljs-built_in">Math</span>.abs(ease.laneStep) &gt; <span class="hljs-number">0.005</span>) {
       loop(data, ease);
+    } <span class="hljs-keyword">else</span> {
+      killLoop(data, ease);
     }
   }
 
