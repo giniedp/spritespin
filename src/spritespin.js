@@ -369,8 +369,7 @@
     var img = data.images[0];
     var size = naturalSize(img);
 
-    if (data.images.length === 1){
-
+    if (data.images.length === 1) {
       data.sourceWidth = size.width;
       data.sourceHeight = size.height;
       if (data.detectSubsampling && detectSubsampling(img, size)){
@@ -509,9 +508,8 @@
         data.lane = clamp(data.lane, 0, data.lanes - 1);
       }
     }
-
     if (data.lastFrame != data.frame || data.lastLane != data.lane) {
-      data.target.trigger("onFrameChanged", data);  
+      data.target.trigger("onFrameChanged", data);
     }
     data.target.trigger("onFrame", data);
     data.target.trigger("onDraw", data);

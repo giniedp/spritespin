@@ -30,6 +30,7 @@
 
   function drawFrames(data){
     var index = data.lane * data.frames + data.frame;
+
     var img = data.images[index];
     if (data.renderer === 'canvas'){
       if (img && img.complete !== false){

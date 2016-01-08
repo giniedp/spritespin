@@ -29,7 +29,6 @@
       });
     },
 
-    // The function was stripped to do only necessary CSS updates
     onDraw: function(e, data){
       var x = 0, y = 0;
       if (data.orientation === "horizontal"){

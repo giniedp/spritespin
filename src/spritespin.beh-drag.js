@@ -2,9 +2,7 @@
   "use strict";
 
   function dragStart(e, data) {
-    if (data.loading || data.dragging || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || data.dragging || !data.stage.is(':visible')) return;
     data.dragFrame = data.frame || 0;
     data.dragLane = data.lane || 0;
     data.dragging = true;
@@ -19,14 +17,12 @@
   }
 
   function drag(e, data) {
-    if (!data.dragging) {
-      return;
-    }
+    if (!data.dragging) return;
     SpriteSpin.updateInput(e, data);
 
     // dont do anything if the drag distance exceeds the scroll threshold.
     // this allows to use touch scroll on mobile devices.
-    if (Math.abs(data.ddX) + Math.abs(data.ddY) > data.scrollThreshold){
+    if ((Math.abs(data.ddX) + Math.abs(data.ddY)) > data.scrollThreshold) {
       data.dragging = false;
       SpriteSpin.resetInput(data);
       return;
@@ -61,19 +57,6 @@
   SpriteSpin.registerModule('drag', {
     mousedown: dragStart,
     mousemove: drag,
-    mouseup: dragEnd,
-    mouseleave: dragEnd,
-
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
-  });
-
-  SpriteSpin.registerModule('dragDoc', {
-    mousedown: dragStart,
-    mousemove: drag,
-
     mouseup: dragEnd,
 
     documentmousemove: drag,

@@ -2,9 +2,7 @@
   "use strict";
 
   function start(e, data) {
-    if (data.loading || data.dragging || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || data.dragging || !data.stage.is(':visible')) return;
     SpriteSpin.updateInput(e, data);
     data.dragging = true;
     data.animate = true;
@@ -18,9 +16,7 @@
   }
 
   function update(e, data) {
-    if (!data.dragging){
-      return;
-    }
+    if (!data.dragging) return;
     SpriteSpin.updateInput(e, data);
 
     var half, delta, target = data.target, offset = target.offset();

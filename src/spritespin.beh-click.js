@@ -2,9 +2,7 @@
   "use strict";
 
   function click(e, data) {
-    if (data.loading || !data.stage.is(':visible')){
-      return;
-    }
+    if (data.loading || !data.stage.is(':visible')) return;
     SpriteSpin.updateInput(e, data);
 
     var half, pos, target = data.target, offset = target.offset();
@@ -15,11 +13,7 @@
       half = target.innerHeight() / 2;
       pos = data.currentY - offset.top;
     }
-    if (pos > half) {
-      SpriteSpin.updateFrame(data, data.frame + 1);
-    } else {
-      SpriteSpin.updateFrame(data, data.frame - 1);
-    }
+    SpriteSpin.updateFrame(data, data.frame + (pos > half ? 1 : -1));
   }
 
   SpriteSpin.registerModule('click', {

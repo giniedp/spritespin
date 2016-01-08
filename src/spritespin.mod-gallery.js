@@ -33,14 +33,14 @@
       opacity : 1
     }, data.gallerySpeed);
   }
-  
+
   function draw(e, data){
     if (data.galleryFrame !== data.frame && !data.dragging){
       data.galleryStage.stop(true, false);
       data.galleryStage.animate({
         "left" : data.galleryOffsets[data.frame]
       }, data.gallerySpeed);
-      
+
       data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed);
       data.galleryFrame = data.frame;
       data.galleryImages[data.galleryFrame].animate({ opacity : 1 }, data.gallerySpeed);
