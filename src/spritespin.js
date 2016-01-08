@@ -295,6 +295,17 @@
     };
   }
 
+  function pixelRatio(context) {
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio =
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio ||
+      context.msBackingStorePixelRatio ||
+      context.oBackingStorePixelRatio ||
+      context.backingStorePixelRatio || 1;
+    return devicePixelRatio / backingStoreRatio;
+  }
+
   // Public Helper Functions
   // ----------
 
@@ -632,6 +643,19 @@
 
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
     var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+
+    if (data.responsive && (typeof window.getComputedStyle === 'function')) {
+      var style = getComputedStyle(data.target[0]);
+      if (style.width) {
+        w = Number(style.width.replace('px', ''))|0;
+        if (style.height) {
+          h = Number(style.height.replace('px', ''))|0;
+        } else {
+          h = (data.frameHeight / data.frameWidth * w)|0;
+        }
+      }
+    }
+
     data.target.css({
       width    : w,
       height   : h,
@@ -642,18 +666,11 @@
     var css = Spin.calculateInnerLayout(data);
     data.stage.css(css).hide();
     if (data.canvas){
-      var context = data.context;
-      var devicePixelRatio = window.devicePixelRatio || 1;
-      var backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio || 1;
-      var ratio = devicePixelRatio / backingStoreRatio;
-      data.canvas[0].width = w * ratio;
-      data.canvas[0].height = h * ratio;
+      data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
+      data.canvas[0].width = w * data.canvasRatio;
+      data.canvas[0].height = h * data.canvasRatio;
       data.canvas.css(css).hide();
+      data.context.scale(data.canvasRatio, data.canvasRatio);
     }
   };
 
