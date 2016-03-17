@@ -521,10 +521,7 @@
    */
   Spin.stopAnimation = function(data){
     data.animate = false;
-    if (data.animation){
-      window.clearInterval(data.animation);
-      data.animation = null;
-    }
+    Spin.setAnimation(data);
   };
 
   /**
@@ -535,8 +532,10 @@
     if (data.animate){
       Spin.requestFrame(data);
     } else {
-      Spin.stopAnimation(data);
+      window.clearInterval(data.animation);
+      data.animation = null;
     }
+    data.target.trigger("setAnimation", data);
   };
 
   Spin.requestFrame = function(data){
