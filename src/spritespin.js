@@ -531,9 +531,9 @@
   Spin.setAnimation = function(data){
     if (data.animate){
       Spin.requestFrame(data);
-    } else {
-      window.clearInterval(data.animation);
-      data.animation = null;
+    } else if (data.animation) {
+        window.clearInterval(data.animation);
+        data.animation = null;
     }
     data.target.trigger("setAnimation", data);
   };
