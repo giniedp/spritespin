@@ -579,6 +579,17 @@
     }
   };
 
+  Spin.displaySize = function(data) {
+    var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
+    var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+    var a = w / h;
+    return {
+      width: w, 
+      height: h,
+      aspect: a
+    }
+  }
+  
   Spin.calculateInnerLayout = function(data){
     // outer container size
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
@@ -627,6 +638,9 @@
         css.width = w;
         css.height = w / a1;
       }
+    } else {
+      css.width = w;
+      css.height = h;
     }
 
     css.width = css.width|0;
@@ -660,16 +674,13 @@
 
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
     var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
-
+    
     if (data.responsive && (typeof window.getComputedStyle === 'function')) {
       var style = getComputedStyle(data.target[0]);
       if (style.width) {
+        var a = w / h;
         w = Number(style.width.replace('px', ''))|0;
-        if (style.height) {
-          h = Number(style.height.replace('px', ''))|0;
-        } else {
-          h = (data.frameHeight / data.frameWidth * w)|0;
-        }
+        h = (w / a)|0;
       }
     }
 
@@ -684,8 +695,8 @@
     data.stage.css(css).hide();
     if (data.canvas){
       data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
-      data.canvas[0].width = w * data.canvasRatio;
-      data.canvas[0].height = h * data.canvasRatio;
+      data.canvas[0].width = (css.width * data.canvasRatio) || w;
+      data.canvas[0].height = (css.height * data.canvasRatio) || h;
       data.canvas.css(css).hide();
       data.context.scale(data.canvasRatio, data.canvasRatio);
     }

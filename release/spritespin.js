@@ -579,6 +579,17 @@
     }
   };
 
+  Spin.displaySize = function(data) {
+    var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
+    var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
+    var a = w / h;
+    return {
+      width: w, 
+      height: h,
+      aspect: a
+    }
+  }
+  
   Spin.calculateInnerLayout = function(data){
     // outer container size
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
@@ -627,6 +638,9 @@
         css.width = w;
         css.height = w / a1;
       }
+    } else {
+      css.width = w;
+      css.height = h;
     }
 
     css.width = css.width|0;
@@ -660,16 +674,13 @@
 
     var w = Math.floor(data.width || data.frameWidth || data.target.innerWidth());
     var h = Math.floor(data.height || data.frameHeight || data.target.innerHeight());
-
+    
     if (data.responsive && (typeof window.getComputedStyle === 'function')) {
       var style = getComputedStyle(data.target[0]);
       if (style.width) {
+        var a = w / h;
         w = Number(style.width.replace('px', ''))|0;
-        if (style.height) {
-          h = Number(style.height.replace('px', ''))|0;
-        } else {
-          h = (data.frameHeight / data.frameWidth * w)|0;
-        }
+        h = (w / a)|0;
       }
     }
 
@@ -684,8 +695,8 @@
     data.stage.css(css).hide();
     if (data.canvas){
       data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
-      data.canvas[0].width = w * data.canvasRatio;
-      data.canvas[0].height = h * data.canvasRatio;
+      data.canvas[0].width = (css.width * data.canvasRatio) || w;
+      data.canvas[0].height = (css.height * data.canvasRatio) || h;
       data.canvas.css(css).hide();
       data.context.scale(data.canvasRatio, data.canvasRatio);
     }
@@ -1433,8 +1444,10 @@
     var y = data.frameHeight * floor(index / data.framesX);
 
     if (data.renderer === 'canvas'){
-      data.context.clearRect(0, 0, data.width, data.height);
-      data.context.drawImage(data.images[0], x, y, data.frameWidth, data.frameHeight, 0, 0, data.width, data.height);
+      var w = data.canvas[0].width / data.canvasRatio;
+      var h = data.canvas[0].height / data.canvasRatio;
+      data.context.clearRect(0, 0, w, h);
+      data.context.drawImage(data.images[0], x, y, data.frameWidth, data.frameHeight, 0, 0, w, h);
       return;
     }
 
@@ -1457,8 +1470,10 @@
     var img = data.images[index];
     if (data.renderer === 'canvas'){
       if (img && img.complete !== false){
-        data.context.clearRect(0, 0, data.width, data.height);
-        data.context.drawImage(img, 0, 0, data.width, data.height);
+        var w = data.canvas[0].width / data.canvasRatio;
+        var h = data.canvas[0].height / data.canvasRatio;
+        data.context.clearRect(0, 0, w, h);
+        data.context.drawImage(img, 0, 0, w, h);
       }
     } else if (data.renderer === 'background') {
       data.stage.css({
@@ -1477,8 +1492,16 @@
       var w, h;
 
       // calculate scaling if we are in responsive mode
-      data.scaleWidth = data.width / data.frameWidth;
-      data.scaleHeight = data.height / data.frameHeight;
+      if (data.width && data.frameWidth) {
+        data.scaleWidth = data.width / data.frameWidth;
+      } else {
+        data.scaleWidth = 1;
+      }
+      if (data.height && data.frameHeight) {
+        data.scaleHeight = data.height / data.frameHeight;
+      } else {
+        data.scaleHeight = 1;
+      }
 
       // assume that the source is a spritesheet, when there is only one image given
       data.sourceIsSprite = data.images.length === 1;
@@ -1488,9 +1511,9 @@
 
       if (data.renderer === 'canvas')
       {
-        // prepare rendering to canvas
-        // clear and enable the canvas container
-        data.context.clearRect(0, 0, data.width, data.height);
+        var w = data.canvas[0].width / data.canvasRatio;
+        var h = data.canvas[0].height / data.canvasRatio;
+        data.context.clearRect(0, 0, w, h);
         data.canvas.show();
       }
       else if (data.renderer === 'background')
