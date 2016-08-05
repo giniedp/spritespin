@@ -24,6 +24,8 @@
     "page"
   ],
   "dependencies": {
-    "kube-scss": "*"
+    "kube-scss": "*",
+    "jquery": "^1.4.1",
+    "prism": "prismjs#^1.5.1"
   }
 }

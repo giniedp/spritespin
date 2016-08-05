@@ -98,8 +98,17 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      data.scaleWidth = data.width / data.frameWidth;
-      data.scaleHeight = data.height / data.frameHeight;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (data.width !== <span class="hljs-literal">null</span>) {
+        data.scaleWidth = data.width / data.frameWidth;
+      } <span class="hljs-keyword">else</span> {
+        data.scaleWidth = <span class="hljs-number">1</span>;
+      }
+        
+      <span class="hljs-keyword">if</span> (data.height !== <span class="hljs-literal">null</span>) {
+        data.scaleHeight = data.height / data.frameHeight;
+      } <span class="hljs-keyword">else</span> {
+        data.scaleHeight = <span class="hljs-number">1</span>;
+      }</pre></div></div>
             
         </li>
         

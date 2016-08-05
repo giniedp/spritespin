@@ -1,5 +1,5 @@
 {
-  "name": "SpriteSpin",
+  "name": "spritespin",
   "version": "3.3.3",
   "engines": {
     "node": ">= 0.8.0"
@@ -7,13 +7,17 @@
   "scripts": {},
   "devDependencies": {
     "del": "^2.0.2",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-docco": "^0.0.4",
     "gulp-jade": "^1.1.0",
     "gulp-jsdoc": "^0.1.5",
-    "gulp-sass": "^2.1.0",
-    "gulp-uglify": "^1.4.2"
+    "gulp-sass": "^2.2.0",
+    "gulp-uglify": "^1.4.2",
+    "gulp-webserver": "^0.9.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-livereload": "^3.8.1",
+    "merge": "^1.2.0"
   },
   "description": "jQuery plugin for creating flipbook animations",
   "main": "release/spritespin.js",

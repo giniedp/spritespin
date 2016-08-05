@@ -1,0 +1,32 @@
+extends ../layouts/example.jade
+block source
+  a(name="Html" index=3)
+  viewcode
+  a(name="Javascript")
+  script(type='text/javascript').
+    $(function(){
+      $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('/images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+        // width and height of the display
+        width: 400,
+        height: 225,
+        // the number of lanes (vertical angles)
+        lanes: 12,
+        // the number of frames per lane (per vertical angle)
+        frames: 24,
+        // interaction sensitivity (and direction) modifier for horizontal movement
+        sense: 1,
+        // interaction sensitivity (and direction) modifier for vertical movement
+        senseLane: -2,
+
+        // the initial lane number
+        lane: 6,
+        // the initial frame number (within the lane)
+        frame: 0,
+        // disable autostart of the animation
+        animate: false,
+
+        mods: ['drag', 'ease', '360', 'blur'],
+        cssBlur: true
+      });
+    });

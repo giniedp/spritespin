@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SpriteSpin Example</title>
+    <link type="text/css" rel="stylesheet" media="all" href="/style.css">
+    <script src="/page.js" type="text/javascript"></script>
+    <script src="/spritespin.js" type="text/javascript"></script>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SpriteSpin example">
+    <meta property="og:site_name" content="SpriteSpin">
+    <meta property="og:description" content="A SpriteSpin example.">
+  </head>
+  <body>
+    <div class="container">
+      <div class="sample-view">
+        <div class="spritespin"></div>
+      </div>
+      <div class="sample-code"></div>
+      <div class="sample-source"><a name="Remarks"></a><a name="Html" index="3"></a>
+        <viewcode></viewcode><a name="Javascript"></a>
+        <script type="text/javascript">
+          $(function(){
+            $('.spritespin').spritespin({
+               source: SpriteSpin.sourceArray('/images/3d/sample-{lane}-{frame}.jpg', { lane: [0,11], frame: [0,23], digits: 2}) ,
+               width: 400,
+               height: 225,
+               frames: 24,
+               lanes: 12,
+               sense: 1,
+               senseLane: -2,
+               mods: ['drag', 'ease', '360', 'blur'],
+               cssBlur: true
+            });
+          });
+        </script>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    SpriteSpinPage.bootSample({
+      view: '.sample-view',
+      code: '.sample-code',
+      source: '.sample-source'
+    });
+  </script>
+</html>

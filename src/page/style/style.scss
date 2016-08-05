@@ -17,7 +17,9 @@
 @import "helpers";
 @import "prettyprint";
 
-@import "highlight";
+@import "bower_components/prism/themes/prism-okaidia";
+@import "bower_components/prism/plugins/autolinker/prism-autolinker";
+@import "bower_components/prism/plugins/line-numbers/prism-line-numbers";
 
 html, body{
   -webkit-font-smoothing: subpixel-antialiased;
@@ -34,10 +36,21 @@ nav.navbar{
 a{
   text-decoration: none;
 }
+ul.no-bullets {
+  list-style: none;
+}
 pre{
   background: #222 !important;
 }
-
+iframe {
+  border: none;
+}
+.padding {
+  padding: 1rem;
+}
+.pl {
+  padding: 1rem;
+}
 .container, ul.container, code{
   width: 960px;
   margin: 0 auto auto;
@@ -65,5 +78,61 @@ button.example {
     float: initial;
     margin: 0;
     padding: 0;
+  }
+}
+
+#examples-page {
+  display: flex;
+  position: absolute;
+  top: 83px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  flex-direction: row;
+  .sample-menu {
+    flex: 1;
+    text-align: right;
+    padding: 2rem 1rem;
+  }
+  .sample-frame {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    iframe {
+      width: 100%;
+      flex: 1;
+    }
+  }
+}
+
+.sample-tabs {
+  a {
+    padding: 1rem;
+    line-height: 1;
+    background: #000;
+    color: #fff;
+    vertical-align: bottom;
+    display: inline-block;
+    cursor: pointer;
+  }
+  a:hover{ 
+    background: #111;
+  }
+  a.active{
+    background: #222;
+    color: #fff;
+  }
+}
+.sample-contents {
+  background: #222;
+  color: #fff;
+  pre {
+    margin: 0;
+    box-sizing: border-box;
+    border-radius: 0;
+  }
+  code {
+    display: inline-block;
+    width: auto;
   }
 }

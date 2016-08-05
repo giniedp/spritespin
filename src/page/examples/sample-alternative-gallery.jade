@@ -1,0 +1,23 @@
+extends ../layouts/example.jade
+block source
+  a(name="Html" index=3)
+  viewcode
+  a(name="Javascript")
+  script(type='text/javascript').
+    $(function(){
+      $('.spritespin').spritespin({
+        source: SpriteSpin.sourceArray('http://lorempixel.com/240/164/sports/{frame}/', { frame: [1,10], digits: 1 }),
+        width: 240,
+        height: 164,
+        sense: -1,
+        animate: false,
+        wrap: false,
+        // setup the modules to use
+        mods: [
+          // enables frame change on swipe
+          'swipe', 
+          // adds the gallery module
+          'gallery'
+        ]
+      });
+    });
