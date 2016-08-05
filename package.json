@@ -1,6 +1,6 @@
 {
   "name": "spritespin",
-  "version": "3.3.3",
+  "version": "3.4.0",
   "engines": {
     "node": ">= 0.8.0"
   },
