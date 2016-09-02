@@ -23,6 +23,7 @@
 
 html, body{
   -webkit-font-smoothing: subpixel-antialiased;
+  overflow-x: hidden;
 }
 
 nav.navbar{
@@ -105,6 +106,11 @@ button.example {
   }
 }
 
+.sample-page {
+  padding-top: 5rem; 
+  padding-bottom: 5rem;
+  max-width: 960px;
+}
 .sample-tabs {
   a {
     padding: 1rem;
