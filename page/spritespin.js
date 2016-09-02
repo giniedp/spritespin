@@ -1178,12 +1178,15 @@
       var oWidth = data.width;
       var oHeight = data.height;
       var oSource = data.source;
+      var oSize = data.sizeMode;
+
       bindChangeEvent(function(){
         if (isFullscreen()){
           // ENTER
           data.width = window.screen.width;
           data.height = window.screen.height;
           data.source = opts.source || oSource;
+          data.sizeMode = opts.sizeMode || 'fit';
           SpriteSpin.boot(data);
         } else {
           // EXIT
@@ -1191,6 +1194,7 @@
           data.width = oWidth;
           data.height = oHeight;
           data.source = oSource;
+          data.sizeMode = oSize;
           SpriteSpin.boot(data);
         }
       });

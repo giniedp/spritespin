@@ -1973,7 +1973,8 @@ pre.line-numbers > code {
   text-align: right; }
 
 html, body {
-  -webkit-font-smoothing: subpixel-antialiased; }
+  -webkit-font-smoothing: subpixel-antialiased;
+  overflow-x: hidden; }
 
 nav.navbar {
   padding: 30px 50px 28px;
@@ -2044,6 +2045,11 @@ button.example {
     #examples-page .sample-frame iframe {
       width: 100%;
       flex: 1; }
+
+.sample-page {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  max-width: 960px; }
 
 .sample-tabs a {
   padding: 1rem;

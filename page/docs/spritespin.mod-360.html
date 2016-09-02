@@ -42,8 +42,10 @@
     <span class="hljs-keyword">var</span> y = data.frameHeight * floor(index / data.framesX);
 
     <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
-      data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
-      data.context.drawImage(data.images[<span class="hljs-number">0</span>], x, y, data.frameWidth, data.frameHeight, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+      <span class="hljs-keyword">var</span> w = data.canvas[<span class="hljs-number">0</span>].width / data.canvasRatio;
+      <span class="hljs-keyword">var</span> h = data.canvas[<span class="hljs-number">0</span>].height / data.canvasRatio;
+      data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
+      data.context.drawImage(data.images[<span class="hljs-number">0</span>], x, y, data.frameWidth, data.frameHeight, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
       <span class="hljs-keyword">return</span>;
     }
 
@@ -66,8 +68,10 @@
     <span class="hljs-keyword">var</span> img = data.images[index];
     <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>){
       <span class="hljs-keyword">if</span> (img &amp;&amp; img.complete !== <span class="hljs-literal">false</span>){
-        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
-        data.context.drawImage(img, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
+        <span class="hljs-keyword">var</span> w = data.canvas[<span class="hljs-number">0</span>].width / data.canvasRatio;
+        <span class="hljs-keyword">var</span> h = data.canvas[<span class="hljs-number">0</span>].height / data.canvasRatio;
+        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
+        data.context.drawImage(img, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
       }
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>) {
       data.stage.css({
@@ -98,13 +102,12 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (data.width !== <span class="hljs-literal">null</span>) {
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (data.width &amp;&amp; data.frameWidth) {
         data.scaleWidth = data.width / data.frameWidth;
       } <span class="hljs-keyword">else</span> {
         data.scaleWidth = <span class="hljs-number">1</span>;
       }
-        
-      <span class="hljs-keyword">if</span> (data.height !== <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">if</span> (data.height &amp;&amp; data.frameHeight) {
         data.scaleHeight = data.height / data.frameHeight;
       } <span class="hljs-keyword">else</span> {
         data.scaleHeight = <span class="hljs-number">1</span>;
@@ -141,6 +144,13 @@
             <div class="content"><div class='highlight'><pre>      data.stage.empty().css({ <span class="hljs-string">"background-image"</span> : <span class="hljs-string">'none'</span> }).show();
 
       <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'canvas'</span>)
+      {
+        <span class="hljs-keyword">var</span> w = data.canvas[<span class="hljs-number">0</span>].width / data.canvasRatio;
+        <span class="hljs-keyword">var</span> h = data.canvas[<span class="hljs-number">0</span>].height / data.canvasRatio;
+        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, w, h);
+        data.canvas.show();
+      }
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>)
       {</pre></div></div>
             
         </li>
@@ -151,26 +161,6 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p>prepare rendering to canvas
-clear and enable the canvas container</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        data.context.clearRect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, data.width, data.height);
-        data.canvas.show();
-      }
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.renderer === <span class="hljs-string">'background'</span>)
-      {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>prepare rendering frames as background images</p>
 
@@ -192,11 +182,11 @@ clear and enable the canvas container</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>set custom background size to enable responsive rendering</p>
 
@@ -214,11 +204,11 @@ clear and enable the canvas container</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>prepare rendering frames as image elements</p>
 

@@ -1100,6 +1100,17 @@ stops performing the script</p>
     }
   };
 
+  Spin.displaySize = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+    <span class="hljs-keyword">var</span> w = <span class="hljs-built_in">Math</span>.floor(data.width || data.frameWidth || data.target.innerWidth());
+    <span class="hljs-keyword">var</span> h = <span class="hljs-built_in">Math</span>.floor(data.height || data.frameHeight || data.target.innerHeight());
+    <span class="hljs-keyword">var</span> a = w / h;
+    <span class="hljs-keyword">return</span> {
+      width: w, 
+      height: h,
+      aspect: a
+    }
+  }
+  
   Spin.calculateInnerLayout = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{</pre></div></div>
             
         </li>
@@ -1197,6 +1208,9 @@ stops performing the script</p>
         css.width = w;
         css.height = w / a1;
       }
+    } <span class="hljs-keyword">else</span> {
+      css.width = w;
+      css.height = h;
     }
 
     css.width = css.width|<span class="hljs-number">0</span>;
@@ -1255,16 +1269,13 @@ stops performing the script</p>
 
     <span class="hljs-keyword">var</span> w = <span class="hljs-built_in">Math</span>.floor(data.width || data.frameWidth || data.target.innerWidth());
     <span class="hljs-keyword">var</span> h = <span class="hljs-built_in">Math</span>.floor(data.height || data.frameHeight || data.target.innerHeight());
-
+    
     <span class="hljs-keyword">if</span> (data.responsive &amp;&amp; (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span>.getComputedStyle === <span class="hljs-string">'function'</span>)) {
       <span class="hljs-keyword">var</span> style = getComputedStyle(data.target[<span class="hljs-number">0</span>]);
       <span class="hljs-keyword">if</span> (style.width) {
+        <span class="hljs-keyword">var</span> a = w / h;
         w = <span class="hljs-built_in">Number</span>(style.width.replace(<span class="hljs-string">'px'</span>, <span class="hljs-string">''</span>))|<span class="hljs-number">0</span>;
-        <span class="hljs-keyword">if</span> (style.height) {
-          h = <span class="hljs-built_in">Number</span>(style.height.replace(<span class="hljs-string">'px'</span>, <span class="hljs-string">''</span>))|<span class="hljs-number">0</span>;
-        } <span class="hljs-keyword">else</span> {
-          h = (data.frameHeight / data.frameWidth * w)|<span class="hljs-number">0</span>;
-        }
+        h = (w / a)|<span class="hljs-number">0</span>;
       }
     }
 
@@ -1279,8 +1290,8 @@ stops performing the script</p>
     data.stage.css(css).hide();
     <span class="hljs-keyword">if</span> (data.canvas){
       data.canvasRatio = data.canvasRatio || pixelRatio(data.context);
-      data.canvas[<span class="hljs-number">0</span>].width = w * data.canvasRatio;
-      data.canvas[<span class="hljs-number">0</span>].height = h * data.canvasRatio;
+      data.canvas[<span class="hljs-number">0</span>].width = (css.width * data.canvasRatio) || w;
+      data.canvas[<span class="hljs-number">0</span>].height = (css.height * data.canvasRatio) || h;
       data.canvas.css(css).hide();
       data.context.scale(data.canvasRatio, data.canvasRatio);
     }
