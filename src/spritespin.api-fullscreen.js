@@ -91,8 +91,7 @@
     return !!fullscreenElement();
   }
 
-  var changeEvent = fn.fullscreenchange + '.' + SpriteSpin.namespace;
-
+  var changeEvent = fn.fullscreenchange + '.' + SpriteSpin.namespace + '-fullscreen';
   function unbindChangeEvent(){
     $(document).unbind(changeEvent);
   }
@@ -100,6 +99,15 @@
   function bindChangeEvent(callback){
     unbindChangeEvent();
     $(document).bind(changeEvent, callback);
+  }
+
+  var orientationEvent = 'orientationchange.' + SpriteSpin.namespace + '-fullscreen';
+  function unbindOrientationEvent() {
+    $(window).unbind(orientationEvent)
+  }
+  function bindOrientationEvent(callback) {
+    unbindOrientationEvent()
+    $(window).bind(orientationEvent, callback);
   }
 
   SpriteSpin.extendApi({
@@ -121,23 +129,29 @@
       var oHeight = data.height;
       var oSource = data.source;
       var oSize = data.sizeMode;
+      var enter = function() {
+        data.width = window.screen.width;
+        data.height = window.screen.height;
+        data.source = opts.source || oSource;
+        data.sizeMode = opts.sizeMode || 'fit';
+        SpriteSpin.boot(data);
+      }
+      var exit = function() {
+        data.width = oWidth;
+        data.height = oHeight;
+        data.source = oSource;
+        data.sizeMode = oSize;
+        SpriteSpin.boot(data);
+      }
 
       bindChangeEvent(function(){
         if (isFullscreen()){
-          // ENTER
-          data.width = window.screen.width;
-          data.height = window.screen.height;
-          data.source = opts.source || oSource;
-          data.sizeMode = opts.sizeMode || 'fit';
-          SpriteSpin.boot(data);
+          enter();
+          bindOrientationEvent(enter);
         } else {
-          // EXIT
           unbindChangeEvent();
-          data.width = oWidth;
-          data.height = oHeight;
-          data.source = oSource;
-          data.sizeMode = oSize;
-          SpriteSpin.boot(data);
+          unbindOrientationEvent();
+          exit();
         }
       });
       requestFullscreen(data.target[0]);
