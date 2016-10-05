@@ -24,8 +24,8 @@
     "page"
   ],
   "devDependencies": {
-    "kube-scss": "*",
-    "prism": "prismjs#^1.5.1"
+    "prism": "prismjs#^1.5.1",
+    "milligram": "^1.1.0"
   },
   "dependencies": {
     "jquery": "^1.4.1"

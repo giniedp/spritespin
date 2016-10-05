@@ -1,25 +1,10 @@
-@import "mixins";
-@import "variables";
-
-@import "normalize";
-@import "typography";
-
-@import "grid";
-@import "blocks";
-
-@import "navigation";
-
-@import "tables";
-@import "forms";
-
-@import "buttons";
-
-@import "helpers";
-@import "prettyprint";
-
+@import "bower_components/normalize.css/normalize";
+@import "bower_components/milligram/dist/milligram";
 @import "bower_components/prism/themes/prism-okaidia";
 @import "bower_components/prism/plugins/autolinker/prism-autolinker";
 @import "bower_components/prism/plugins/line-numbers/prism-line-numbers";
+@import "index";
+@import "examples";
 
 html, body{
   -webkit-font-smoothing: subpixel-antialiased;
@@ -27,13 +12,36 @@ html, body{
 }
 
 nav.navbar{
-  padding: 30px 50px 28px;
   background: #222;
   margin-bottom: 1.65em;
-  a{
+  ul {
+    list-style: none;
+    display: flex;
+    @media (max-width: 40.0rem) {
+      padding: 0;
+    }
+  }
+  li {
+    margin: 0;
+    display: block;
+    flex: 1;
+  }
+  a {
     color: white;
+    line-height: 4rem;
+    height: 6rem;
+    display: block;
+    text-align: center;
+    padding: 1rem 0rem;
+    @media (min-width: 40.0rem) {
+      padding: 1rem;
+    }
+  }
+  a:hover{
+    background: #333;
   }
 }
+
 a{
   text-decoration: none;
 }
@@ -43,6 +51,11 @@ ul.no-bullets {
 pre{
   background: #222 !important;
 }
+pre[class*="language-"] {
+  border-radius: 0;
+  padding: 0.5rem;
+}
+
 iframe {
   border: none;
 }
@@ -53,15 +66,9 @@ iframe {
   padding: 1rem;
 }
 .container, ul.container, code{
-  width: 960px;
+  max-width: 960px;
   margin: 0 auto auto;
   display: block;
-}
-button.example {
-  padding: 10px;
-  background-color: #F7F7F9;
-  border: 1px solid #E1E1E8;
-  color: #48484C;
 }
 
 .spritespin-instance.loading{
@@ -70,75 +77,3 @@ button.example {
   background-repeat: no-repeat;
 }
 
-.blocks-2 li,
-.blocks-3 li,
-.blocks-4 li,
-.blocks-5 li,
-.blocks-6 li {
-  li {
-    float: initial;
-    margin: 0;
-    padding: 0;
-  }
-}
-
-#examples-page {
-  display: flex;
-  position: absolute;
-  top: 83px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  flex-direction: row;
-  .sample-menu {
-    flex: 1;
-    text-align: right;
-    padding: 2rem 1rem;
-  }
-  .sample-frame {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
-    iframe {
-      width: 100%;
-      flex: 1;
-    }
-  }
-}
-
-.sample-page {
-  padding-top: 5rem; 
-  padding-bottom: 5rem;
-  max-width: 960px;
-}
-.sample-tabs {
-  a {
-    padding: 1rem;
-    line-height: 1;
-    background: #000;
-    color: #fff;
-    vertical-align: bottom;
-    display: inline-block;
-    cursor: pointer;
-  }
-  a:hover{ 
-    background: #111;
-  }
-  a.active{
-    background: #222;
-    color: #fff;
-  }
-}
-.sample-contents {
-  background: #222;
-  color: #fff;
-  pre {
-    margin: 0;
-    box-sizing: border-box;
-    border-radius: 0;
-  }
-  code {
-    display: inline-block;
-    width: auto;
-  }
-}

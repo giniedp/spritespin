@@ -86,7 +86,7 @@ gulp.task('page:html', function() {
 gulp.task('page:style', function() {
   return src('src/page/style/style.scss')
     .pipe(sass({
-      includePaths: ["bower_components/kube-scss/scss"]
+      // includePaths: ["bower_components/kube-scss/scss"]
     }).on("error", sass.logError))
     .pipe(concat('style.css'))
     .pipe(gulp.dest('page'))

@@ -161,8 +161,7 @@
     <span class="hljs-keyword">return</span> !!fullscreenElement();
   }
 
-  <span class="hljs-keyword">var</span> changeEvent = fn.fullscreenchange + <span class="hljs-string">'.'</span> + SpriteSpin.namespace;
-
+  <span class="hljs-keyword">var</span> changeEvent = fn.fullscreenchange + <span class="hljs-string">'.'</span> + SpriteSpin.namespace + <span class="hljs-string">'-fullscreen'</span>;
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbindChangeEvent</span>(<span class="hljs-params"></span>)</span>{
     $(<span class="hljs-built_in">document</span>).unbind(changeEvent);
   }
@@ -170,6 +169,15 @@
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindChangeEvent</span>(<span class="hljs-params">callback</span>)</span>{
     unbindChangeEvent();
     $(<span class="hljs-built_in">document</span>).bind(changeEvent, callback);
+  }
+
+  <span class="hljs-keyword">var</span> orientationEvent = <span class="hljs-string">'orientationchange.'</span> + SpriteSpin.namespace + <span class="hljs-string">'-fullscreen'</span>;
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unbindOrientationEvent</span>(<span class="hljs-params"></span>) </span>{
+    $(<span class="hljs-built_in">window</span>).unbind(orientationEvent)
+  }
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindOrientationEvent</span>(<span class="hljs-params">callback</span>) </span>{
+    unbindOrientationEvent()
+    $(<span class="hljs-built_in">window</span>).bind(orientationEvent, callback);
   }
 
   SpriteSpin.extendApi({
@@ -191,49 +199,29 @@
       <span class="hljs-keyword">var</span> oHeight = data.height;
       <span class="hljs-keyword">var</span> oSource = data.source;
       <span class="hljs-keyword">var</span> oSize = data.sizeMode;
+      <span class="hljs-keyword">var</span> enter = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        data.width = <span class="hljs-built_in">window</span>.screen.width;
+        data.height = <span class="hljs-built_in">window</span>.screen.height;
+        data.source = opts.source || oSource;
+        data.sizeMode = opts.sizeMode || <span class="hljs-string">'fit'</span>;
+        SpriteSpin.boot(data);
+      }
+      <span class="hljs-keyword">var</span> exit = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        data.width = oWidth;
+        data.height = oHeight;
+        data.source = oSource;
+        data.sizeMode = oSize;
+        SpriteSpin.boot(data);
+      }
 
       bindChangeEvent(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-        <span class="hljs-keyword">if</span> (isFullscreen()){</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p>ENTER</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          data.width = <span class="hljs-built_in">window</span>.screen.width;
-          data.height = <span class="hljs-built_in">window</span>.screen.height;
-          data.source = opts.source || oSource;
-          data.sizeMode = opts.sizeMode || <span class="hljs-string">'fit'</span>;
-          SpriteSpin.boot(data);
-        } <span class="hljs-keyword">else</span> {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
-              </div>
-              <p>EXIT</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          unbindChangeEvent();
-          data.width = oWidth;
-          data.height = oHeight;
-          data.source = oSource;
-          data.sizeMode = oSize;
-          SpriteSpin.boot(data);
+        <span class="hljs-keyword">if</span> (isFullscreen()){
+          enter();
+          bindOrientationEvent(enter);
+        } <span class="hljs-keyword">else</span> {
+          unbindChangeEvent();
+          unbindOrientationEvent();
+          exit();
         }
       });
       requestFullscreen(data.target[<span class="hljs-number">0</span>]);

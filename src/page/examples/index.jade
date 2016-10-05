@@ -1,8 +1,8 @@
 extends ../layouts/default.jade
 block content
   #examples-page 
-    .sample-menu
-      ul.no-bullets
+    nav.sample-menu
+      ul
         li: a(href="#basic-usage.html") Basic usage
         li: a(href="#sprite-sheet.html") Sprite sheet
         li: a(href="#3d-view.html") 3D view
@@ -12,13 +12,11 @@ block content
         li: a(href="#zoom.html") Zoom
         li: a(href="#fullscreen.html") Fullscreen
         li: a(href="#responsive.html") Responsive
-        
-      h4 Alternative use cases
-      ul.no-bullets
+
         li: a(href="#alternative-gallery.html") Gallery
         li: a(href="#alternative-panorama.html") Panorama
         
-    .sample-frame
+    section.sample-frame
       iframe(allowfullscreen=true)
     script(type="text/javascript").
       SpriteSpinPage.bootSampleMenu({

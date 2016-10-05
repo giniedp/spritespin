@@ -2,29 +2,28 @@ extends layouts/default.jade
 block content
   .container
     h1 Download
-    hr
     a(href='https://github.com/giniedp/spritespin' target='blank')
       img(src="./images/icons/github.png" width=16)
-      | view source on github
+      |  source on github
     br
     a(href='./docs/spritespin.html' target='blank')
       img(src="./images/icons/source.png" width=16)
-      | view annoted source code
+      |  annoted source code
     br
     a(href='https://github.com/giniedp/spritespin/archive/master.zip' target='blank')
       img(src="./images/icons/zipped.png" width=16)
-      | download zip
-    br
+      |  download zip
+    hr
+    h2 Bower
+    code.
+      $ bower install spritespin
+    hr
+    h2 cdnjs
     p
-      | Spritespin is also hosted on cdnjs
+      span Spritespin is also hosted on cdnjs
       a(href='https://cdnjs.com/libraries/spritespin' target='blank')  here
-    p
-      form(action="https://www.paypal.com/cgi-bin/webscr" method="post")
-        input(type="hidden" name="cmd" value="_s-xclick")
-        input(type="hidden" name="hosted_button_id" value="997NPGE9M3XWL")
-        span Buy me a beer, if you like this plugin
-        input(type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!")
-        img(alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1")
+
+    hr
     h1 License
     span Code licensed under the
     a(href='http://opensource.org/licenses/MIT' target='_blank')  MIT license
