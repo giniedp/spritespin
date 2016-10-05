@@ -1,0 +1,19 @@
+#home-page {
+  .row-teaser {
+    .column-teaser-text {
+      @media (min-width: 40.0rem) {
+        flex: 0 0 60%;
+        max-width: 60%;
+      }
+    }
+    .column-teaser-spin {
+      @media (min-width: 40.0rem) {
+        flex: 0 0 40%;
+        max-width: 40%;
+      }
+      #showcase-example {
+        width: 100%;
+      }
+    }
+  }
+}
