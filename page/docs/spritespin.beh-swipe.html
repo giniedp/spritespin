@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params">e, data</span>) </span>{
     data.swipeFling = data.swipeFling || <span class="hljs-number">10</span>;
@@ -82,16 +82,16 @@
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'swipe'</span>, {
-    onLoad: init,
-    mousedown: start,
-    mousemove: update,
-    mouseup: end,
-    mouseleave: end,
+    <span class="hljs-attr">onLoad</span>: init,
+    <span class="hljs-attr">mousedown</span>: start,
+    <span class="hljs-attr">mousemove</span>: update,
+    <span class="hljs-attr">mouseup</span>: end,
+    <span class="hljs-attr">mouseleave</span>: end,
 
-    touchstart: start,
-    touchmove: update,
-    touchend: end,
-    touchcancel: end
+    <span class="hljs-attr">touchstart</span>: start,
+    <span class="hljs-attr">touchmove</span>: update,
+    <span class="hljs-attr">touchend</span>: end,
+    <span class="hljs-attr">touchcancel</span>: end
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

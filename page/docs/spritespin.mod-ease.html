@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> max = <span class="hljs-built_in">Math</span>.max
   <span class="hljs-keyword">var</span> min = <span class="hljs-built_in">Math</span>.min
@@ -41,7 +41,7 @@
     data.easeDamping = max(min(data.easeDamping || <span class="hljs-number">0.9</span>, <span class="hljs-number">0.999</span>), <span class="hljs-number">0</span>);
     data.easeSamples = max(data.easeSamples || <span class="hljs-number">5</span>, <span class="hljs-number">1</span>);
     data.easeUpdateTime = max(data.easeUpdateTime || data.frameTime, <span class="hljs-number">16</span>);
-    data.easeScope = { samples: [], steps: [] };
+    data.easeScope = { <span class="hljs-attr">samples</span>: [], <span class="hljs-attr">steps</span>: [] };
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params">e, data</span>) </span>{
@@ -110,9 +110,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    ease.samples.push({
-      time: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime(),
-      frame: data.dragFrame,
-      lane: data.dragLane
+      <span class="hljs-attr">time</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime(),
+      <span class="hljs-attr">frame</span>: data.dragFrame,
+      <span class="hljs-attr">lane</span>: data.dragLane
     });</pre></div></div>
             
         </li>
@@ -165,15 +165,15 @@
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'ease'</span>, {
-    onLoad: init,
+    <span class="hljs-attr">onLoad</span>: init,
 
-    mousemove: update,
-    mouseup: end,
-    mouseleave: end,
+    <span class="hljs-attr">mousemove</span>: update,
+    <span class="hljs-attr">mouseup</span>: end,
+    <span class="hljs-attr">mouseleave</span>: end,
 
-    touchmove: update,
-    touchend: end,
-    touchcancel: end
+    <span class="hljs-attr">touchmove</span>: update,
+    <span class="hljs-attr">touchend</span>: end,
+    <span class="hljs-attr">touchcancel</span>: end
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

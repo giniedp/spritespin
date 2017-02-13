@@ -31,19 +31,19 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onCreate</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (data.zoomStage) <span class="hljs-keyword">return</span>
     data.zoomStage = $(<span class="hljs-string">"&lt;div class='spritezoom-stage'&gt;&lt;/div&gt;"</span>)
       .css({
-        width    : <span class="hljs-string">'100%'</span>,
-        height   : <span class="hljs-string">'100%'</span>,
-        top      : <span class="hljs-number">0</span>,
-        left     : <span class="hljs-number">0</span>,
-        bottom   : <span class="hljs-number">0</span>,
-        right    : <span class="hljs-number">0</span>,
-        position : <span class="hljs-string">'absolute'</span>
+        <span class="hljs-attr">width</span>    : <span class="hljs-string">'100%'</span>,
+        <span class="hljs-attr">height</span>   : <span class="hljs-string">'100%'</span>,
+        <span class="hljs-attr">top</span>      : <span class="hljs-number">0</span>,
+        <span class="hljs-attr">left</span>     : <span class="hljs-number">0</span>,
+        <span class="hljs-attr">bottom</span>   : <span class="hljs-number">0</span>,
+        <span class="hljs-attr">right</span>    : <span class="hljs-number">0</span>,
+        <span class="hljs-attr">position</span> : <span class="hljs-string">'absolute'</span>
       }).appendTo(data.target).hide();
   }
 
@@ -355,18 +355,18 @@ prevents frame change during zoom mode</p>
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'zoom'</span>, {
-    mousedown: onClick,
-    touchstart: onClick,
-    mousemove: onMove,
-    touchmove: onMove,
+    <span class="hljs-attr">mousedown</span>: onClick,
+    <span class="hljs-attr">touchstart</span>: onClick,
+    <span class="hljs-attr">mousemove</span>: onMove,
+    <span class="hljs-attr">touchmove</span>: onMove,
 
-    onInit: onCreate,
-    onDestroy: onDestroy,
-    onDraw: onDraw
+    <span class="hljs-attr">onInit</span>: onCreate,
+    <span class="hljs-attr">onDestroy</span>: onDestroy,
+    <span class="hljs-attr">onDraw</span>: onDraw
   });
 
   SpriteSpin.extendApi({
-    toggleZoom: toggleZoom
+    <span class="hljs-attr">toggleZoom</span>: toggleZoom
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">start</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (data.loading || data.dragging || !data.stage.is(<span class="hljs-string">':visible'</span>)) <span class="hljs-keyword">return</span>;
@@ -71,17 +71,17 @@
 
   SpriteSpin.registerModule(<span class="hljs-string">'hold'</span>, {
 
-    mousedown: start,
-    mousemove: update,
-    mouseup: stop,
-    mouseleave: stop,
+    <span class="hljs-attr">mousedown</span>: start,
+    <span class="hljs-attr">mousemove</span>: update,
+    <span class="hljs-attr">mouseup</span>: stop,
+    <span class="hljs-attr">mouseleave</span>: stop,
 
-    touchstart: start,
-    touchmove: update,
-    touchend: stop,
-    touchcancel: stop,
+    <span class="hljs-attr">touchstart</span>: start,
+    <span class="hljs-attr">touchmove</span>: update,
+    <span class="hljs-attr">touchend</span>: stop,
+    <span class="hljs-attr">touchcancel</span>: stop,
 
-    onFrame: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-attr">onFrame</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
       $(<span class="hljs-keyword">this</span>).spritespin(<span class="hljs-string">"api"</span>).startAnimation();
     }
   });

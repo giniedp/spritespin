@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dragStart</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (data.loading || data.dragging || !data.stage.is(<span class="hljs-string">':visible'</span>)) <span class="hljs-keyword">return</span>;
@@ -123,30 +123,30 @@ this allows to use touch scroll on mobile devices.</p>
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'drag'</span>, {
-    mousedown: dragStart,
-    mousemove: drag,
-    mouseup: dragEnd,
+    <span class="hljs-attr">mousedown</span>: dragStart,
+    <span class="hljs-attr">mousemove</span>: drag,
+    <span class="hljs-attr">mouseup</span>: dragEnd,
 
-    documentmousemove: drag,
-    documentmouseup: dragEnd,
+    <span class="hljs-attr">documentmousemove</span>: drag,
+    <span class="hljs-attr">documentmouseup</span>: dragEnd,
 
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
+    <span class="hljs-attr">touchstart</span>: dragStart,
+    <span class="hljs-attr">touchmove</span>: drag,
+    <span class="hljs-attr">touchend</span>: dragEnd,
+    <span class="hljs-attr">touchcancel</span>: dragEnd
   });
 
   SpriteSpin.registerModule(<span class="hljs-string">'move'</span>, {
-    mousemove: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-attr">mousemove</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       dragStart.call(<span class="hljs-keyword">this</span>, e, data);
       drag.call(<span class="hljs-keyword">this</span>, e, data);
     },
-    mouseleave: dragEnd,
+    <span class="hljs-attr">mouseleave</span>: dragEnd,
 
-    touchstart: dragStart,
-    touchmove: drag,
-    touchend: dragEnd,
-    touchcancel: dragEnd
+    <span class="hljs-attr">touchstart</span>: dragStart,
+    <span class="hljs-attr">touchmove</span>: drag,
+    <span class="hljs-attr">touchend</span>: dragEnd,
+    <span class="hljs-attr">touchcancel</span>: dragEnd
   });
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
             

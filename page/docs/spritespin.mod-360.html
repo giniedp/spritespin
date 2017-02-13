@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> floor = <span class="hljs-built_in">Math</span>.floor;
 
@@ -58,7 +58,7 @@
         <span class="hljs-string">"background-position"</span> : [x, <span class="hljs-string">"px "</span>, y, <span class="hljs-string">"px"</span>].join(<span class="hljs-string">""</span>)
       });
     } <span class="hljs-keyword">else</span> {
-      $(data.images).css({ top: y, left: x, <span class="hljs-string">"max-width"</span> : <span class="hljs-string">'initial'</span> });
+      $(data.images).css({ <span class="hljs-attr">top</span>: y, <span class="hljs-attr">left</span>: x, <span class="hljs-string">"max-width"</span> : <span class="hljs-string">'initial'</span> });
     }
   }
 
@@ -86,7 +86,7 @@
 
   SpriteSpin.registerModule(<span class="hljs-string">'360'</span>, {
 
-    onLoad: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-attr">onLoad</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">var</span> w, h;</pre></div></div>
             
         </li>
@@ -221,14 +221,14 @@
           w = h = <span class="hljs-string">'100%'</span>;
         }
         $(data.images).appendTo(data.stage).css({
-          width: w,
-          height: h,
-          position: <span class="hljs-string">'absolute'</span>
+          <span class="hljs-attr">width</span>: w,
+          <span class="hljs-attr">height</span>: h,
+          <span class="hljs-attr">position</span>: <span class="hljs-string">'absolute'</span>
         });
       }
     },
 
-    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-attr">onDraw</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">if</span> (data.sourceIsSprite){
         drawSprite(data);
       } <span class="hljs-keyword">else</span>{

@@ -31,13 +31,13 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> floor = <span class="hljs-built_in">Math</span>.floor;
 
   SpriteSpin.registerModule(<span class="hljs-string">'panorama'</span>, {
 
-    onLoad: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-attr">onLoad</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       data.stage.empty().show();
       data.frames = data.sourceWidth;
       <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>){
@@ -75,7 +75,7 @@
       });
     },
 
-    onDraw: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
+    <span class="hljs-attr">onDraw</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e, data</span>)</span>{
       <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>, y = <span class="hljs-number">0</span>;
       <span class="hljs-keyword">if</span> (data.orientation === <span class="hljs-string">"horizontal"</span>){
         x = -floor((data.frame % data.frames) * data.scale);

@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">var</span> scope = scopeFrom(data);
@@ -72,10 +72,10 @@
     <span class="hljs-keyword">var</span> d = <span class="hljs-built_in">Math</span>.abs(data.frame - data.lastFrame); <span class="hljs-comment">// distance between frames</span>
     <span class="hljs-keyword">if</span> (d &gt;= data.frames / <span class="hljs-number">2</span>) d = data.frames - d; <span class="hljs-comment">// get shortest distance</span>
     scope.steps.unshift({
-      index: data.lane * data.frames + data.frame,
-      live: <span class="hljs-number">1</span>,
-      step: scope.frameTime / scope.fadeTime,
-      d: d
+      <span class="hljs-attr">index</span>: data.lane * data.frames + data.frame,
+      <span class="hljs-attr">live</span>: <span class="hljs-number">1</span>,
+      <span class="hljs-attr">step</span>: scope.frameTime / scope.fadeTime,
+      <span class="hljs-attr">d</span>: d
     });
   }
 
@@ -151,8 +151,8 @@
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'blur'</span>, {
-    onLoad: init,
-    onFrameChanged: onFrame
+    <span class="hljs-attr">onLoad</span>: init,
+    <span class="hljs-attr">onFrameChanged</span>: onFrame
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

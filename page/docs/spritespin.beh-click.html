@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">click</span>(<span class="hljs-params">e, data</span>) </span>{
     <span class="hljs-keyword">if</span> (data.loading || !data.stage.is(<span class="hljs-string">':visible'</span>)) <span class="hljs-keyword">return</span>;
@@ -45,12 +45,12 @@
       half = target.innerHeight() / <span class="hljs-number">2</span>;
       pos = data.currentY - offset.top;
     }
-    SpriteSpin.updateFrame(data, data.frame + (pos &gt; half ? <span class="hljs-number">1</span> : -<span class="hljs-number">1</span>));
+    SpriteSpin.updateFrame(data, data.frame + (pos &gt; half ? <span class="hljs-number">1</span> : <span class="hljs-number">-1</span>));
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'click'</span>, {
-    mouseup: click,
-    touchend: click
+    <span class="hljs-attr">mouseup</span>: click,
+    <span class="hljs-attr">touchend</span>: click
   });
 
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>

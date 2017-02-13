@@ -31,7 +31,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$, SpriteSpin</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span>(<span class="hljs-params">e, data</span>)</span>{
     data.galleryImages = [];
@@ -53,17 +53,17 @@
       size += data.width;
       img.css({
         <span class="hljs-string">"max-width"</span> : <span class="hljs-string">'initial'</span>,
-        opacity : data.galleryOpacity,
-        width: data.width,
-        height: data.height
+        <span class="hljs-attr">opacity</span> : data.galleryOpacity,
+        <span class="hljs-attr">width</span>: data.width,
+        <span class="hljs-attr">height</span>: data.height
       });
     }
     <span class="hljs-keyword">var</span> css = SpriteSpin.calculateInnerLayout(data);
     data.galleryStage.css(css).css({
-      width: size
+      <span class="hljs-attr">width</span>: size
     });
     data.galleryImages[data.galleryFrame].animate({
-      opacity : <span class="hljs-number">1</span>
+      <span class="hljs-attr">opacity</span> : <span class="hljs-number">1</span>
     }, data.gallerySpeed);
   }
 
@@ -74,9 +74,9 @@
         <span class="hljs-string">"left"</span> : data.galleryOffsets[data.frame]
       }, data.gallerySpeed);
 
-      data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed);
+      data.galleryImages[data.galleryFrame].animate({ <span class="hljs-attr">opacity</span> : data.galleryOpacity }, data.gallerySpeed);
       data.galleryFrame = data.frame;
-      data.galleryImages[data.galleryFrame].animate({ opacity : <span class="hljs-number">1</span> }, data.gallerySpeed);
+      data.galleryImages[data.galleryFrame].animate({ <span class="hljs-attr">opacity</span> : <span class="hljs-number">1</span> }, data.gallerySpeed);
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.dragging || data.dX != data.gallerydX) {
       data.galleryDX = data.DX;
       data.galleryDDX = data.DDX;
@@ -87,8 +87,8 @@
   }
 
   SpriteSpin.registerModule(<span class="hljs-string">'gallery'</span>, {
-    onLoad: load,
-    onDraw: draw
+    <span class="hljs-attr">onLoad</span>: load,
+    <span class="hljs-attr">onDraw</span>: draw
   });
 }(<span class="hljs-built_in">window</span>.jQuery || <span class="hljs-built_in">window</span>.Zepto || <span class="hljs-built_in">window</span>.$, <span class="hljs-built_in">window</span>.SpriteSpin));</pre></div></div>
             

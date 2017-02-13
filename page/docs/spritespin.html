@@ -32,7 +32,7 @@
             
             <div class="content"><div class='highlight'><pre>
 (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">$</span>) </span>{
-<span class="hljs-pi">  "use strict"</span>;
+<span class="hljs-meta">  "use strict"</span>;
 
   <span class="hljs-keyword">var</span> name = <span class="hljs-string">'spritespin'</span>;
 
@@ -98,7 +98,7 @@
    * @type {object}
    */</span>
   Spin.defaults = {
-    source            : <span class="hljs-literal">undefined</span>,    <span class="hljs-comment">// Stitched source image or array of files</span>
+    <span class="hljs-attr">source</span>            : <span class="hljs-literal">undefined</span>,    <span class="hljs-comment">// Stitched source image or array of files</span>
     width             : <span class="hljs-literal">undefined</span>,    <span class="hljs-comment">// actual display width</span>
     height            : <span class="hljs-literal">undefined</span>,    <span class="hljs-comment">// actual display height</span>
     frames            : <span class="hljs-literal">undefined</span>,    <span class="hljs-comment">// Total number of frames</span>
@@ -385,10 +385,10 @@ The SpriteSpin namespace is attached to the event name</p>
       count += <span class="hljs-number">1</span>;
       <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> opts.progress === <span class="hljs-string">'function'</span>){
         opts.progress({
-          index: $.inArray(<span class="hljs-keyword">this</span>, images),
-          loaded: count,
-          total: src.length,
-          percent: <span class="hljs-built_in">Math</span>.round((count / src.length) * <span class="hljs-number">100</span>)
+          <span class="hljs-attr">index</span>: $.inArray(<span class="hljs-keyword">this</span>, images),
+          <span class="hljs-attr">loaded</span>: count,
+          <span class="hljs-attr">total</span>: src.length,
+          <span class="hljs-attr">percent</span>: <span class="hljs-built_in">Math</span>.round((count / src.length) * <span class="hljs-number">100</span>)
         });
       }
       firstLoaded = firstLoaded || (<span class="hljs-keyword">this</span> === images[<span class="hljs-number">0</span>]);
@@ -570,8 +570,8 @@ if color still magenta, the image is assumed to be sub sampled.</p>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (image.naturalWidth != <span class="hljs-literal">null</span>) {
       <span class="hljs-keyword">return</span> {
-        width: image.naturalWidth,
-        height: image.naturalHeight
+        <span class="hljs-attr">width</span>: image.naturalWidth,
+        <span class="hljs-attr">height</span>: image.naturalHeight
       };
     }</pre></div></div>
             
@@ -594,8 +594,8 @@ Here we assume that the src has already been downloaded, so no onload callback i
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> Image();
     img.src = image.src;
     <span class="hljs-keyword">return</span> {
-      width: img.width,
-      height: img.height
+      <span class="hljs-attr">width</span>: img.width,
+      <span class="hljs-attr">height</span>: img.height
     };
   }
 
@@ -915,7 +915,7 @@ Useful for different behavior implementations. This must be restored when the cl
     <span class="hljs-keyword">if</span> (frame !== <span class="hljs-literal">undefined</span>){
       data.frame = <span class="hljs-built_in">Number</span>(frame);
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (data.animation) {
-      data.frame += (data.reverse ? -<span class="hljs-number">1</span> : <span class="hljs-number">1</span>);
+      data.frame += (data.reverse ? <span class="hljs-number">-1</span> : <span class="hljs-number">1</span>);
     }
 
     <span class="hljs-keyword">if</span> (data.animation){</pre></div></div>
@@ -1105,9 +1105,9 @@ stops performing the script</p>
     <span class="hljs-keyword">var</span> h = <span class="hljs-built_in">Math</span>.floor(data.height || data.frameHeight || data.target.innerHeight());
     <span class="hljs-keyword">var</span> a = w / h;
     <span class="hljs-keyword">return</span> {
-      width: w, 
-      height: h,
-      aspect: a
+      <span class="hljs-attr">width</span>: w, 
+      <span class="hljs-attr">height</span>: h,
+      <span class="hljs-attr">aspect</span>: a
     }
   }
   
@@ -1161,14 +1161,14 @@ stops performing the script</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> css = {
-      width    : <span class="hljs-string">'100%'</span>,
-      height   : <span class="hljs-string">'100%'</span>,
-      top      : <span class="hljs-number">0</span>,
-      left     : <span class="hljs-number">0</span>,
-      bottom   : <span class="hljs-number">0</span>,
-      right    : <span class="hljs-number">0</span>,
-      position : <span class="hljs-string">'absolute'</span>,
-      overflow : <span class="hljs-string">'hidden'</span>
+      <span class="hljs-attr">width</span>    : <span class="hljs-string">'100%'</span>,
+      <span class="hljs-attr">height</span>   : <span class="hljs-string">'100%'</span>,
+      <span class="hljs-attr">top</span>      : <span class="hljs-number">0</span>,
+      <span class="hljs-attr">left</span>     : <span class="hljs-number">0</span>,
+      <span class="hljs-attr">bottom</span>   : <span class="hljs-number">0</span>,
+      <span class="hljs-attr">right</span>    : <span class="hljs-number">0</span>,
+      <span class="hljs-attr">position</span> : <span class="hljs-string">'absolute'</span>,
+      <span class="hljs-attr">overflow</span> : <span class="hljs-string">'hidden'</span>
     };</pre></div></div>
             
         </li>
@@ -1259,7 +1259,7 @@ stops performing the script</p>
             <div class="content"><div class='highlight'><pre>    data.target
       .attr(<span class="hljs-string">'unselectable'</span>, <span class="hljs-string">'on'</span>)
       .css({
-        width: <span class="hljs-string">''</span>, height: <span class="hljs-string">''</span>,
+        <span class="hljs-attr">width</span>: <span class="hljs-string">''</span>, <span class="hljs-attr">height</span>: <span class="hljs-string">''</span>,
         <span class="hljs-string">'-ms-user-select'</span>: <span class="hljs-string">'none'</span>,
         <span class="hljs-string">'-moz-user-select'</span>: <span class="hljs-string">'none'</span>,
         <span class="hljs-string">'-khtml-user-select'</span>: <span class="hljs-string">'none'</span>,
@@ -1280,10 +1280,10 @@ stops performing the script</p>
     }
 
     data.target.css({
-      width    : w,
-      height   : h,
-      position : <span class="hljs-string">'relative'</span>,
-      overflow : <span class="hljs-string">'hidden'</span>
+      <span class="hljs-attr">width</span>    : w,
+      <span class="hljs-attr">height</span>   : h,
+      <span class="hljs-attr">position</span> : <span class="hljs-string">'relative'</span>,
+      <span class="hljs-attr">overflow</span> : <span class="hljs-string">'hidden'</span>
     });
 
     <span class="hljs-keyword">var</span> css = Spin.calculateInnerLayout(data);
@@ -1427,12 +1427,12 @@ mainly prevents image drag operation</p>
     data.target.addClass(<span class="hljs-string">'loading'</span>).trigger(<span class="hljs-string">'onInit'</span>, data);
     data.loading = <span class="hljs-literal">true</span>;
     load({
-      source: data.source,
-      preloadCount: data.preloadCount,
-      progress: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">progress</span>)</span>{
+      <span class="hljs-attr">source</span>: data.source,
+      <span class="hljs-attr">preloadCount</span>: data.preloadCount,
+      <span class="hljs-attr">progress</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">progress</span>)</span>{
         data.target.trigger(<span class="hljs-string">'onProgress'</span>, [progress, data]);
       },
-      complete: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">images</span>)</span>{
+      <span class="hljs-attr">complete</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">images</span>)</span>{
         data.images = images;
         data.loading = <span class="hljs-literal">false</span>;
         Spin.measureSource(data);
