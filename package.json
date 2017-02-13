@@ -6,22 +6,22 @@
   },
   "scripts": {},
   "devDependencies": {
-    "del": "^2.0.2",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
-    "gulp-docco": "^0.0.4",
-    "gulp-jade": "^1.1.0",
-    "gulp-jsdoc": "^0.1.5",
-    "gulp-sass": "^2.2.0",
-    "gulp-uglify": "^1.4.2",
-    "gulp-webserver": "^0.9.1",
-    "gulp-plumber": "^1.1.0",
-    "gulp-livereload": "^3.8.1",
-    "merge": "^1.2.0"
+    "@types/jasmine": "^2.5.41",
+    "@types/node": "^7.0.5",
+    "jasmine-core": "^2.5.2",
+    "jquery": "^1.11.0",
+    "karma": "^1.4.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-typescript-preprocessor": "^0.3.1",
+    "typescript": "2.1.6"
   },
   "description": "jQuery plugin for creating flipbook animations",
   "main": "release/spritespin.js",
-  "dependencies": {},
+  "peerDependencies": {
+    "jquery": "^1.11.0"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/giniedp/spritespin.git"
@@ -37,5 +37,16 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/giniedp/spritespin/issues"
+  },
+  "dependencies": {
+    "gulp-typescript": "3.1.4",
+    "karma-coverage": "^1.1.1",
+    "karma-remap-coverage": "^0.1.4",
+    "karma-remap-istanbul": "^0.6.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-sourcemap-writer": "^0.1.2",
+    "karma-typescript": "^2.1.7",
+    "karma-typescript-preprocessor2": "^1.2.1",
+    "remap-istanbul": "^0.9.1"
   }
 }

@@ -1,0 +1,24 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "no-namespace": false,
+    "no-internal-module": false,
+    "interface-name": [true, "never-prefix"],
+    "quotemark": [true, "single", "avoid-escape"],
+    "trailing-comma": [true, {
+      "multiline": "never",
+      "singleline": "never"
+    }],
+    "semicolon": [true, "never"],
+    "member-ordering": [
+      false
+    ],
+    "max-line-length": [
+      140
+    ],
+    "one-variable-per-declaration": [false],
+    "object-literal-sort-keys": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "object-literal-shorthand": false
+  }
+}
