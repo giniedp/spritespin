@@ -1187,11 +1187,13 @@
       var oHeight = data.height;
       var oSource = data.source;
       var oSize = data.sizeMode;
+      var oResponsive = data.responsive;
       var enter = function() {
         data.width = window.screen.width;
         data.height = window.screen.height;
         data.source = opts.source || oSource;
         data.sizeMode = opts.sizeMode || 'fit';
+        data.responsive = false;
         SpriteSpin.boot(data);
       }
       var exit = function() {
@@ -1199,6 +1201,7 @@
         data.height = oHeight;
         data.source = oSource;
         data.sizeMode = oSize;
+        data.responsive = oResponsive;
         SpriteSpin.boot(data);
       }
 
