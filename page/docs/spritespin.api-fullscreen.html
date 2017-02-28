@@ -199,11 +199,13 @@
       <span class="hljs-keyword">var</span> oHeight = data.height;
       <span class="hljs-keyword">var</span> oSource = data.source;
       <span class="hljs-keyword">var</span> oSize = data.sizeMode;
+      <span class="hljs-keyword">var</span> oResponsive = data.responsive;
       <span class="hljs-keyword">var</span> enter = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         data.width = <span class="hljs-built_in">window</span>.screen.width;
         data.height = <span class="hljs-built_in">window</span>.screen.height;
         data.source = opts.source || oSource;
         data.sizeMode = opts.sizeMode || <span class="hljs-string">'fit'</span>;
+        data.responsive = <span class="hljs-literal">false</span>;
         SpriteSpin.boot(data);
       }
       <span class="hljs-keyword">var</span> exit = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
@@ -211,6 +213,7 @@
         data.height = oHeight;
         data.source = oSource;
         data.sizeMode = oSize;
+        data.responsive = oResponsive;
         SpriteSpin.boot(data);
       }
 
