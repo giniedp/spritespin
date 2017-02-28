@@ -1,4 +1,4 @@
-module SpriteSpin {
+((SpriteSpin) => {
 
   const $ = SpriteSpin.$
 
@@ -140,4 +140,4 @@ module SpriteSpin {
     onDraw
   })
 
-}
+})(SpriteSpin)

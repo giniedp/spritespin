@@ -1,11 +1,11 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
   let img: HTMLImageElement
 
   /**
    * gets the original width and height of an image element
    */
-  export function naturalSize(image) {
+  export function naturalSize(image: HTMLImageElement) {
     // for browsers that support naturalWidth and naturalHeight properties
     if (image.naturalWidth != null) {
       return {

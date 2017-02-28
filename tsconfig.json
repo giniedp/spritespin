@@ -6,14 +6,13 @@
     "outFile": "dist/spritespin.js",
     "outDir": "dist",
     "sourceMap": true,
+    "declaration": true,
     "newLine": "LF",
     "rootDir": "src",
     "module": "none",
     "noEmit": false,
-    "listFiles": true,
     "alwaysStrict": false,
     "noEmitOnError": false,
-    "declaration": true,
     "removeComments": true,
     "typeRoots": [
       "node_modules/@types"

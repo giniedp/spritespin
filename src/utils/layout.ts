@@ -1,4 +1,4 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
   export interface Layout {
     width: string|number
@@ -20,7 +20,7 @@ module SpriteSpin.Utils {
   /**
    *
    */
-  export function getOuterSize(data): Size {
+  export function getOuterSize(data: SpriteSpin.Instance): Size {
     const width = Math.floor(data.width || data.frameWidth || data.target.innerWidth())
     const height = Math.floor(data.height || data.frameHeight || data.target.innerHeight())
     return {
@@ -30,7 +30,7 @@ module SpriteSpin.Utils {
     }
   }
 
-  export function getComputedSize(data): Size {
+  export function getComputedSize(data: SpriteSpin.Instance): Size {
     const size = getOuterSize(data)
     if ((typeof window.getComputedStyle === 'function')) {
       const style = window.getComputedStyle(data.target[0])
@@ -45,7 +45,7 @@ module SpriteSpin.Utils {
   /**
    *
    */
-  export function getInnerSize(data): Size {
+  export function getInnerSize(data: SpriteSpin.Instance): Size {
     const width = Math.floor(data.frameWidth || data.width || data.target.innerWidth())
     const height = Math.floor(data.frameHeight || data.height || data.target.innerHeight())
     return {
@@ -58,7 +58,7 @@ module SpriteSpin.Utils {
   /**
    *
    */
-  export function getInnerLayout(data): Layout {
+  export function getInnerLayout(data: SpriteSpin.Instance): Layout {
 
     // the size mode
     const mode = data.sizeMode

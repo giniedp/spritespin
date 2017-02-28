@@ -1,16 +1,16 @@
-module SpriteSpin {
+namespace SpriteSpin {
 
   //
-  // INSTANCE REGISTRY
+  // - INSTANCE REGISTRY
   //
 
   let instanceCounter = 0
-  export const instances = {}
+  export const instances: {[key: string]: Instance} = {}
 
   function pushInstance(data: Instance) {
     instanceCounter += 1
-    data.id = instanceCounter
-    instances[instanceCounter] = data
+    data.id = String(instanceCounter)
+    instances[data.id] = data
   }
 
   function popInstance(data: Instance) {
@@ -31,8 +31,8 @@ module SpriteSpin {
     }
 
     function onEvent(eventName, e) {
-      eachInstance((data) => {
-        for (const module of data.mods) {
+      eachInstance((data: Instance) => {
+        for (const module of data.plugins) {
           if (typeof module[eventName] === 'function') {
             module[eventName].apply(data.target, [e, data])
           }
@@ -62,7 +62,7 @@ module SpriteSpin {
   }
 
   //
-  // PLUGIN REGISTRY
+  // - PLUGIN REGISTRY
   //
 
   /**
@@ -88,7 +88,7 @@ module SpriteSpin {
   }
 
   //
-  // API REGISTRY
+  // - API REGISTRY
   //
 
   /**
@@ -121,35 +121,31 @@ module SpriteSpin {
   }
 
   //
-  // STATE REGISTRY
+  // - STATE REGISTRY
   //
 
-  function getStateObject(data: Instance) {
+  function getState(data: Instance, name: string): any {
     data.state = data.state || {}
-    return data.state
+    data.state[name] = data.state[name] || {}
+    return data.state[name]
   }
 
   export function getInputState(data: Instance): InputState {
-    const state = getStateObject(data)
-    state.input = state.input || {}
-    return state.input
+    return getState(data, 'input')
   }
 
   export function getAnimationState(data: Instance): AnimationState {
-    const state = getStateObject(data)
-    state.animation = state.animation || {}
-    return state.animation
+    return getState(data, 'animation')
   }
 
   export function getPluginState(data: Instance, name: string) {
-    const state = getStateObject(data)
-    state.plugin = state.plugin || {}
-    state.plugin[name] = state.plugin[name] || {}
-    return state.plugin[name]
+    const state = getState(data, 'plugin')
+    state[name] = state[name] || {}
+    return state[name]
   }
 
   //
-  // INPUT HANDLING
+  // - INPUT HANDLING
   //
 
   export interface InputState {
@@ -242,7 +238,7 @@ module SpriteSpin {
   }
 
   //
-  // ANIMATION HANDLING                                                         //
+  // - ANIMATION HANDLING                                                         //
   //
 
   export interface AnimationState {
@@ -255,7 +251,7 @@ module SpriteSpin {
   /**
    * Updates the frame number of the SpriteSpin data. Performs an auto increment if no frame number is given.
    */
-  export function updateFrame(data: Instance, frame= undefined, lane= undefined) {
+  export function updateFrame(data: Instance, frame?: number, lane?: number) {
     const ani = getAnimationState(data)
 
     ani.lastFrame = data.frame
@@ -310,7 +306,7 @@ module SpriteSpin {
   /**
    * Starts animation on given SpriteSpin data if animation is enabled.
    */
-  export function setAnimation(data: Instance) {
+  export function applyAnimation(data: Instance) {
     if (data.animate) {
       requestAnimation(data)
     } else {
@@ -414,10 +410,12 @@ module SpriteSpin {
 
     /**
      * The presentation module to use
+     * @deprecated
      */
     module?: string
     /**
      * The interaction module to use
+     * @deprecated
      */
     behavior?: string
 
@@ -497,15 +495,17 @@ module SpriteSpin {
   }
 
   export interface Instance extends Options {
-    id: number
+    id: string
     source: string[]
-    stage: any
+    images: HTMLImageElement[]
+
     state: any
+    loading: boolean
+
+    stage: any
     canvas: any
     context: CanvasRenderingContext2D
     canvasRatio: number
-    loading: boolean
-    images: HTMLImageElement[]
   }
 
   export const $ = (window['jQuery'] || window['Zepto'] || window['$']) // tslint:disable-line
@@ -692,7 +692,7 @@ module SpriteSpin {
 
     // bind auto start function to load event.
     Utils.bind(target, 'onLoad', (e, d) => {
-      setAnimation(d)
+      applyAnimation(d)
     })
 
     // bind all user events that have been passed on initialization
@@ -702,15 +702,15 @@ module SpriteSpin {
   }
 
   /**
-   * Runs the boot process. (re)creates modules, (re)sets the layout, (re)binds all events and loads source images.
+   * Runs the boot process. (re)initializes plugins, (re)initializes the layout, (re)binds events and loads source images.
    */
   export function boot(data: Instance) {
     applyPlugins(data)
     applyLayout(data)
     applyEvents(data)
 
-    data.target.addClass('loading').trigger('onInit', data)
     data.loading = true
+    data.target.addClass('loading').trigger('onInit', data)
     Utils.preload({
       source: data.source,
       preloadCount: data.preloadCount,
@@ -721,7 +721,7 @@ module SpriteSpin {
         data.images = images
         data.loading = false
 
-        Utils.measureSource(data)
+        Utils.measure(data.images, data, data.detectSubsampling)
 
         applyLayout(data)
         data.stage.show()

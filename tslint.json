@@ -19,6 +19,7 @@
     "one-variable-per-declaration": [false],
     "object-literal-sort-keys": false,
     "object-literal-key-quotes": [true, "as-needed"],
-    "object-literal-shorthand": false
+    "object-literal-shorthand": false,
+    "no-reference": false
   }
 }

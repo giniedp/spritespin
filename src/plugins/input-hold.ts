@@ -13,7 +13,7 @@
     SpriteSpin.updateInput(e, data)
     data.dragging = true
     data.animate = true
-    SpriteSpin.setAnimation(data)
+    SpriteSpin.applyAnimation(data)
   }
 
   function stop(e, data) {

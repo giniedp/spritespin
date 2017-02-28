@@ -1,4 +1,4 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
   let canvas
   let context

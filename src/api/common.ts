@@ -1,7 +1,7 @@
 // tslint:disable:object-literal-shorthand
 // tslint:disable:only-arrow-functions
 
-module SpriteSpin {
+namespace SpriteSpin {
 
   SpriteSpin.registerApi({
     // Gets a value indicating whether the animation is currently running.
@@ -17,26 +17,26 @@ module SpriteSpin {
     // Starts/Stops the animation playback
     toggleAnimation: function() {
       this.data.animate = !this.data.animate
-      SpriteSpin.setAnimation(this.data)
+      SpriteSpin.applyAnimation(this.data)
     },
 
     // Stops animation playback
     stopAnimation: function() {
       this.data.animate = false
-      SpriteSpin.setAnimation(this.data)
+      SpriteSpin.applyAnimation(this.data)
     },
 
     // Starts animation playback
     startAnimation: function() {
       this.data.animate = true
-      SpriteSpin.setAnimation(this.data)
+      SpriteSpin.applyAnimation(this.data)
     },
 
     // Sets a value indicating whether the animation should be looped or not.
     // This might start the animation (if the 'animate' data attribute is set to true)
     loop: function(value) {
       this.data.loop = value
-      SpriteSpin.setAnimation(this.data)
+      SpriteSpin.applyAnimation(this.data)
       return this
     },
 
@@ -90,7 +90,7 @@ module SpriteSpin {
       data.animate = true
       data.loop = false
       data.stopFrame = frame
-      SpriteSpin.setAnimation(data)
+      SpriteSpin.applyAnimation(data)
       return this
     }
   })

@@ -1,4 +1,4 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
   export function toArray(value: string|string[]) {
     return typeof value === 'string' ? [value] : value

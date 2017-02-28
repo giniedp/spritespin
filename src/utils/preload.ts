@@ -1,4 +1,4 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
   function indexOf(element: any, arr: any[]) {
     for (let i = 0; i < arr.length; i++) {

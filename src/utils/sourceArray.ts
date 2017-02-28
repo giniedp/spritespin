@@ -1,9 +1,5 @@
-module SpriteSpin.Utils {
+namespace SpriteSpin.Utils {
 
-  /**
-   * converts the given number to string and pads it to match at least the given length.
-   * The pad value is added in front of the string. This padNumber(4, 5, 0) would convert 4 to '00004'
-   */
   function padNumber(num, length, pad) {
     num = String(num)
     while (num.length < length) {
@@ -46,6 +42,6 @@ module SpriteSpin.Utils {
     return result
   }
 }
-module SpriteSpin {
+namespace SpriteSpin {
   export const sourceArray = Utils.sourceArray
 }
