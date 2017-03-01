@@ -140,9 +140,16 @@
   }
 
   var resizeTimeout = null;
+  var cachedWidth = $(window).width();
   $(window).on('resize', function() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(handleResizeEvent, 100);
+    var newWidth = $(this).width();
+    // only triggers a resize when the width has changed
+	// this will prevent unwanted calls when the android|ios url address bar fades away
+    if (newWidth != cachedWidth) {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(handleResizeEvent, 100);
+      cachedWidth = newWidth;
+    }
   });
 
   for (var i = 0; i < Spin.eventNames.length; i += 1) {
