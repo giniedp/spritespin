@@ -2,11 +2,7 @@
 
   const NAME = 'click'
 
-  function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
-  }
-
-  function click(e, data) {
+  function click(e, data: SpriteSpin.Instance) {
     if (data.loading || !data.stage.is(':visible')) {
       return
     }

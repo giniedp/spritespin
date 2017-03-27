@@ -2,58 +2,79 @@
 
   const NAME = 'blur'
 
+  interface BlurStep {
+    frame: number
+    lane: number
+    live: number
+    step: number
+    d: number
+    alpha: number
+  }
+  interface BlurState {
+    canvas: any
+    context: CanvasRenderingContext2D
+    steps: BlurStep[]
+    fadeTime: number
+    frameTime: number
+    trackTime: number
+    cssBlur: boolean
+
+    timeout: number
+  }
+
   function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
+    return SpriteSpin.getPluginState(data, NAME) as BlurState
+  }
+  function getOption(data, name, fallback) {
+    return data[name] || fallback
   }
 
-  function init(e, data) {
-    const scope = scopeFrom(data)
-    const css = SpriteSpin.Utils.getInnerLayout(data)
-    scope.canvas[0].width = data.width * data.canvasRatio
-    scope.canvas[0].height = data.height * data.canvasRatio
-    scope.canvas.css(css).show()
-    scope.context.scale(data.canvasRatio, data.canvasRatio)
-    data.target.append(scope.canvas)
-  }
+  function init(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
 
-  function destroy(e, data) {
-    const scope = scopeFrom(data)
-    data.target.remove(data)
-    delete data.blurScope
+    state.canvas = state.canvas || SpriteSpin.$("<canvas class='blur-layer'></canvas>")
+    state.context = state.context || state.canvas[0].getContext('2d')
+    state.steps = state.steps || []
+    state.fadeTime = Math.max(getOption(data, 'blurFadeTime', 200), 1)
+    state.frameTime = Math.max(getOption(data, 'blurFrameTime', data.frameTime), 16)
+    state.trackTime = null
+    state.cssBlur = !!getOption(data, 'blurCss', data.frameTime)
+
+    const inner = SpriteSpin.Utils.getInnerSize(data)
+    const outer = data.responsive ? SpriteSpin.Utils.getComputedSize(data) : SpriteSpin.Utils.getOuterSize(data)
+    const css = SpriteSpin.Utils.getInnerLayout(data.sizeMode, inner, outer)
+
+    state.canvas[0].width = data.width * data.canvasRatio
+    state.canvas[0].height = data.height * data.canvasRatio
+    state.canvas.css(css).show()
+    state.context.scale(data.canvasRatio, data.canvasRatio)
+    data.target.append(state.canvas)
   }
 
   function onFrame(e, data) {
-    const scope = scopeFrom(data)
-    trackFrame(data, scope)
-    if (scope.timeout == null) {
-      loop(data, scope)
+    const state = getState(data)
+    trackFrame(data)
+    if (state.timeout == null) {
+      loop(data)
     }
   }
 
-  function scopeFrom(data) {
-    data.blurScope = data.blurScope || {}
-    const scope = data.blurScope
-    scope.canvas = scope.canvas || SpriteSpin.$("<canvas class='blur-layer'></canvas>")
-    scope.context = scope.context || scope.canvas[0].getContext('2d')
-    scope.steps = scope.steps || []
-    scope.fadeTime = Math.max(data.blurFadeTime || 200, 1)
-    scope.frameTime = Math.max(data.blurFrameTime || data.frameTime, 16)
-    scope.trackTime = null
-    scope.cssBlur = !!data.blurCss
-    return scope
-  }
+  function trackFrame(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    const ani = SpriteSpin.getAnimationState(data)
 
-  function trackFrame(data, scope) {
-    let d = Math.abs(data.frame - data.lastFrame) // distance between frames
-    if (d >= data.frames / 2) {
-      // get shortest distance
-      d = data.frames - d
-    }
-    scope.steps.unshift({
-      index: data.lane * data.frames + data.frame,
+    // distance between frames
+    let d = Math.abs(data.frame - ani.lastFrame)
+    // shortest distance
+    d = d >= data.frames / 2 ? data.frames - d : d
+
+    state.steps.unshift({
+      frame: data.frame,
+      lane: data.lane,
       live: 1,
-      step: scope.frameTime / scope.fadeTime,
-      d: d
+      step: state.frameTime / state.fadeTime,
+      d: d,
+      alpha: 0
     })
   }
 
@@ -70,15 +91,15 @@
     }
   }
 
-  function loop(data, scope) {
-    scope.timeout = window.setTimeout(() => {
-      tick(data, scope)
-    }, scope.frameTime)
+  function loop(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    state.timeout = window.setTimeout(() => { tick(data) }, state.frameTime)
   }
 
-  function killLoop(data, scope) {
-    window.clearTimeout(scope.timeout)
-    scope.timeout = null
+  function killLoop(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    window.clearTimeout(state.timeout)
+    state.timeout = null
   }
 
   function applyCssBlur(canvas, d) {
@@ -90,48 +111,46 @@
     })
   }
 
-  function drawFrame(data, scope, step) {
-    const context = scope.context
-    const index = step.index
-    const img = (data.sourceIsSprite ? data.images[0] : data.images[index])
+  function drawFrame(data: SpriteSpin.Instance, state: BlurState, step: BlurStep) {
+    if (step.alpha <= 0) { return }
 
-    if (step.alpha <= 0) {
-      return
-    }
-    if (!img || img.complete === false) {
-      return
-    }
+    const specs = SpriteSpin.Utils.findSpecs(data.metrics, data.frames, data.frame, data.lane)
+    const sheet = specs.sheet
+    const sprite = specs.sprite
+    if (!sheet || !sprite) { return }
 
-    context.globalAlpha = step.alpha
-    if (data.sourceIsSprite) {
-      const x = data.frameWidth * (index % data.framesX)
-      const y = data.frameHeight * Math.floor(index / data.framesX)
-      context.drawImage(img, x, y, data.frameWidth, data.frameHeight, 0, 0, data.width, data.height)
-    } else {
-      context.drawImage(img, 0, 0, data.width, data.height)
-    }
+    const src = data.source[sheet.id]
+    const image = data.images[sheet.id]
+    if (image.complete === false) { return }
+
+    state.canvas.show()
+    const w = state.canvas[0].width / data.canvasRatio
+    const h = state.canvas[0].height / data.canvasRatio
+    state.context.clearRect(0, 0, w, h)
+    state.context.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
   }
 
-  function tick(data, scope) {
-    killLoop(data, scope)
-    if (!scope.context) {
+  function tick(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    killLoop(data)
+    if (!state.context) {
       return
     }
 
     let d = 0
-    scope.context.clearRect(0, 0, data.width, data.height)
-    for (const step of scope.steps) {
+    state.context.clearRect(0, 0, data.width, data.height)
+    for (const step of state.steps) {
       step.live = Math.max(step.live - step.step, 0)
       step.alpha = Math.max(step.live - 0.25, 0)
-      drawFrame(data, scope, step)
+      drawFrame(data, state, step)
       d += step.alpha + step.d
     }
-    if (scope.cssBlur) {
-      applyCssBlur(scope.canvas, d)
+    if (state.cssBlur) {
+      applyCssBlur(state.canvas, d)
     }
-    removeOldFrames(scope.steps)
-    if (scope.steps.length) {
-      loop(data, scope)
+    removeOldFrames(state.steps)
+    if (state.steps.length) {
+      loop(data)
     }
   }
 

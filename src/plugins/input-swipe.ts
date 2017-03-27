@@ -2,24 +2,33 @@
 
   const NAME = 'swipe'
 
+  interface SwipeState {
+    fling: number
+    snap: number
+  }
+
   function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
+    return SpriteSpin.getPluginState(data, NAME) as SwipeState
+  }
+  function getOption(data, name, fallback) {
+    return data[name] || fallback
   }
 
   function init(e, data) {
-    data.swipeFling = data.swipeFling || 10
-    data.swipeSnap = data.swipeSnap || 0.50
+    const state = getState(data)
+    state.fling = getOption(data, 'swipeFling', 10)
+    state.snap = getOption(data, 'swipeSnap', 0.50)
   }
 
-  function start(e, data) {
-    if (!data.loading && !data.dragging) {
+  function start(e, data: SpriteSpin.Instance) {
+    if (!data.loading && !SpriteSpin.is(data, 'dragging')) {
       SpriteSpin.updateInput(e, data)
-      data.dragging = true
+      SpriteSpin.flag(data, 'dragging', true)
     }
   }
 
-  function update(e, data) {
-    if (!data.dragging) {
+  function update(e, data: SpriteSpin.Instance) {
+    if (!SpriteSpin.is(data, 'dragging')) {
       return
     }
     SpriteSpin.updateInput(e, data)
@@ -28,23 +37,26 @@
     SpriteSpin.updateFrame(data, frame, lane)
   }
 
-  function end(e, data) {
-    if (!data.dragging) {
+  function end(e, data: SpriteSpin.Instance) {
+    if (!SpriteSpin.is(data, 'dragging')) {
       return
     }
-    data.dragging = false
+    SpriteSpin.flag(data, 'dragging', false)
+
+    const state = getState(data)
+    const input = SpriteSpin.getInputState(data)
 
     let frame = data.frame
     const lane = data.lane
-    const snap = data.swipeSnap
-    const fling = data.swipeFling
+    const snap = state.snap
+    const fling = state.fling
     let dS, dF
     if (data.orientation === 'horizontal') {
-      dS = data.ndX
-      dF = data.ddX
+      dS = input.ndX
+      dF = input.ddX
     } else {
-      dS = data.ndY
-      dF = data.ddY
+      dS = input.ndY
+      dF = input.ddY
     }
 
     if (dS > snap || dF > fling) {

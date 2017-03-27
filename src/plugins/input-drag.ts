@@ -2,26 +2,30 @@
 
   const NAME = 'drag'
 
-  function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
+  interface DragState {
+    frame: number
+    lane: number
   }
 
-  function dragStart(e, data) {
-    const drag = getState(data)
-    if (drag.active || data.loading || !data.stage.is(':visible')) {
+  function getState(data: SpriteSpin.Instance) {
+    return SpriteSpin.getPluginState(data, NAME) as DragState
+  }
+
+  function dragStart(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+    if (data.loading || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
       return
     }
 
-    drag.frame = data.frame || 0
-    drag.lane = data.lane || 0
-    drag.active = true
+    state.frame = data.frame || 0
+    state.lane = data.lane || 0
+    SpriteSpin.flag(data, 'dragging', true)
     SpriteSpin.updateInput(e, data)
   }
 
   function dragEnd(e, data: SpriteSpin.Instance) {
-    const drag = getState(data)
-    if (drag.active) {
-      drag.active = false
+    if (SpriteSpin.is(data, 'dragging')) {
+      SpriteSpin.flag(data, 'dragging', false)
       SpriteSpin.resetInput(data)
     }
   }
@@ -29,15 +33,13 @@
   function drag(e, data: SpriteSpin.Instance) {
     const drag = getState(data)
     const input = SpriteSpin.getInputState(data)
-    if (!drag.active) {
-      return
-    }
+    if (!SpriteSpin.is(data, 'dragging')) { return }
     SpriteSpin.updateInput(e, data)
 
     // dont do anything if the drag distance exceeds the scroll threshold.
     // this allows to use touch scroll on mobile devices.
     if ((Math.abs(input.ddX) + Math.abs(input.ddY)) > data.scrollThreshold) {
-      drag.active = false
+      SpriteSpin.flag(data, 'dragging', false)
       SpriteSpin.resetInput(data)
       return
     }

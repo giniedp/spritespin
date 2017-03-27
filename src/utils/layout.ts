@@ -1,5 +1,14 @@
 namespace SpriteSpin.Utils {
 
+  export interface Layoutable {
+    width?: number
+    height?: number
+    frameWidth?: number
+    frameHeight?: number
+    target: any
+    sizeMode?: SizeMode
+  }
+
   export interface Layout {
     width: string|number
     height: string|number
@@ -11,16 +20,16 @@ namespace SpriteSpin.Utils {
     overflow: 'hidden'
   }
 
-  export interface Size {
+  export interface SizeWithAspect {
     width: number
     height: number
-    aspect?: number
+    aspect: number
   }
 
   /**
    *
    */
-  export function getOuterSize(data: SpriteSpin.Instance): Size {
+  export function getOuterSize(data: Layoutable): SizeWithAspect {
     const width = Math.floor(data.width || data.frameWidth || data.target.innerWidth())
     const height = Math.floor(data.height || data.frameHeight || data.target.innerHeight())
     return {
@@ -30,22 +39,22 @@ namespace SpriteSpin.Utils {
     }
   }
 
-  export function getComputedSize(data: SpriteSpin.Instance): Size {
+  export function getComputedSize(data: Layoutable): SizeWithAspect {
     const size = getOuterSize(data)
-    if ((typeof window.getComputedStyle === 'function')) {
-      const style = window.getComputedStyle(data.target[0])
-      if (style.width) {
-        size.width = Math.floor(Number(style.width.replace('px', '')))
-        size.height = Math.floor(size.width / size.aspect)
-      }
-    }
+    if (typeof window.getComputedStyle !== 'function') { return size }
+
+    const style = window.getComputedStyle(data.target[0])
+    if (!style.width) { return size }
+
+    size.width = Math.floor(Number(style.width.replace('px', '')))
+    size.height = Math.floor(size.width / size.aspect)
     return size
   }
 
   /**
    *
    */
-  export function getInnerSize(data: SpriteSpin.Instance): Size {
+  export function getInnerSize(data: Layoutable): SizeWithAspect {
     const width = Math.floor(data.frameWidth || data.width || data.target.innerWidth())
     const height = Math.floor(data.frameHeight || data.height || data.target.innerHeight())
     return {
@@ -58,10 +67,12 @@ namespace SpriteSpin.Utils {
   /**
    *
    */
-  export function getInnerLayout(data: SpriteSpin.Instance): Layout {
+  export function getInnerLayout(mode: SizeMode, inner: SizeWithAspect, outer: SizeWithAspect): Layout {
 
-    // the size mode
-    const mode = data.sizeMode
+    // get mode
+    const isFit = mode === 'fit'
+    const isFill = mode === 'fill'
+    const isMatch = mode === 'stretch'
 
     // resulting layout
     const layout: Layout = {
@@ -76,46 +87,36 @@ namespace SpriteSpin.Utils {
     }
 
     // no calculation here
-    if (!mode || mode === 'scale') {
+    if (!mode || isMatch) {
       return layout
     }
 
-    const outer = getOuterSize(data)
-    const inner = getInnerSize(data)
+    // get size and aspect
+    const aspectIsGreater = inner.aspect >= outer.aspect
 
     // mode == original
-    layout.width = outer.width
-    layout.height = outer.height
+    let width = inner.width
+    let height = inner.height
 
-    // keep aspect ratio but fit into container
-    if (mode === 'fit') {
-      if (inner.aspect >= outer.aspect) {
-        layout.width = outer.width
-        layout.height = outer.width / inner.aspect
-      } else {
-        layout.height = outer.height
-        layout.width = outer.height * inner.aspect
-      }
+    // keep aspect ratio but fit/fill into container
+    if (isFit && aspectIsGreater || isFill && !aspectIsGreater) {
+      width = outer.width
+      height = outer.width / inner.aspect
     }
-
-    // keep aspect ratio but fill the container
-    if (mode === 'fill') {
-      if (inner.aspect >= outer.aspect) {
-        layout.height = outer.height
-        layout.width = outer.height * inner.aspect
-      } else {
-        layout.width = outer.width
-        layout.height = outer.width / inner.aspect
-      }
+    if (isFill && aspectIsGreater || isFit && !aspectIsGreater) {
+      height = outer.height
+      width = outer.height * inner.aspect
     }
 
     // floor the numbers
-    layout.width = Math.floor(layout.width as number)
-    layout.height = Math.floor(layout.height as number)
+    width = Math.floor(width)
+    height = Math.floor(height)
 
     // position in center
-    layout.top = Math.floor((outer.width - (layout.height as number)) / 2)
-    layout.left = Math.floor((outer.height - (layout.width as number)) / 2)
+    layout.width = width
+    layout.height = height
+    layout.top = Math.floor((outer.height - height) / 2)
+    layout.left = Math.floor((outer.width - width) / 2)
     layout.right = layout.left
     layout.bottom = layout.top
 

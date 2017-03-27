@@ -1,3 +1,4 @@
+
 namespace SpriteSpin {
 
   //
@@ -144,6 +145,14 @@ namespace SpriteSpin {
     return state[name]
   }
 
+  export function is(data: Instance, flag: string): boolean {
+    return !!getState(data, 'flags')[flag]
+  }
+
+  export function flag(data: Instance, flag: string, value: boolean) {
+    getState(data, 'flags')[flag] = !!value
+  }
+
   //
   // - INPUT HANDLING
   //
@@ -167,60 +176,68 @@ namespace SpriteSpin {
     nddY: number
   }
 
-  /**
-   * Updates the input state of the SpriteSpin data using the given mouse or touch event.
-   */
-  export function updateInput(e, data: Instance) {
+  function inputFromEvent(e) {
+    let touches = e.touches
+    let source = e
 
     // jQuery Event normalization does not preserve the 'event.touches'
     // try to grab touches from the original event
     if (e.touches === undefined && e.originalEvent !== undefined) {
-      e.touches = e.originalEvent.touches
+      touches = e.originalEvent.touches
     }
+    // get current touch or mouse position
+    if (touches !== undefined && touches.length > 0) {
+      source = e.touches[0]
+    }
+    return {
+      clientX: source.clientX || 0,
+      clientY: source.clientY || 0
+    }
+  }
 
-    const input = getInputState(data)
+  /**
+   * Updates the input state of the SpriteSpin data using the given mouse or touch event.
+   */
+  export function updateInput(e, data: Instance) {
+    const input = inputFromEvent(e)
+    const state = getInputState(data)
 
     // cache positions from previous frame
-    input.oldX = input.currentX
-    input.oldY = input.currentY
+    state.oldX = state.currentX
+    state.oldY = state.currentY
 
-    // get current touch or mouse position
-    if (e.touches !== undefined && e.touches.length > 0) {
-      input.currentX = e.touches[0].clientX || 0
-      input.currentY = e.touches[0].clientY || 0
-    } else {
-      input.currentX = e.clientX || 0
-      input.currentY = e.clientY || 0
-    }
+    state.currentX = input.clientX
+    state.currentY = input.clientY
+
     // Fix old position.
-    if (input.oldX === undefined || input.oldY === undefined) {
-      input.oldX = input.currentX
-      input.oldY = input.currentY
+    if (state.oldX === undefined || state.oldY === undefined) {
+      state.oldX = state.currentX
+      state.oldY = state.currentY
     }
 
     // Cache the initial click/touch position and store the frame number at which the click happened.
     // Useful for different behavior implementations. This must be restored when the click/touch is released.
-    if (input.startX === undefined || input.startY === undefined) {
-      input.startX = input.currentX
-      input.startY = input.currentY
-      input.clickframe = data.frame
-      input.clicklane = data.lane
+    if (state.startX === undefined || state.startY === undefined) {
+      state.startX = state.currentX
+      state.startY = state.currentY
+      state.clickframe = data.frame
+      state.clicklane = data.lane
     }
 
     // Calculate the vector from start position to current pointer position.
-    input.dX = input.currentX - input.startX
-    input.dY = input.currentY - input.startY
+    state.dX = state.currentX - state.startX
+    state.dY = state.currentY - state.startY
 
     // Calculate the vector from last frame position to current pointer position.
-    input.ddX = input.currentX - input.oldX
-    input.ddY = input.currentY - input.oldY
+    state.ddX = state.currentX - state.oldX
+    state.ddY = state.currentY - state.oldY
 
     // Normalize vectors to range [-1:+1]
-    input.ndX = input.dX / data.width
-    input.ndY = input.dY / data.height
+    state.ndX = state.dX / data.width
+    state.ndY = state.dY / data.height
 
-    input.nddX = input.ddX / data.width
-    input.nddY = input.ddY / data.height
+    state.nddX = state.ddX / data.width
+    state.nddY = state.ddY / data.height
   }
 
   /**
@@ -238,57 +255,80 @@ namespace SpriteSpin {
   }
 
   //
-  // - ANIMATION HANDLING                                                         //
+  // - ANIMATION HANDLING
   //
 
   export interface AnimationState {
     lastFrame: number
     lastLane: number
-    handler: any
-    tick: () => void
+    handler: number
+  }
+
+  function updateLane(data: Instance, lane: number) {
+    data.lane = lane
+    if (data.wrapLane) {
+      data.lane = Utils.wrap(data.lane, 0, data.lanes - 1, data.lanes)
+    } else {
+      data.lane = Utils.clamp(data.lane, 0, data.lanes - 1)
+    }
+  }
+
+  function updateAnimationFrame(data: Instance) {
+    data.frame += (data.reverse ? -1 : 1)
+    // wrap the frame value to fit in range [0, data.frames)
+    data.frame = Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
+    // stop animation if loop is disabled and the stopFrame is reached
+    if (!data.loop && (data.frame === data.stopFrame)) {
+      stopAnimation(data)
+    }
+  }
+
+  function updateInputFrame(data: Instance, frame: number) {
+    data.frame = Number(frame)
+    if (data.wrap) {
+      // wrap/clamp the frame value to fit in range [0, data.frames)
+      data.frame = Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
+    } else {
+      data.frame = Utils.clamp(data.frame, 0, data.frames - 1)
+    }
+  }
+
+  function updateAnimation(data: Instance) {
+    const state = getAnimationState(data)
+    if (state.handler) {
+      updateBefore(data)
+      updateAnimationFrame(data)
+      updateAfter(data)
+    }
+  }
+
+  function updateBefore(data: Instance) {
+    const state = getAnimationState(data)
+    state.lastFrame = data.frame
+    state.lastLane = data.lane
+  }
+
+  function updateAfter(data: Instance) {
+    const state = getAnimationState(data)
+    if (state.lastFrame !== data.frame || state.lastLane !== data.lane) {
+      data.target.trigger('onFrameChanged', data)
+    }
+    data.target.trigger('onFrame', data)
+    data.target.trigger('onDraw', data)
   }
 
   /**
    * Updates the frame number of the SpriteSpin data. Performs an auto increment if no frame number is given.
    */
-  export function updateFrame(data: Instance, frame?: number, lane?: number) {
-    const ani = getAnimationState(data)
-
-    ani.lastFrame = data.frame
-    ani.lastLane = data.lane
-
+  export function updateFrame(data: Instance, frame: number, lane?: number) {
+    updateBefore(data)
     if (frame !== undefined) {
-      data.frame = Number(frame)
-    } else if (ani.handler) {
-      data.frame += (data.reverse ? -1 : 1)
-    }
-
-    if (ani.handler) {
-      // wrap the frame value to fit in range [0, data.frames]
-      data.frame = Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
-      // stop animation if loop is disabled and the stopFrame is reached
-      if (!data.loop && (data.frame === data.stopFrame)) {
-        stopAnimation(data)
-      }
-    } else if (data.wrap) {
-      // wrap/clamp the frame value to fit in range [0, data.frames]
-      data.frame = Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
-    } else {
-      data.frame = Utils.clamp(data.frame, 0, data.frames - 1)
+      updateInputFrame(data, frame)
     }
     if (lane !== undefined) {
-      data.lane = lane
-      if (data.wrapLane) {
-        data.lane = Utils.wrap(data.lane, 0, data.lanes - 1, data.lanes)
-      } else {
-        data.lane = Utils.clamp(data.lane, 0, data.lanes - 1)
-      }
+      updateLane(data, lane)
     }
-    if (ani.lastFrame !== data.frame || ani.lastLane !== data.lane) {
-      data.target.trigger('onFrameChanged', data)
-    }
-    data.target.trigger('onFrame', data)
-    data.target.trigger('onDraw', data)
+    updateAfter(data)
   }
 
   /**
@@ -315,23 +355,10 @@ namespace SpriteSpin {
   }
 
   function requestAnimation(data: Instance) {
-    const ani = getAnimationState(data)
-    if (ani.handler) {
-      // another frame has been already requested
-      return
-    }
-    // cache the tick function
-    ani.tick = ani.tick || (() => {
-      try {
-        updateFrame(data)
-      } catch (ignore) {
-        // The try catch block is a hack for Opera Browser
-        // Opera sometimes rises an exception here and
-        // stops performing the script
-      }
-    })
-    //
-    ani.handler = window.setInterval(ani.tick, data.frameTime)
+    const state = getAnimationState(data)
+    state.handler = (state.handler || window.setInterval((() => {
+      updateAnimation(data)
+    }), data.frameTime))
   }
 
   //
@@ -361,9 +388,11 @@ namespace SpriteSpin {
      * Occurs when all update is complete and frame can be drawn
      */
     onDraw?: Callback
+
+    onComplete?: Callback
   }
 
-  export type SizeMode = 'original' | 'fit' | 'fill' | 'scale'
+  export type SizeMode = 'original' | 'fit' | 'fill' | 'stretch'
   export type RenderMode = 'canvas' | 'image' | 'background'
   export type Orientation = 'horizontal' | 'vertical'
 
@@ -404,7 +433,8 @@ namespace SpriteSpin {
     lanes?: number
 
     /**
-     *
+     * Determines how the inner container is sized and scaled if it does not match the given
+     * width and height dimensions.
      */
     sizeMode?: SizeMode
 
@@ -425,15 +455,15 @@ namespace SpriteSpin {
     renderer?: RenderMode
 
     /**
-     * The initial sequence number to play
+     * The initial sequence number to play. This value is updated each frame and also represends the current lane number.
      */
     lane?: number
     /**
-     * Initial (and current) frame number
+     * Initial frame number. This value is updated each frame and also represends the current frame number.
      */
     frame?: number
     /**
-     * Time in ms between updates. 40 is exactly 25 FPS
+     * Time in ms between updates. e.g. 40 is exactly 25 FPS
      */
     frameTime?: number
     /**
@@ -445,7 +475,7 @@ namespace SpriteSpin {
      */
     reverse?: boolean
     /**
-     * If true loops the animation
+     * If true animation is loopt infinitely
      */
     loop?: boolean
     /**
@@ -454,7 +484,7 @@ namespace SpriteSpin {
     stopFrame?: number
 
     /**
-     * If true wraps around the frame index on user interaction
+     * If true wraps around the frame index on user interaction.
      */
     wrap?: boolean
     /**
@@ -498,6 +528,10 @@ namespace SpriteSpin {
     id: string
     source: string[]
     images: HTMLImageElement[]
+    target: any
+    metrics: Utils.SheetSpec[]
+    frameWidth: number
+    frameHeight: number
 
     state: any
     loading: boolean
@@ -508,7 +542,7 @@ namespace SpriteSpin {
     canvasRatio: number
   }
 
-  export const $ = (window['jQuery'] || window['Zepto'] || window['$']) // tslint:disable-line
+  export const $: any = (window['jQuery'] || window['Zepto'] || window['$']) // tslint:disable-line
 
   /**
    * The namespace that is used to bind functions to DOM events and store the data object
@@ -547,7 +581,8 @@ namespace SpriteSpin {
     'onLoad',
     'onFrameChanged',
     'onFrame',
-    'onDraw'
+    'onDraw',
+    'onComplete'
   ]
 
   /**
@@ -557,13 +592,11 @@ namespace SpriteSpin {
     'dragstart'
   ]
 
-  const freeze = Object.freeze || ((v) => v)
-
   /**
    * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
    * lifetime of a SpriteSpin instance. The data is stored inside the target DOM element on which the plugin is called.
    */
-  export const defaults: Options = freeze({
+  export const defaults: Options = {
     source            : undefined,    // Stitched source image or array of files
     width             : undefined,    // actual display width
     height            : undefined,    // actual display height
@@ -572,8 +605,6 @@ namespace SpriteSpin {
     lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
     sizeMode          : undefined,    //
 
-    module            : '360',        // The presentation module to use
-    behavior          : 'drag',       // The interaction module to use
     renderer          : 'canvas',     // The rendering mode to use
 
     lane              : 0,            // The initial sequence number to play
@@ -597,8 +628,14 @@ namespace SpriteSpin {
     onProgress        : undefined,    // Occurs when any source file has been loaded
     onLoad            : undefined,    // Occurs when all source files have been loaded
     onFrame           : undefined,    // Occurs when the frame number has been updated (e.g. during animation)
-    onDraw            : undefined     // Occurs when all update is complete and frame can be drawn
-  }) as any
+    onDraw            : undefined,     // Occurs when all update is complete and frame can be drawn
+
+    responsive        : undefined,
+    plugins           : [
+      '360',
+      'drag'
+    ]
+  }
 
   /**
    * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
@@ -611,7 +648,7 @@ namespace SpriteSpin {
       }
       const plugin = plugins[name]
       if (!plugin) {
-        $.error('No plugin found with name ' + name)
+        Utils.error('No plugin found with name ' + name)
         continue
       }
       data.plugins[i] = plugin
@@ -636,7 +673,7 @@ namespace SpriteSpin {
       })
 
     const size = data.responsive ? Utils.getComputedSize(data) : Utils.getOuterSize(data)
-    const layout = Utils.getInnerLayout(data)
+    const layout = Utils.getInnerLayout(data.sizeMode, Utils.getInnerSize(data), size)
 
     // apply layout on target
     data.target.css({
@@ -701,6 +738,19 @@ namespace SpriteSpin {
     }
   }
 
+  function applyMetrics(data: Instance) {
+    if (!data.images) {
+      data.metrics = []
+    }
+    data.metrics = Utils.measure(data.images, data)
+    const spec = Utils.findSpecs(data.metrics, data.frames, 0, 0)
+    if (spec.sprite) {
+      // TODO: try to remove frameWidth/frameHeight
+      data.frameWidth = spec.sprite.width
+      data.frameHeight = spec.sprite.height
+    }
+  }
+
   /**
    * Runs the boot process. (re)initializes plugins, (re)initializes the layout, (re)binds events and loads source images.
    */
@@ -720,9 +770,9 @@ namespace SpriteSpin {
       complete: (images) => {
         data.images = images
         data.loading = false
+        data.frames = data.frames || images.length
 
-        Utils.measure(data.images, data, data.detectSubsampling)
-
+        applyMetrics(data)
         applyLayout(data)
         data.stage.show()
         data.target
@@ -730,6 +780,7 @@ namespace SpriteSpin {
           .trigger('onLoad', data)
           .trigger('onFrame', data)
           .trigger('onDraw', data)
+          .trigger('onComplete', data)
       }
     })
   }

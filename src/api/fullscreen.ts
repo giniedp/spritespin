@@ -8,7 +8,7 @@ namespace SpriteSpin.Fullscreen {
 
   function pick(target, names: string[]): string {
     for (const name of names) {
-      if (target[name]) {
+      if (target[name] || name in target) {
         return name
       }
     }
@@ -39,15 +39,15 @@ namespace SpriteSpin.Fullscreen {
          'mozFullScreenEnabled',
           'msFullscreenEnabled']),
     fullscreenchange: pick(document, [
-      'fullscreenchange',
-      'webkitfullscreenchange',
-         'mozfullscreenchange',
-          'MSFullscreenChange']),
+      'onfullscreenchange',
+      'onwebkitfullscreenchange',
+         'onmozfullscreenchange',
+          'onMSFullscreenChange']).replace(/^on/, ''),
     fullscreenerror: pick(document, [
-      'fullscreenerror',
-      'webkitfullscreenerror',
-         'mozfullscreenerror',
-          'MSFullscreenError'])
+      'onfullscreenerror',
+      'onwebkitfullscreenerror',
+         'onmozfullscreenerror',
+          'onMSFullscreenError']).replace(/^on/, '')
   }
 
   const changeEvent = browser.fullscreenchange + '.' + SpriteSpin.namespace + '-fullscreen'

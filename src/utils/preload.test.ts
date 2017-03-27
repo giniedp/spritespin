@@ -7,7 +7,7 @@ describe('SpriteSpin.Utils', () => {
   const PNG_BLACK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
   const Utils = SpriteSpin.Utils
 
-  describe('preload', () => {
+  describe('#preload', () => {
 
     const source = [PNG_TRANSPARENT, PNG_WHITE, PNG_BLACK]
 
@@ -16,6 +16,16 @@ describe('SpriteSpin.Utils', () => {
       expect(output.length).toBe(input.length)
       expect(output.every((it) => it instanceof Image)).toBe(true)
     }
+
+    it ('accepts string input', (done) => {
+      Utils.preload({
+        source: PNG_TRANSPARENT,
+        initiated: (result) => {
+          expectArrayOfImages([PNG_TRANSPARENT], result)
+          done()
+        }
+      })
+    })
 
     it ('reports array of Image elements when initiated', (done) => {
       Utils.preload({

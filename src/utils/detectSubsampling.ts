@@ -3,7 +3,7 @@ namespace SpriteSpin.Utils {
   let canvas
   let context
 
-  function detectContext() {
+  function detectionContext() {
     if (context) {
       return context
     }
@@ -24,17 +24,14 @@ namespace SpriteSpin.Utils {
    * Detects whether the image has been sub sampled by the browser and does not have its original dimensions.
    * This method unfortunately does not work for images that have transparent background.
    */
-  export function detectSubsampling(img: HTMLImageElement, size: { width: number, height: number }) {
+  export function detectSubsampling(img: HTMLImageElement, width: number, height: number) {
 
-    if (!detectContext()) {
+    if (!detectionContext()) {
       return false
     }
 
-    const iw = (size || img).width
-    const ih = (size || img).height
-
     // sub sampling happens on images above 1 megapixel
-    if (iw * ih <= 1024 * 1024) {
+    if (width * height <= 1024 * 1024) {
       return false
     }
 
@@ -44,7 +41,7 @@ namespace SpriteSpin.Utils {
     context.fillRect(0, 0, 1, 1)
     // render the image with a negative offset to the left so that it would
     // fill the canvas pixel with the top right pixel of the image.
-    context.drawImage(img, -iw + 1, 0)
+    context.drawImage(img, -width + 1, 0)
 
     // check color value to confirm image is covering edge pixel or not.
     // if color still magenta, the image is assumed to be sub sampled.

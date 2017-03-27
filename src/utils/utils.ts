@@ -1,7 +1,18 @@
 namespace SpriteSpin.Utils {
+  export function noop() {
+    // noop
+  }
 
-  export function toArray(value: string|string[]) {
-    return typeof value === 'string' ? [value] : value
+  function wrapConsole(type: string): (message?: any, ...optionalParams: any[]) => void {
+    return console && console[type] ? (...args: any[]) => console.log.apply(console, args) : noop
+  }
+
+  export const log = wrapConsole('log')
+  export const warn = wrapConsole('warn')
+  export const error = wrapConsole('error')
+
+  export function toArray<T>(value: T|T[]): T[] {
+    return Array.isArray(value) ? value : [value]
   }
 
   /**
@@ -26,33 +37,6 @@ namespace SpriteSpin.Utils {
   export function prevent(e) {
     e.preventDefault()
     return false
-  }
-
-  /**
-   *
-   */
-  export function log(args) {
-    if (window.console && window.console.log) {
-      window.console.log.apply(window.console, arguments)
-    }
-  }
-
-  /**
-   *
-   */
-  export function error(args) {
-    if (window.console && window.console.error) {
-      window.console.error.apply(window.console, arguments)
-    }
-  }
-
-  /**
-   *
-   */
-  export function warn(args) {
-    if (window.console && window.console.warn) {
-      window.console.warn.apply(window.console, arguments)
-    }
   }
 
   /**

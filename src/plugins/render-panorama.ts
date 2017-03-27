@@ -1,48 +1,51 @@
 ((SpriteSpin) => {
 
-  const floor = Math.floor
-
   const NAME = 'panorama'
 
-  function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
+  interface PanoramaState {
+    scale: number
   }
 
-  function onLoad(e, data) {
-    data.stage.empty().show()
-    data.frames = data.sourceWidth
-    if (data.orientation === 'horizontal') {
-      data.scale = data.height / data.sourceHeight
-      data.frames = data.sourceWidth
-    } else {
-      data.scale = data.width / data.sourceWidth
-      data.frames = data.sourceHeight
+  function getState(data) {
+    return SpriteSpin.getPluginState(data, NAME) as PanoramaState
+  }
+
+  function onLoad(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+    const sprite = data.metrics[0]
+    if (!sprite) {
+      return
     }
-    const w = floor(data.sourceWidth * data.scale)
-    const h = floor(data.sourceHeight * data.scale)
-    const background = `${w}px ${h}px`
+
+    if (data.orientation === 'horizontal') {
+      state.scale = data.target.innerHeight() / sprite.sampledHeight
+      data.frames = sprite.sampledWidth
+    } else {
+      state.scale = data.target.innerWidth() / sprite.sampledWidth
+      data.frames = sprite.sampledHeight
+    }
+    const width = Math.floor(sprite.sampledWidth * state.scale)
+    const height = Math.floor(sprite.sampledHeight * state.scale)
     data.stage.css({
-      'max-width'               : 'initial',
-      'background-image'        : ["url('", data.source[0], "')"].join(''),
+      'background-image'        : `url('${data.source[sprite.id]}')`,
       'background-repeat'       : 'repeat-both',
       // set custom background size to enable responsive rendering
-      '-webkit-background-size' : background, /* Safari 3-4 Chrome 1-3 */
-      '-moz-background-size'    : background, /* Firefox 3.6 */
-      '-o-background-size'      : background, /* Opera 9.5 */
-      'background-size'         : background  /* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */
+      '-webkit-background-size' : `${width}px ${height}px`, /* Safari 3-4 Chrome 1-3 */
+      '-moz-background-size'    : `${width}px ${height}px`, /* Firefox 3.6 */
+      '-o-background-size'      : `${width}px ${height}px`, /* Opera 9.5 */
+      'background-size'         : `${width}px ${height}px`  /* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */
     })
   }
 
-  function onDraw(e, data) {
-    let x = 0, y = 0
-    if (data.orientation === 'horizontal') {
-      x = -floor((data.frame % data.frames) * data.scale)
-    } else {
-      y = -floor((data.frame % data.frames) * data.scale)
-    }
-    data.stage.css({
-      'background-position' : `${x}px ${y}px`
-    })
+  function onDraw(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+    const px = data.orientation === 'horizontal' ? 1 : 0
+    const py = px ? 0 : 1
+
+    const offset = data.frame % data.frames
+    const left = px * offset * state.scale
+    const top = py * offset * state.scale
+    data.stage.css({ 'background-position' : `${left}px ${top}px` })
   }
 
   SpriteSpin.registerPlugin(NAME, {

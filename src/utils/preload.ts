@@ -6,7 +6,6 @@ namespace SpriteSpin.Utils {
         return i
       }
     }
-    return -1
   }
 
   function noop() {

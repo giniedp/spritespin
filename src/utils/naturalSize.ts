@@ -7,7 +7,7 @@ namespace SpriteSpin.Utils {
    */
   export function naturalSize(image: HTMLImageElement) {
     // for browsers that support naturalWidth and naturalHeight properties
-    if (image.naturalWidth != null) {
+    if (image.naturalWidth) {
       return {
         height: image.naturalHeight,
         width: image.naturalWidth

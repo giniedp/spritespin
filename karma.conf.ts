@@ -1,6 +1,8 @@
 'use strict'
 
-let tsconfig = require('./tsconfig.json'); // tslint:disable-line
+const remap = false
+const tsconfig = require('./tsconfig.json') // tslint:disable-line
+tsconfig.compilerOptions.inlineSourceMap = false
 
 module.exports = (config) => {
   config.set({
@@ -8,8 +10,14 @@ module.exports = (config) => {
       'karma-jasmine',
       'karma-phantomjs-launcher',
       'karma-typescript-preprocessor',
-      'karma-coverage'
+      'karma-sourcemap-loader',
+      'karma-mocha-reporter',
+
+      'karma-coverage',
+      'karma-remap-coverage'
     ],
+    logLevel: 'info',
+
     frameworks: [
       'jasmine'
     ],
@@ -18,31 +26,40 @@ module.exports = (config) => {
     ],
     files: [
       'node_modules/jquery/dist/jquery.js',
-      ...(tsconfig.files),
+      ...tsconfig.files,
+      'tools/**/*.ts',
       'src/**/*.test.ts'
     ],
 
     preprocessors: {
-      '**/*test.ts': ['typescript'],
-      '**/!(*test).ts': ['typescript', 'coverage']
+      '**/*.test.ts': ['typescript'],
+      '**/!(*test).ts': [
+        'typescript',
+        remap ? 'sourcemap' : null,
+        'coverage'
+      ].filter((it) => !!it)
     },
     reporters: [
-      'dots', 'coverage'
-    ],
+      'mocha',
+      'coverage',
+      remap ? 'remap-coverage' : null
+    ].filter((it) => !!it),
 
     typescriptPreprocessor: {
-      tsconfigPath: './tsconfig.json',
-      transformPath: (path) => {
-        return path.replace(/\.ts$/, '.js')
-      }
+      options: tsconfig.compilerOptions,
+      typescript: require('typescript') // tslint:disable-line
     },
 
     coverageReporter: {
-      dir: 'coverage',
-      reporters: [{
-        type : 'html',
-        subdir: 'report-html'
-      }]
+      dir : 'coverage/',
+      reporters: [
+        remap ? { type: 'in-memory' } : { type: 'html', subdir: 'report-html' }
+      ]
+    },
+
+    remapCoverageReporter: {
+      'text-summary': null, // to show summary in console
+      html: './coverage/report-html'
     }
   })
 }

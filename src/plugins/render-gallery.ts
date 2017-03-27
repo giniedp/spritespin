@@ -2,61 +2,76 @@
 
   const NAME = 'gallery'
 
-  function getState(data) {
-    return SpriteSpin.getPluginState(data, NAME)
+  interface GalleryState {
+    images: any[]
+    offsets: any[]
+    speed: number
+    opacity: number
+    frame: number
+    stage: any
+    dX: number
+    ddX: number
   }
 
-  function load(e, data) {
-    data.galleryImages = []
-    data.galleryOffsets = []
-    data.gallerySpeed = 500
-    data.galleryOpacity = 0.25
-    data.galleryFrame = 0
-    data.galleryStage = data.galleryStage || SpriteSpin.$('<div/>')
-    data.stage.prepend(data.galleryStage)
-    data.galleryStage.empty()
+  function getState(data) {
+    return SpriteSpin.getPluginState(data, NAME) as GalleryState
+  }
+
+  function getOption(data, name, fallback) {
+    return data[name] || fallback
+  }
+
+  function load(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+
+    state.images = []
+    state.offsets = []
+    state.frame = data.frame
+    state.speed = getOption(data, 'gallerySpeed', 500)
+    state.opacity = getOption(data, 'galleryOpacity', 0.25)
+    state.stage = getOption(data, 'galleryStage', SpriteSpin.$('<div></div>'))
+
+    state.stage.empty().addClass('gallery-stage').prependTo(data.stage)
 
     let size = 0
-    for (const source of data.source){
-      const img = SpriteSpin.$("<img src='" + source + "'/>")
-      data.galleryStage.append(img)
-      data.galleryImages.push(img)
-      const scale = data.height / img[0].height
-      data.galleryOffsets.push(-size + (data.width - img[0].width * scale) / 2)
+    for (const image of data.images){
+      const naturalSize = SpriteSpin.Utils.naturalSize(image)
+      const scale = data.height / naturalSize.height
+
+      const img = $(image)
+      state.stage.append(img)
+      state.images.push(img)
+      state.offsets.push(-size + (data.width - image.width * scale) / 2)
       size += data.width
       img.css({
         'max-width' : 'initial',
-        opacity : data.galleryOpacity,
+        opacity : state.opacity,
         width: data.width,
         height: data.height
       })
     }
-
-    const layout = SpriteSpin.Utils.getInnerLayout(data)
-    data.galleryStage.css(layout).css({
-      width: size
-    })
-    data.galleryImages[data.galleryFrame].animate({
-      opacity : 1
-    }, data.gallerySpeed)
+    const innerSize = SpriteSpin.Utils.getInnerSize(data)
+    const outerSize = data.responsive ? SpriteSpin.Utils.getComputedSize(data) : SpriteSpin.Utils.getOuterSize(data)
+    const layout = SpriteSpin.Utils.getInnerLayout(data.sizeMode, innerSize, outerSize)
+    state.stage.css(layout).css({ width: size, left: state.offsets[state.frame] })
+    state.images[state.frame].animate({ opacity : 1 }, state.speed)
   }
 
-  function draw(e, data) {
-    if (data.galleryFrame !== data.frame && !data.dragging) {
-      data.galleryStage.stop(true, false)
-      data.galleryStage.animate({
-        left : data.galleryOffsets[data.frame]
-      }, data.gallerySpeed)
+  function draw(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+    const input = SpriteSpin.getInputState(data)
+    const isDragging = SpriteSpin.is(data, 'dragging')
+    if (state.frame !== data.frame && !isDragging) {
+      state.stage.stop(true, false).animate({ left : state.offsets[data.frame] }, state.speed)
 
-      data.galleryImages[data.galleryFrame].animate({ opacity : data.galleryOpacity }, data.gallerySpeed)
-      data.galleryFrame = data.frame
-      data.galleryImages[data.galleryFrame].animate({ opacity : 1 }, data.gallerySpeed)
-    } else if (data.dragging || data.dX !== data.gallerydX) {
-      data.galleryDX = data.DX
-      data.galleryDDX = data.DDX
-      data.galleryStage.stop(true, true).animate({
-        left : data.galleryOffsets[data.frame] + data.dX
-      })
+      state.images[state.frame].animate({ opacity : state.opacity }, state.speed)
+      state.frame = data.frame
+      state.images[state.frame].animate({ opacity : 1 }, state.speed)
+      state.stage.animate({ left : state.offsets[state.frame] })
+    } else if (isDragging || state.dX !== input.dX) {
+      state.dX = input.dX
+      state.ddX = input.ddX
+      state.stage.stop(true, true).animate({ left : state.offsets[state.frame] + state.dX })
     }
   }
 

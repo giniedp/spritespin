@@ -3,7 +3,7 @@
 describe('SpriteSpin.Utils', () => {
   const Utils = SpriteSpin.Utils
 
-  describe('toArray', () => {
+  describe('#toArray', () => {
     it ('wraps string to array', () => {
       const input = 'foo'
       const output = Utils.toArray(input)
@@ -18,7 +18,7 @@ describe('SpriteSpin.Utils', () => {
     })
   })
 
-  describe('clamp', () => {
+  describe('#clamp', () => {
     it ('clamps to lower bound', () => {
       const min = 10
       const max = 20
@@ -38,6 +38,5 @@ describe('SpriteSpin.Utils', () => {
       expect(Utils.clamp(max, min, max)).toBe(max)
       expect(Utils.clamp(15, min, max)).toBe(15)
     })
-
   })
 })

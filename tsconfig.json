@@ -10,20 +10,22 @@
     "newLine": "LF",
     "rootDir": "src",
     "module": "none",
-    "noEmit": false,
-    "alwaysStrict": false,
+    "alwaysStrict": true,
     "noEmitOnError": false,
     "removeComments": true,
+    "noEmitHelpers": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "types": [
       "jasmine",
-      "node"
+      "node",
+      "jquery"
     ]
   },
   "files": [
     "src/spritespin.ts",
+    "src/utils/cursor.ts",
     "src/utils/detectSubsampling.ts",
     "src/utils/layout.ts",
     "src/utils/measure.ts",
