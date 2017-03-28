@@ -8,7 +8,8 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "test": "karma start --no-auto-watch --single-run",
-    "test:watch": "karma start --auto-watch --no-single-run"
+    "test:watch": "karma start --auto-watch --no-single-run",
+    "serve": "pushd page && python -m SimpleHTTPServer 3000"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.46",

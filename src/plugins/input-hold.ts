@@ -2,14 +2,35 @@
 
   const NAME = 'hold'
 
+  interface HoldState {
+    frameTime: number
+    animate: boolean
+    reverse: boolean
+  }
+
   function getState(data: SpriteSpin.Instance) {
-    return SpriteSpin.getPluginState(data, NAME)
+    return SpriteSpin.getPluginState(data, NAME) as HoldState
+  }
+
+  function rememberOptions(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    state.frameTime = data.frameTime
+    state.animate = data.animate
+    state.reverse = data.reverse
+  }
+
+  function restoreOptions(data: SpriteSpin.Instance) {
+    const state = getState(data)
+    data.frameTime = state.frameTime
+    data.animate = state.animate
+    data.reverse = state.reverse
   }
 
   function start(e, data: SpriteSpin.Instance) {
     if (SpriteSpin.is(data, 'loading') || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
       return
     }
+    rememberOptions(data)
     SpriteSpin.updateInput(e, data)
     SpriteSpin.flag(data, 'dragging', true)
     data.animate = true
@@ -20,6 +41,8 @@
     SpriteSpin.flag(data, 'dragging', false)
     SpriteSpin.resetInput(data)
     SpriteSpin.stopAnimation(data)
+    restoreOptions(data)
+    SpriteSpin.applyAnimation(data)
   }
 
   function update(e, data: SpriteSpin.Instance) {
@@ -40,6 +63,7 @@
     }
     data.reverse = delta < 0
     delta = delta < 0 ? -delta : delta
+    console.warn(delta)
     data.frameTime = 80 * (1 - delta) + 20
 
     if (((data.orientation === 'horizontal') && (input.dX < input.dY)) ||
@@ -48,12 +72,13 @@
     }
   }
 
-  function onFrame() {
-    SpriteSpin.$(this).spritespin('api').startAnimation()
+  function onFrame(e, data: SpriteSpin.Instance) {
+    data.animate = true
+    SpriteSpin.applyAnimation(data)
   }
 
   SpriteSpin.registerPlugin(NAME, {
-    namw: NAME,
+    name: NAME,
 
     mousedown: start,
     mousemove: update,

@@ -11,6 +11,16 @@
     return SpriteSpin.getPluginState(data, NAME) as DragState
   }
 
+  function getAxis(data: SpriteSpin.Instance) {
+    if (typeof data.orientation === 'number') {
+      return data.orientation * Math.PI / 180
+    }
+    if (data.orientation === 'horizontal') {
+      return 0
+    }
+    return Math.PI / 2
+  }
+
   function dragStart(e, data: SpriteSpin.Instance) {
     const state = getState(data)
     if (data.loading || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
@@ -36,27 +46,9 @@
     if (!SpriteSpin.is(data, 'dragging')) { return }
     SpriteSpin.updateInput(e, data)
 
-    // dont do anything if the drag distance exceeds the scroll threshold.
-    // this allows to use touch scroll on mobile devices.
-    if ((Math.abs(input.ddX) + Math.abs(input.ddY)) > data.scrollThreshold) {
-      SpriteSpin.flag(data, 'dragging', false)
-      SpriteSpin.resetInput(data)
-      return
-    }
-
-    // disable touch scroll
-    e.preventDefault()
-
-    let angle = 0
-    if (typeof data.orientation === 'number') {
-      angle = (Number(data.orientation) || 0) * Math.PI / 180
-    } else if (data.orientation === 'horizontal') {
-      angle = 0
-    } else {
-      angle = Math.PI / 2
-    }
-    const sn = Math.sin(angle)
-    const cs = Math.cos(angle)
+    const rad = getAxis(data)
+    const sn = Math.sin(rad)
+    const cs = Math.cos(rad)
     const x = ((input.nddX * cs - input.nddY * sn) * data.sense) || 0
     const y = ((input.nddX * sn + input.nddY * cs) * (data.senseLane || data.sense)) || 0
 
@@ -64,10 +56,20 @@
     drag.frame += data.frames * x
     drag.lane += data.lanes * y
 
-    const frame = Math.floor(drag.frame)
-    const lane = Math.floor(drag.lane)
-    SpriteSpin.updateFrame(data, frame, lane)
+    // update spritespin
+    const oldFrame = data.frame
+    const oldLane = data.lane
+    SpriteSpin.updateFrame(data, Math.floor(drag.frame), Math.floor(drag.lane))
     SpriteSpin.stopAnimation(data)
+
+    if (/^touch.*/.test(e.name) && (oldFrame !== data.frame || oldLane !== data.lane)) {
+      // prevent touch scroll
+      e.preventDefault()
+      // stop dragging if the drag distance exceeds the scroll threshold.
+      if (data.scrollThreshold != null && (Math.abs(input.ddX) + Math.abs(input.ddY)) > data.scrollThreshold) {
+        dragEnd(e, data)
+      }
+    }
   }
 
   function mousemove(e, data) {
@@ -76,6 +78,8 @@
   }
 
   SpriteSpin.registerPlugin('drag', {
+    name: 'drag',
+
     mousedown: dragStart,
     mousemove: drag,
     mouseup: dragEnd,
@@ -90,6 +94,8 @@
   })
 
   SpriteSpin.registerPlugin('move', {
+    name: 'move',
+
     mousemove: mousemove,
     mouseleave: dragEnd,
 

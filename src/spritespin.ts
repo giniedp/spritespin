@@ -502,7 +502,7 @@ namespace SpriteSpin {
     /**
      * Preferred axis for user interaction
      */
-    orientation?: Orientation
+    orientation?: Orientation|number
     /**
      * Tries to detect whether the images are downsampled by the browser.
      */

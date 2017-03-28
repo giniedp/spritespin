@@ -49,7 +49,10 @@
     "src/plugins/render-zoom.ts"
   ],
   "exclude": [
+    "bower_components",
     "node_modules",
-    "dist"
+    "dist",
+    "release",
+    "tools"
   ]
 }

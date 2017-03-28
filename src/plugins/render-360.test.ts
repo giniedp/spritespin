@@ -1,7 +1,7 @@
 /// <reference path="../spritespin.ts" />
 /// <reference path="render-360.ts" />
 
-describe('SpriteSpin.Plugins#input-click', () => {
+describe('SpriteSpin.Plugins#render-360', () => {
 
   const WIDTH = 50
   const HEIGHT = 50

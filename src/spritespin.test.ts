@@ -7,10 +7,6 @@ describe('SpriteSpin', () => {
   const HEIGHT = 50
 
   let data: SpriteSpin.Instance
-  afterEach(() => {
-    SpriteSpin.destroy(data)
-  })
-
   beforeEach((done) => {
     $el.spritespin({
       source: WHITE50x50,
@@ -21,6 +17,9 @@ describe('SpriteSpin', () => {
       plugins: ['click', '360']
     })
     data = $el.data(SpriteSpin.namespace)
+  })
+  afterEach(() => {
+    SpriteSpin.destroy(data)
   })
 
   describe('#getAnimationState', () => {
