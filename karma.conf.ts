@@ -9,6 +9,9 @@ module.exports = (config) => {
     plugins: [
       'karma-jasmine',
       'karma-phantomjs-launcher',
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-safari-launcher',
       'karma-typescript-preprocessor',
       'karma-sourcemap-loader',
       'karma-mocha-reporter',
@@ -23,6 +26,9 @@ module.exports = (config) => {
     ],
     browsers: [
       'PhantomJS'
+      // 'Chrome',
+      // 'Firefox',
+      // 'Safari'
     ],
     files: [
       'node_modules/jquery/dist/jquery.js',
