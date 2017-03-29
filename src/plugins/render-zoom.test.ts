@@ -1,6 +1,5 @@
 /// <reference path="../../tools/spritespin-jasmine.test.ts" />
 /// <reference path="../spritespin.ts" />
-/// <reference path="render-360.ts" />
 
 describe('SpriteSpin.Plugins#render-zoom', () => {
 

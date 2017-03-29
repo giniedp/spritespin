@@ -1,11 +1,11 @@
+/// <reference path="../../tools/spritespin-jasmine.test.ts" />
+/// <reference path="./../spritespin.ts" />
 /// <reference path="./measure.ts" />
 /// <reference path="./preload.ts" />
-/// <reference path="./../spritespin.ts" />
 
 describe('SpriteSpin.Utils', () => {
 
   const Utils = SpriteSpin.Utils
-  const WHITE50x50 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAQAAAC0NkA6AAAALUlEQVR42u3NMQEAAAgDINc/9Mzg4QcFSDvvIpFIJBKJRCKRSCQSiUQikUhuFtAOY89wCn1dAAAAAElFTkSuQmCC'
   const WIDTH = 50
   const HEIGHT = 50
 

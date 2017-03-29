@@ -2,5 +2,5 @@
 /// <reference path="../spritespin.ts" />
 
 describe('SpriteSpin.Api#fullscreen', () => {
-
+  // untestable
 })

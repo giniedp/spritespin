@@ -1,15 +1,13 @@
+/// <reference path="../../tools/spritespin-jasmine.test.ts" />
 /// <reference path="./preload.ts" />
 
 describe('SpriteSpin.Utils', () => {
 
-  const PNG_TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
-  const PNG_WHITE = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
-  const PNG_BLACK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
   const Utils = SpriteSpin.Utils
 
   describe('#preload', () => {
 
-    const source = [PNG_TRANSPARENT, PNG_WHITE, PNG_BLACK]
+    const source = [RED40x30, GREEN40x30, BLUE40x30]
 
     function expectArrayOfImages(input, output) {
       expect(Array.isArray(output)).toBe(true)
@@ -19,9 +17,9 @@ describe('SpriteSpin.Utils', () => {
 
     it ('accepts string input', (done) => {
       Utils.preload({
-        source: PNG_TRANSPARENT,
+        source: RED40x30,
         initiated: (result) => {
-          expectArrayOfImages([PNG_TRANSPARENT], result)
+          expectArrayOfImages([RED40x30], result)
           done()
         }
       })

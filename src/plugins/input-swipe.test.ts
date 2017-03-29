@@ -1,12 +1,7 @@
+/// <reference path="../../tools/spritespin-jasmine.test.ts" />
 /// <reference path="../spritespin.ts" />
 
 describe('SpriteSpin.Plugins#input-swipe', () => {
-
-  function event(name: string, clientX: number, clientY: number) {
-    const e = document.createEvent('MouseEvent') as MouseEvent
-    e.initMouseEvent(name, true, true, window, 0, 0, 0, clientX, clientY, false, false, false, false, 0, el)
-    return e
-  }
 
   const FRAME_WIDHT = 10
   const FRAME_HEIGHT = 10

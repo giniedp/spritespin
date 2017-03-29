@@ -16,6 +16,9 @@ function mouseDown(el: HTMLElement, x, y) {
 function mouseUp(el: HTMLElement, x, y) {
   el.dispatchEvent(mouseEvent('mouseup', x, y))
 }
+function mouseLeave(el: HTMLElement, x, y) {
+  el.dispatchEvent(mouseEvent('mouseleave', x, y))
+}
 function mouseMove(el: HTMLElement, x, y) {
   el.dispatchEvent(mouseEvent('mousemove', x, y))
 }

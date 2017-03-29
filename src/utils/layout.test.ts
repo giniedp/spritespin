@@ -1,3 +1,4 @@
+/// <reference path="../../tools/spritespin-jasmine.test.ts" />
 /// <reference path="./../spritespin.ts" />
 /// <reference path="./layout.ts" />
 
@@ -33,7 +34,7 @@ describe('SpriteSpin.Utils', () => {
     }
     let inner: SpriteSpin.Utils.SizeWithAspect
     let outer: SpriteSpin.Utils.SizeWithAspect
-    const modes: SpriteSpin.SizeMode[] = ['original', 'fit', 'fill', 'scale']
+    const modes: SpriteSpin.SizeMode[] = ['original', 'fit', 'fill', 'stretch']
 
     describe('with equal outer and inner size', () => {
       beforeEach(() => {
