@@ -5,6 +5,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
+    "lint": "tslint --config tslint.json src/**/*.ts",
+    "lint:silent": "tslint --config tslint.json src/**/*.ts || true",
     "build": "tsc",
     "build:watch": "tsc -w",
     "test": "karma start --no-auto-watch --single-run",
@@ -13,6 +15,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.46",
+    "@types/jquery": "^2.0.41",
     "@types/node": "^7.0.11",
     "jasmine-core": "^2.5.2",
     "jquery": ">1.11.0",
@@ -27,6 +30,8 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-typescript-preprocessor": "^0.3.1",
+    "ts-node": "^3.0.2",
+    "tslint": "^5.0.0",
     "typescript": "next"
   },
   "description": "jQuery plugin for creating flipbook animations",
@@ -49,8 +54,5 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/giniedp/spritespin/issues"
-  },
-  "dependencies": {
-    "@types/jquery": "^2.0.41"
   }
 }
