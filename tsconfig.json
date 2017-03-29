@@ -3,8 +3,8 @@
   "compilerOptions": {
     "target": "es5",
     "noResolve": true,
-    "outFile": "dist/spritespin.js",
-    "outDir": "dist",
+    "outFile": "release/spritespin.js",
+    "outDir": "release",
     "sourceMap": true,
     "declaration": true,
     "newLine": "LF",
