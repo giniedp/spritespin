@@ -6,7 +6,7 @@ namespace SpriteSpin {
   SpriteSpin.registerApi({
     // Gets a value indicating whether the animation is currently running.
     isPlaying: function() {
-      return this.data.animation !== null
+      return SpriteSpin.getAnimationState(this.data).handler != null
     },
 
     // Gets a value indicating whether the animation looping is enabled.
@@ -16,14 +16,17 @@ namespace SpriteSpin {
 
     // Starts/Stops the animation playback
     toggleAnimation: function() {
-      this.data.animate = !this.data.animate
-      SpriteSpin.applyAnimation(this.data)
+      if (this.isPlaying()) {
+        this.stopAnimation()
+      } else {
+        this.startAnimation()
+      }
     },
 
     // Stops animation playback
     stopAnimation: function() {
       this.data.animate = false
-      SpriteSpin.applyAnimation(this.data)
+      SpriteSpin.stopAnimation(this.data)
     },
 
     // Starts animation playback

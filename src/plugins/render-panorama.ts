@@ -43,8 +43,8 @@
     const py = px ? 0 : 1
 
     const offset = data.frame % data.frames
-    const left = px * offset * state.scale
-    const top = py * offset * state.scale
+    const left = Math.round(px * offset * state.scale)
+    const top = Math.round(py * offset * state.scale)
     data.stage.css({ 'background-position' : `${left}px ${top}px` })
   }
 

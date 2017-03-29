@@ -59,9 +59,9 @@
       dF = input.ddY
     }
 
-    if (dS > snap || dF > fling) {
+    if (dS >= snap || dF >= fling) {
       frame = data.frame - 1
-    } else if (dS < -snap || dF < -fling) {
+    } else if (dS <= -snap || dF <= -fling) {
       frame = data.frame + 1
     }
 

@@ -63,7 +63,6 @@
     }
     data.reverse = delta < 0
     delta = delta < 0 ? -delta : delta
-    console.warn(delta)
     data.frameTime = 80 * (1 - delta) + 20
 
     if (((data.orientation === 'horizontal') && (input.dX < input.dY)) ||

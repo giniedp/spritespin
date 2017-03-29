@@ -54,7 +54,7 @@
     const outerSize = data.responsive ? SpriteSpin.Utils.getComputedSize(data) : SpriteSpin.Utils.getOuterSize(data)
     const layout = SpriteSpin.Utils.getInnerLayout(data.sizeMode, innerSize, outerSize)
     state.stage.css(layout).css({ width: size, left: state.offsets[state.frame] })
-    state.images[state.frame].animate({ opacity : 1 }, state.speed)
+    state.images[state.frame].animate({ opacity : 1 }, { duration: state.speed })
   }
 
   function draw(e, data: SpriteSpin.Instance) {
@@ -62,16 +62,16 @@
     const input = SpriteSpin.getInputState(data)
     const isDragging = SpriteSpin.is(data, 'dragging')
     if (state.frame !== data.frame && !isDragging) {
-      state.stage.stop(true, false).animate({ left : state.offsets[data.frame] }, state.speed)
+      state.stage.stop(true, false).animate({ left : state.offsets[data.frame] }, { duration: state.speed })
 
-      state.images[state.frame].animate({ opacity : state.opacity }, state.speed)
+      state.images[state.frame].animate({ opacity : state.opacity }, { duration: state.speed })
       state.frame = data.frame
-      state.images[state.frame].animate({ opacity : 1 }, state.speed)
+      state.images[state.frame].animate({ opacity : 1 }, { duration: state.speed })
       state.stage.animate({ left : state.offsets[state.frame] })
     } else if (isDragging || state.dX !== input.dX) {
       state.dX = input.dX
       state.ddX = input.ddX
-      state.stage.stop(true, true).animate({ left : state.offsets[state.frame] + state.dX })
+      state.stage.stop(true, true).css({ left : state.offsets[state.frame] + state.dX })
     }
   }
 

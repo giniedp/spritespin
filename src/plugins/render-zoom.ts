@@ -26,7 +26,7 @@
     const state = getState(data)
     state.source = getOption(data, 'zoomSource', data.source)
     state.doubleClickTime = getOption(data, 'zoomDoubleClickTime', 500)
-    state.stage = state.stage || SpriteSpin.$("<div class='spritezoom-stage'></div>")
+    state.stage = state.stage || SpriteSpin.$("<div class='zoom-stage'></div>")
     state.stage.css({
       width    : '100%',
       height   : '100%',
@@ -49,6 +49,11 @@
   }
 
   function updateInput(e, data: SpriteSpin.Instance) {
+    const state = getState(data)
+    if (!state.stage.is(':visible')) {
+      return
+    }
+
     e.preventDefault()
 
     // hack into drag/move module and disable dragging
@@ -61,12 +66,11 @@
     const x = cursor.x / data.width
     const y = cursor.y / data.height
 
-    const state = getState(data)
     if (state.oldX == null) {
       state.oldX = x
       state.oldY = y
     }
-    if (state.currentX == null || state.currentY == null) {
+    if (state.currentX == null) {
       state.currentX = x
       state.currentY = y
     }
@@ -137,7 +141,7 @@
     let x = state.currentX
     let y = state.currentY
     // fallback to centered position
-    if (x == null || y == null) {
+    if (x == null) {
       x = state.currentX = 0.5
       y = state.currentY = 0.5
     }

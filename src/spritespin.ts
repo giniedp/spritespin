@@ -176,38 +176,19 @@ namespace SpriteSpin {
     nddY: number
   }
 
-  function inputFromEvent(e) {
-    let touches = e.touches
-    let source = e
-
-    // jQuery Event normalization does not preserve the 'event.touches'
-    // try to grab touches from the original event
-    if (e.touches === undefined && e.originalEvent !== undefined) {
-      touches = e.originalEvent.touches
-    }
-    // get current touch or mouse position
-    if (touches !== undefined && touches.length > 0) {
-      source = e.touches[0]
-    }
-    return {
-      clientX: source.clientX || 0,
-      clientY: source.clientY || 0
-    }
-  }
-
   /**
    * Updates the input state of the SpriteSpin data using the given mouse or touch event.
    */
   export function updateInput(e, data: Instance) {
-    const input = inputFromEvent(e)
+    const cursor = Utils.getCursorPosition(e)
     const state = getInputState(data)
 
     // cache positions from previous frame
     state.oldX = state.currentX
     state.oldY = state.currentY
 
-    state.currentX = input.clientX
-    state.currentY = input.clientY
+    state.currentX = cursor.x
+    state.currentY = cursor.y
 
     // Fix old position.
     if (state.oldX === undefined || state.oldY === undefined) {
@@ -337,7 +318,7 @@ namespace SpriteSpin {
   export function stopAnimation(data: Instance) {
     data.animate = false
     const animation = getAnimationState(data)
-    if (animation.handler) {
+    if (animation.handler != null) {
       window.clearInterval(animation.handler)
       animation.handler = null
     }

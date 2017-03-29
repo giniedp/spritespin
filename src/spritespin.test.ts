@@ -1,5 +1,5 @@
 /// <reference path="./spritespin.ts" />
-/// <reference path="./../tools/spritespin-jasmine.ts" />
+/// <reference path="./../tools/spritespin-jasmine.test.ts" />
 
 describe('SpriteSpin', () => {
 
