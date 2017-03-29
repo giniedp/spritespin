@@ -111,4 +111,3 @@ describe('SpriteSpin.Plugins#input-drag', () => {
     })
   })
 })
-

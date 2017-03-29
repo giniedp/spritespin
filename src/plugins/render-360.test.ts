@@ -72,7 +72,6 @@ describe('SpriteSpin.Plugins#render-360', () => {
     })
   })
 
-
   describe('renderer = image', () => {
 
     beforeEach((done) => {

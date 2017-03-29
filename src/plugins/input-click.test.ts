@@ -19,7 +19,7 @@ describe('SpriteSpin.Plugins#input-click', () => {
   afterEach(() => {
     SpriteSpin.destroy(data)
   })
-  
+
   describe('interaction', () => {
     describe('in loading state', () => {
       it ('is idle', () => {

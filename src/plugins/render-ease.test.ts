@@ -3,7 +3,6 @@
 
 describe('SpriteSpin.Plugins#render-ease', () => {
 
-
   let data: SpriteSpin.Instance
   beforeEach((done) => {
     $el.spritespin({

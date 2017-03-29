@@ -6,7 +6,6 @@ const Utils = SpriteSpin.Utils
 
 describe('SpriteSpin.Utils', () => {
 
-
   describe('#getOuterSize', () => {
     it ('returns width, height and aspect', () => {
       const result = Utils.getOuterSize({ width: 100, height: 200 } as any)
