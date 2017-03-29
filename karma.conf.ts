@@ -1,6 +1,7 @@
 'use strict'
 
 const remap = false
+const coveralls = false
 const tsconfig = require('./tsconfig.json') // tslint:disable-line
 tsconfig.compilerOptions.inlineSourceMap = false
 
@@ -16,6 +17,7 @@ module.exports = (config) => {
       'karma-sourcemap-loader',
       'karma-mocha-reporter',
 
+      'karma-coveralls',
       'karma-coverage',
       'karma-remap-coverage'
     ],
@@ -48,6 +50,7 @@ module.exports = (config) => {
     reporters: [
       'mocha',
       'coverage',
+      coveralls ? 'coveralls' : null,
       remap ? 'remap-coverage' : null
     ].filter((it) => !!it),
 
@@ -59,7 +62,8 @@ module.exports = (config) => {
     coverageReporter: {
       dir : 'coverage/',
       reporters: [
-        remap ? { type: 'in-memory' } : { type: 'html', subdir: 'report-html' }
+        remap ? { type: 'in-memory' } : { type: 'html', subdir: 'report-html' },
+        { type: 'lcov' }
       ]
     },
 
