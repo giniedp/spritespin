@@ -68,8 +68,7 @@ describe('SpriteSpin.Plugins#render-360', () => {
     })
 
     it ('shows background on stage', () => {
-      const bgr = data.stage.css('background-image')
-      expect(bgr).toMatch(WHITE50x50)
+      expect(data.stage.css('background-image')).toContain(WHITE50x50)
     })
   })
 

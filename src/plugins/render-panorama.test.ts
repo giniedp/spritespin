@@ -27,7 +27,7 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
     })
 
     it ('renders the image as background', () => {
-      expect(data.stage.css('background-image')).toBe(`url(${WHITE40x30})`)
+      expect(data.stage.css('background-image')).toContain(WHITE40x30)
     })
   })
 

@@ -27,7 +27,7 @@
     const width = Math.floor(sprite.sampledWidth * state.scale)
     const height = Math.floor(sprite.sampledHeight * state.scale)
     data.stage.css({
-      'background-image'        : `url('${data.source[sprite.id]}')`,
+      'background-image'        : `url(${data.source[sprite.id]})`,
       'background-repeat'       : 'repeat-both',
       // set custom background size to enable responsive rendering
       '-webkit-background-size' : `${width}px ${height}px`, /* Safari 3-4 Chrome 1-3 */
