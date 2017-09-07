@@ -41,7 +41,7 @@
   }
 
   function drag(e, data: SpriteSpin.Instance) {
-    const drag = getState(data)
+    const state = getState(data)
     const input = SpriteSpin.getInputState(data)
     if (!SpriteSpin.is(data, 'dragging')) { return }
     SpriteSpin.updateInput(e, data)
@@ -53,13 +53,13 @@
     const y = ((input.nddX * sn + input.nddY * cs) * (data.senseLane || data.sense)) || 0
 
     // accumulate
-    drag.frame += data.frames * x
-    drag.lane += data.lanes * y
+    state.frame += data.frames * x
+    state.lane += data.lanes * y
 
     // update spritespin
     const oldFrame = data.frame
     const oldLane = data.lane
-    SpriteSpin.updateFrame(data, Math.floor(drag.frame), Math.floor(drag.lane))
+    SpriteSpin.updateFrame(data, Math.floor(state.frame), Math.floor(state.lane))
     SpriteSpin.stopAnimation(data)
 
     if (/^touch.*/.test(e.name) && (oldFrame !== data.frame || oldLane !== data.lane)) {

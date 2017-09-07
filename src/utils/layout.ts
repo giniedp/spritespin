@@ -10,8 +10,8 @@ namespace SpriteSpin.Utils {
   }
 
   export interface Layout {
-    width: string|number
-    height: string|number
+    width: string | number
+    height: string | number
     top: number
     left: number
     bottom: number

@@ -2,7 +2,7 @@
 namespace SpriteSpin.Fullscreen {
 
   export interface Options {
-    source?: string|string[],
+    source?: string | string[],
     sizeMode?: SpriteSpin.SizeMode
   }
 

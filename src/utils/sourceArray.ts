@@ -32,7 +32,7 @@ namespace SpriteSpin.Utils {
     }
     let i, j, temp
     const result = []
-    for (i = lStart; i <= lEnd; i += 1 ) {
+    for (i = lStart; i <= lEnd; i += 1) {
       for (j = fStart; j <= fEnd; j += 1) {
         temp = path.replace('{lane}', padNumber(i, digits, 0))
         temp = temp.replace('{frame}', padNumber(j, digits, 0))

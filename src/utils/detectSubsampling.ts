@@ -50,7 +50,6 @@ namespace SpriteSpin.Utils {
       return (dat[0] === 255) && (dat[1] === 0) && (dat[2] === 255)
     } catch (err) {
       // avoids cross origin exception for chrome when code runs without a server
-      console.error(err.message, err.stack)
       return false
     }
   }

@@ -13,7 +13,7 @@ namespace SpriteSpin.Utils {
   }
 
   export interface PreloadOptions {
-    source: string|string[]
+    source: string | string[]
     preloadCount?: number
     initiated?: (images: HTMLImageElement[]) => void
     progress?: (p: PreloadProgress) => void
@@ -30,11 +30,7 @@ namespace SpriteSpin.Utils {
   export function preload(opts: PreloadOptions) {
     let src: string[]
     const input = opts.source
-    if (typeof input === 'string') {
-      src = [input]
-    } else {
-      src = input
-    }
+    src = typeof input === 'string' ? [input] : input
     // const src: string[] =  ? [opts.source] : opts.source
 
     const images = []
@@ -65,14 +61,14 @@ namespace SpriteSpin.Utils {
       }
     }
 
-    for (let i = 0; i < src.length; i += 1 ) {
+    for (const url of src) {
       const img = new Image()
       // push result
       images.push(img)
       // bind logic, dont care about abort/errors
       img.onload = img.onabort = img.onerror = tick
       // begin load
-      img.src = src[i]
+      img.src = url
     }
 
     onInitiated(images)

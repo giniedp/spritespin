@@ -11,7 +11,7 @@ namespace SpriteSpin.Utils {
   export const warn = wrapConsole('warn')
   export const error = wrapConsole('error')
 
-  export function toArray<T>(value: T|T[]): T[] {
+  export function toArray<T>(value: T | T[]): T[] {
     return Array.isArray(value) ? value : [value]
   }
 
