@@ -529,7 +529,6 @@ var SpriteSpin;
     }
     SpriteSpin.$.fn.spritespin = extension;
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -551,7 +550,6 @@ var SpriteSpin;
         Utils.getCursorPosition = getCursorPosition;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -587,14 +585,12 @@ var SpriteSpin;
                 return (dat[0] === 255) && (dat[1] === 0) && (dat[2] === 255);
             }
             catch (err) {
-                console.error(err.message, err.stack);
                 return false;
             }
         }
         Utils.detectSubsampling = detectSubsampling;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -674,7 +670,6 @@ var SpriteSpin;
         Utils.getInnerLayout = getInnerLayout;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -754,7 +749,6 @@ var SpriteSpin;
         Utils.findSpecs = findSpecs;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -777,7 +771,6 @@ var SpriteSpin;
         Utils.naturalSize = naturalSize;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -794,12 +787,7 @@ var SpriteSpin;
         function preload(opts) {
             var src;
             var input = opts.source;
-            if (typeof input === 'string') {
-                src = [input];
-            }
-            else {
-                src = input;
-            }
+            src = typeof input === 'string' ? [input] : input;
             var images = [];
             var targetCount = (opts.preloadCount || src.length);
             var onInitiated = opts.initiated || noop;
@@ -822,18 +810,18 @@ var SpriteSpin;
                     onComplete(images);
                 }
             };
-            for (var i = 0; i < src.length; i += 1) {
+            for (var _i = 0, src_1 = src; _i < src_1.length; _i++) {
+                var url = src_1[_i];
                 var img = new Image();
                 images.push(img);
                 img.onload = img.onabort = img.onerror = tick;
-                img.src = src[i];
+                img.src = url;
             }
             onInitiated(images);
         }
         Utils.preload = preload;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -873,7 +861,6 @@ var SpriteSpin;
 (function (SpriteSpin) {
     SpriteSpin.sourceArray = SpriteSpin.Utils.sourceArray;
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Utils;
@@ -944,7 +931,6 @@ var SpriteSpin;
         Utils.pixelRatio = pixelRatio;
     })(Utils = SpriteSpin.Utils || (SpriteSpin.Utils = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     SpriteSpin.registerApi({
@@ -1013,7 +999,6 @@ var SpriteSpin;
         }
     });
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 var SpriteSpin;
 (function (SpriteSpin) {
     var Fullscreen;
@@ -1162,7 +1147,6 @@ var SpriteSpin;
         });
     })(Fullscreen = SpriteSpin.Fullscreen || (SpriteSpin.Fullscreen = {}));
 })(SpriteSpin || (SpriteSpin = {}));
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'click';
     function click(e, data) {
@@ -1189,7 +1173,6 @@ var SpriteSpin;
         touchend: click
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'drag';
     function getState(data) {
@@ -1221,7 +1204,7 @@ var SpriteSpin;
         }
     }
     function drag(e, data) {
-        var drag = getState(data);
+        var state = getState(data);
         var input = SpriteSpin.getInputState(data);
         if (!SpriteSpin.is(data, 'dragging')) {
             return;
@@ -1232,11 +1215,11 @@ var SpriteSpin;
         var cs = Math.cos(rad);
         var x = ((input.nddX * cs - input.nddY * sn) * data.sense) || 0;
         var y = ((input.nddX * sn + input.nddY * cs) * (data.senseLane || data.sense)) || 0;
-        drag.frame += data.frames * x;
-        drag.lane += data.lanes * y;
+        state.frame += data.frames * x;
+        state.lane += data.lanes * y;
         var oldFrame = data.frame;
         var oldLane = data.lane;
-        SpriteSpin.updateFrame(data, Math.floor(drag.frame), Math.floor(drag.lane));
+        SpriteSpin.updateFrame(data, Math.floor(state.frame), Math.floor(state.lane));
         SpriteSpin.stopAnimation(data);
         if (/^touch.*/.test(e.name) && (oldFrame !== data.frame || oldLane !== data.lane)) {
             e.preventDefault();
@@ -1271,7 +1254,6 @@ var SpriteSpin;
         touchcancel: dragEnd
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'hold';
     function getState(data) {
@@ -1347,7 +1329,6 @@ var SpriteSpin;
         onFrame: onFrame
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'swipe';
     function getState(data) {
@@ -1419,7 +1400,6 @@ var SpriteSpin;
         touchcancel: end
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var $ = SpriteSpin.$;
     var floor = Math.floor;
@@ -1481,7 +1461,6 @@ var SpriteSpin;
         onDraw: onDraw
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'blur';
     function getState(data) {
@@ -1609,7 +1588,6 @@ var SpriteSpin;
         onFrameChanged: onFrame
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var max = Math.max;
     var min = Math.min;
@@ -1722,7 +1700,6 @@ var SpriteSpin;
         touchcancel: end
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'gallery';
     function getState(data) {
@@ -1786,7 +1763,6 @@ var SpriteSpin;
         onDraw: draw
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'panorama';
     function getState(data) {
@@ -1832,7 +1808,6 @@ var SpriteSpin;
         onDraw: onDraw
     });
 })(SpriteSpin);
-"use strict";
 (function (SpriteSpin) {
     var NAME = 'zoom';
     function getState(data) {

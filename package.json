@@ -11,26 +11,24 @@
     "build:watch": "tsc -w",
     "test": "karma start --no-auto-watch --single-run",
     "test:watch": "karma start --auto-watch --no-single-run",
+    "test:coverage": "IS_COVERAGE=yes karma start --single-run",
+    "test:coveralls": "IS_COVERALLS=yes karma start --single-run && cat coverage/lcov/lcovonly | ./node_modules/.bin/coveralls",
     "serve": "pushd page && python -m SimpleHTTPServer 3000"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.54",
     "@types/jquery": "^3.2.12",
     "@types/node": "^8.0.27",
+    "coveralls": "^3.0.0",
     "jasmine-core": "^2.8.0",
     "jquery": "^3.2.1",
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.1",
-    "karma-coveralls": "^1.1.2",
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "1.1.0",
     "karma-mocha-reporter": "^2.2.4",
     "karma-phantomjs-launcher": "^1.0.4",
-    "karma-remap-coverage": "^0.1.4",
     "karma-safari-launcher": "^1.0.0",
-    "karma-sourcemap-loader": "^0.3.7",
-    "karma-typescript-preprocessor": "^0.3.1",
     "tslint": "^5.7.0",
     "typescript": "^2.5.2"
   },
@@ -48,11 +46,16 @@
     "360",
     "animation",
     "flipbook",
-    "panorama"
+    "panorama",
+    "jquery-plugin",
+    "ecosystem:jquery"
   ],
   "author": "Alexander Graefenstein",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/giniedp/spritespin/issues"
+  },
+  "dependencies": {
+    "karma-typescript": "^3.0.12"
   }
 }
