@@ -49,7 +49,7 @@ namespace SpriteSpin {
     },
 
     // Updates SpriteSpin to the specified frame.
-    updateFrame: function(frame){
+    updateFrame: function(frame) {
       SpriteSpin.updateFrame(this.data, frame)
       return this
     },

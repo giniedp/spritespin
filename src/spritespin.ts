@@ -117,7 +117,6 @@ namespace SpriteSpin {
     return api
   }
   export function extendApi(methods) {
-    Utils.warn('"extendApi" is deprecated, use "registerApi" instead')
     registerApi(methods)
   }
 
@@ -145,12 +144,12 @@ namespace SpriteSpin {
     return state[name]
   }
 
-  export function is(data: Instance, flag: string): boolean {
-    return !!getState(data, 'flags')[flag]
+  export function is(data: Instance, key: string): boolean {
+    return !!getState(data, 'flags')[key]
   }
 
-  export function flag(data: Instance, flag: string, value: boolean) {
-    getState(data, 'flags')[flag] = !!value
+  export function flag(data: Instance, key: string, value: boolean) {
+    getState(data, 'flags')[key] = !!value
   }
 
   //
@@ -246,12 +245,9 @@ namespace SpriteSpin {
   }
 
   function updateLane(data: Instance, lane: number) {
-    data.lane = lane
-    if (data.wrapLane) {
-      data.lane = Utils.wrap(data.lane, 0, data.lanes - 1, data.lanes)
-    } else {
-      data.lane = Utils.clamp(data.lane, 0, data.lanes - 1)
-    }
+    data.lane = data.wrapLane
+      ? Utils.wrap(lane, 0, data.lanes - 1, data.lanes)
+      : Utils.clamp(lane, 0, data.lanes - 1)
   }
 
   function updateAnimationFrame(data: Instance) {
@@ -266,12 +262,9 @@ namespace SpriteSpin {
 
   function updateInputFrame(data: Instance, frame: number) {
     data.frame = Number(frame)
-    if (data.wrap) {
-      // wrap/clamp the frame value to fit in range [0, data.frames)
-      data.frame = Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
-    } else {
-      data.frame = Utils.clamp(data.frame, 0, data.frames - 1)
-    }
+    data.frame = data.wrap
+      ? Utils.wrap(data.frame, 0, data.frames - 1, data.frames)
+      : Utils.clamp(data.frame, 0, data.frames - 1)
   }
 
   function updateAnimation(data: Instance) {
@@ -386,7 +379,7 @@ namespace SpriteSpin {
     /**
      * Url or array of urls to the image frames
      */
-    source: string|string[]
+    source: string | string[]
 
     /**
      * The display width
@@ -483,7 +476,7 @@ namespace SpriteSpin {
     /**
      * Preferred axis for user interaction
      */
-    orientation?: Orientation|number
+    orientation?: Orientation | number
     /**
      * Tries to detect whether the images are downsampled by the browser.
      */

@@ -34,7 +34,7 @@
     state.stage.empty().addClass('gallery-stage').prependTo(data.stage)
 
     let size = 0
-    for (const image of data.images){
+    for (const image of data.images) {
       const naturalSize = SpriteSpin.Utils.naturalSize(image)
       const scale = data.height / naturalSize.height
 
