@@ -21,9 +21,13 @@ namespace SpriteSpin.Utils {
   }
 
   export interface PreloadProgress {
+    // The image index that currently has been loaded
     index: number
+    // The number of images that have been loaded so far
     loaded: number
+    // The total number of images to load
     total: number
+    // Percentage value
     percent: number
   }
 

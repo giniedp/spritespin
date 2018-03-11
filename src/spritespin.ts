@@ -213,11 +213,11 @@ namespace SpriteSpin {
     state.ddY = state.currentY - state.oldY
 
     // Normalize vectors to range [-1:+1]
-    state.ndX = state.dX / data.width
-    state.ndY = state.dY / data.height
+    state.ndX = state.dX / data.target.innerWidth()
+    state.ndY = state.dY / data.target.innerHeight()
 
-    state.nddX = state.ddX / data.width
-    state.nddY = state.ddY / data.height
+    state.nddX = state.ddX / data.target.innerWidth()
+    state.nddY = state.ddY / data.target.innerHeight()
   }
 
   /**
@@ -310,10 +310,10 @@ namespace SpriteSpin {
    */
   export function stopAnimation(data: Instance) {
     data.animate = false
-    const animation = getAnimationState(data)
-    if (animation.handler != null) {
-      window.clearInterval(animation.handler)
-      animation.handler = null
+    const state = getAnimationState(data)
+    if (state.handler != null) {
+      window.clearInterval(state.handler)
+      state.handler = null
     }
   }
 
@@ -343,15 +343,15 @@ namespace SpriteSpin {
 
   export interface CallbackOptions {
     /**
-     * Occurs when plugin has been initialized, but before loading the source files
+     * Occurs when the plugin has been initialized, but before loading the source files.
      */
     onInit?: Callback
     /**
-     * Occurs when any source file has been loaded
+     * Occurs when any source file has been loaded and the progress has changed.
      */
     onProgress?: Callback
     /**
-     * Occurs when all source files have been loaded
+     * Occurs when all source files have been loaded and spritespin is ready to update and draw.
      */
     onLoad?: Callback
     /**
@@ -359,10 +359,16 @@ namespace SpriteSpin {
      */
     onFrame?: Callback
     /**
+     * Occurs when the frame number has changed.
+     */
+    onFrameChanged?: Callback
+    /**
      * Occurs when all update is complete and frame can be drawn
      */
     onDraw?: Callback
-
+    /**
+     * Occurs when spritespin has been loaded and the first draw operation is complente
+     */
     onComplete?: Callback
   }
 
@@ -372,59 +378,61 @@ namespace SpriteSpin {
 
   export interface Options extends CallbackOptions {
     /**
-     * The target element which should hold the spritespin instance.
+     * The target element which should hold the spritespin instance. This is usually aready specified by the jQuery selector but can be overridden here.
      */
     target?: any,
 
     /**
-     * Url or array of urls to the image frames
+     * Image URL or array of urls that should be used.
      */
     source: string | string[]
 
     /**
-     * The display width
+     * The display width in pixels. Width and height should match the aspect ratio of the frames.
      */
     width?: number
 
     /**
-     * The display height
+     * The display height in pixels. Width and height should match the aspect ratio of the frames.
      */
     height?: number
 
     /**
-     * Total number of frames
+     * This is the number of frames for a full 360 rotation. If multiple lanes are used, each lane must have this amount of frames.
      */
     frames: number
 
     /**
-     * Number of frames in one row of sprite sheet (if source is a spritesheet)
+     * Number of frames in one row of a single sprite sheet.
      */
     framesX?: number
 
     /**
-     * Number of 360 sequences. Used for 3D like effect.
+     * Number of sequences.
      */
     lanes?: number
 
     /**
-     * Determines how the inner container is sized and scaled if it does not match the given
+     * Specifies how the frames are sized and scaled if it does not match the given
      * width and height dimensions.
      */
     sizeMode?: SizeMode
 
     /**
      * The presentation module to use
-     * @deprecated
+     *
+     * @deprecated please use plugins option instead
      */
     module?: string
     /**
      * The interaction module to use
-     * @deprecated
+     *
+     * @deprecated please use plugins option instead
      */
     behavior?: string
 
     /**
-     * The rendering mode to use
+     * Specifies the rendering mode.
      */
     renderer?: RenderMode
 
@@ -441,36 +449,36 @@ namespace SpriteSpin {
      */
     frameTime?: number
     /**
-     * If true starts the animation on load
+     * If true, starts the animation automatically on load
      */
     animate?: boolean
     /**
-     * If true animation is played backward
+     * If true, animation playback is reversed
      */
     reverse?: boolean
     /**
-     * If true animation is loopt infinitely
+     * If true, continues to play the animation in a loop without stopping.
      */
     loop?: boolean
     /**
-     * Stops the animation at this frame if loop is disabled
+     * Stops the animation on that frame if `loop` is false.
      */
     stopFrame?: number
 
     /**
-     * If true wraps around the frame index on user interaction.
+     * If true, allows the user to drag the animation beyond the last frame and wrap over to the beginning.
      */
     wrap?: boolean
     /**
-     * If true wraps around the lane index on user interaction
+     * If true, allows the user to drag the animation beyond the last sequence and wrap over to the beginning.
      */
     wrapLane?: boolean
     /**
-     * Interaction sensitivity used by behavior implementations
+     * Sensitivity factor for user interaction
      */
     sense?: number
     /**
-     * Interaction sensitivity used by behavior implementations
+     * Sensitivity factor for user interaction
      */
     senseLane?: number
     /**
@@ -478,7 +486,7 @@ namespace SpriteSpin {
      */
     orientation?: Orientation | number
     /**
-     * Tries to detect whether the images are downsampled by the browser.
+     * If true, tries to detect whether the images are downsampled by the browser.
      */
     detectSubsampling?: boolean
     /**
@@ -486,33 +494,90 @@ namespace SpriteSpin {
      */
     scrollThreshold?: number
     /**
-     * Number of frames to preload. If nothing is set, all frames are preloaded.
+     * Number of images to preload. If nothing is set, all images are preloaded.
      */
     preloadCount?: number
 
     /**
-     *
+     * If true, display width can be controlled by CSS. width and height must still both be set and are used to calculate the aspect ratio.
      */
-    responsive: boolean
+    responsive?: boolean
 
-    plugins: any[]
+    /**
+     * Array of plugins to load
+     */
+    plugins?: any[]
   }
 
   export interface Instance extends Options {
+    /**
+     * The unique spritespin instance identifier
+     */
     id: string
+
+    /**
+     * Array of all image urls
+     */
     source: string[]
+
+    /**
+     * Array of all image elements
+     */
     images: HTMLImageElement[]
-    target: any
+
+    /**
+     * The current preload progress state
+     */
+    progress: null | SpriteSpin.Utils.PreloadProgress
+
+    /**
+     * Array with measurement information for each image
+     */
     metrics: Utils.SheetSpec[]
+
+    /**
+     * The detected width of a single frame
+     */
     frameWidth: number
+
+    /**
+     * The detected height of a single frame
+     */
     frameHeight: number
 
+    /**
+     * Opaque state object. Plugins may store their information here.
+     */
     state: any
+
+    /**
+     * Is true during the preload phase
+     */
     loading: boolean
 
-    stage: any
-    canvas: any
+    /**
+     * The target element
+     */
+    target: JQuery
+
+    /**
+     * The inner stage element
+     */
+    stage: JQuery
+
+    /**
+     * The inner canvas element
+     */
+    canvas: JQuery<HTMLCanvasElement>
+
+    /**
+     * The 2D context of the canvas element
+     */
     context: CanvasRenderingContext2D
+
+    /**
+     * The pixel ratio of the canvas element
+     */
     canvasRatio: number
   }
 
@@ -597,12 +662,6 @@ namespace SpriteSpin {
     detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
     scrollThreshold   : 50,           // Number of pixels the user must drag within a frame to enable page scroll (for touch devices)
     preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
-
-    onInit            : undefined,    // Occurs when plugin has been initialized, but before loading the source files
-    onProgress        : undefined,    // Occurs when any source file has been loaded
-    onLoad            : undefined,    // Occurs when all source files have been loaded
-    onFrame           : undefined,    // Occurs when the frame number has been updated (e.g. during animation)
-    onDraw            : undefined,     // Occurs when all update is complete and frame can be drawn
 
     responsive        : undefined,
     plugins           : [
@@ -739,7 +798,8 @@ namespace SpriteSpin {
       source: data.source,
       preloadCount: data.preloadCount,
       progress: (progress) => {
-        data.target.trigger('onProgress', [progress, data])
+        data.progress = progress
+        data.target.trigger('onProgress', data)
       },
       complete: (images) => {
         data.images = images

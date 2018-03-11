@@ -6,13 +6,14 @@
     "outFile": "release/spritespin.js",
     "outDir": "release",
     "sourceMap": true,
+    "inlineSources": true,
     "declaration": true,
     "newLine": "LF",
     "rootDir": "src",
     "module": "none",
     "alwaysStrict": true,
     "noEmitOnError": false,
-    "removeComments": true,
+    "removeComments": false,
     "noEmitHelpers": true,
     "typeRoots": [
       "node_modules/@types"

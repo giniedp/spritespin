@@ -10,6 +10,7 @@ namespace SpriteSpin.Utils {
   }
 
   export interface Layout {
+    [key: string]: any
     width: string | number
     height: string | number
     top: number
