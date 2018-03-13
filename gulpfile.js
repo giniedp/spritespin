@@ -2,6 +2,8 @@
 
 const del = require('del')
 const gulp = require('gulp')
+const uglify = require('gulp-uglify')
+const concat = require('gulp-concat')
 const path = require('path')
 const shell = require('shelljs')
 const rollup = require('rollup')
@@ -51,6 +53,14 @@ gulp.task('build:rollup', ['build:esm5'], () => {
   })
 })
 
+gulp.task('build:uglify', ['build:rollup'], () => {
+  return gulp
+    .src(path.join(dstDir, 'spritespin.js'))
+    .pipe(uglify())
+    .pipe(concat('spritespin.min.js'))
+    .pipe(gulp.dest(dstDir))
+})
+
 gulp.task('build:typings', ['build:esm5', 'build:esm2015'], () => {
   return gulp
     .src([ path.join(dstDir, 'esm2015', '**', '*.d.ts') ])
@@ -63,7 +73,12 @@ gulp.task('build:typings', ['build:esm5', 'build:esm2015'], () => {
     })
 })
 
-gulp.task('build', ['build:esm5', 'build:esm2015', 'build:rollup', 'build:typings'], () => {
+gulp.task('build', ['build:esm5', 'build:esm2015', 'build:rollup', 'build:typings', 'build:uglify'], () => {
   //
 })
 
+gulp.task('publish', ['build'], (cb) => {
+  shell
+    .exec(`npm publish --access=public`, { async: true })
+    .on('exit', (code) => cb(code === 0 ? null : code))
+})
