@@ -1,20 +1,20 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#input-click', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
 
   beforeEach((done) => {
-    $el.spritespin({
-      source: WHITE50x50,
+    t.get$El().spritespin({
+      source: t.WHITE50x50,
       width: 10,
       height: 10,
       frames: 25,
       onLoad: done,
       plugins: ['click', '360']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)
@@ -25,13 +25,13 @@ describe('SpriteSpin.Plugins#input-click', () => {
       it ('is idle', () => {
         data.loading = true
         expect(data.frame).toBe(0, 'initial')
-        mouseUp(el, 0, 0)
+        t.mouseUp(t.getEl(), 0, 0)
         expect(data.frame).toBe(0)
-        mouseUp(el, 10, 0)
+        t.mouseUp(t.getEl(), 10, 0)
         expect(data.frame).toBe(0)
-        mouseUp(el, 0, 10)
+        t.mouseUp(t.getEl(), 0, 10)
         expect(data.frame).toBe(0)
-        mouseUp(el, 10, 10)
+        t.mouseUp(t.getEl(), 10, 10)
         expect(data.frame).toBe(0)
       })
     })
@@ -42,17 +42,17 @@ describe('SpriteSpin.Plugins#input-click', () => {
       })
       it ('decrements frame on left click', () => {
         expect(data.frame).toBe(0, 'initial')
-        mouseUp(el, 0, 5)
+        t.mouseUp(t.getEl(), 0, 5)
         expect(data.frame).toBe(data.frames - 1)
-        mouseUp(el, 5, 5)
+        t.mouseUp(t.getEl(), 5, 5)
         expect(data.frame).toBe(data.frames - 2)
       })
 
       it ('increments frame on right click', () => {
         expect(data.frame).toBe(0, 'initial')
-        mouseUp(el, 6, 5)
+        t.mouseUp(t.getEl(), 6, 5)
         expect(data.frame).toBe(1)
-        mouseUp(el, 10, 5)
+        t.mouseUp(t.getEl(), 10, 5)
         expect(data.frame).toBe(2)
       })
     })
@@ -64,17 +64,17 @@ describe('SpriteSpin.Plugins#input-click', () => {
 
       it ('decrements frame on upper click', () => {
         expect(data.frame).toBe(0, 'initial')
-        mouseUp(el, 5, 0)
+        t.mouseUp(t.getEl(), 5, 0)
         expect(data.frame).toBe(data.frames - 1)
-        mouseUp(el, 5, 5)
+        t.mouseUp(t.getEl(), 5, 5)
         expect(data.frame).toBe(data.frames - 2)
       })
 
       it ('increments frame on lower click', () => {
         expect(data.frame).toBe(0, 'initial')
-        mouseUp(el, 5, 6)
+        t.mouseUp(t.getEl(), 5, 6)
         expect(data.frame).toBe(1)
-        mouseUp(el, 5, 10)
+        t.mouseUp(t.getEl(), 5, 10)
         expect(data.frame).toBe(2)
       })
     })

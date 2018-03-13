@@ -1,7 +1,8 @@
-/// <reference path="./utils.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
+import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {
-  const Utils = SpriteSpin.Utils
 
   describe('#toArray', () => {
     it ('wraps string to array', () => {

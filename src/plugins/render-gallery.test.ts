@@ -1,12 +1,12 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-gallery', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: [RED40x30, GREEN40x30, BLUE40x30],
+    t.get$El().spritespin({
+      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
       width: 40,
       height: 30,
 
@@ -17,7 +17,7 @@ describe('SpriteSpin.Plugins#render-gallery', () => {
       onComplete: done,
       plugins: ['gallery']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -51,8 +51,8 @@ describe('SpriteSpin.Plugins#render-gallery', () => {
           expect(data.target.find('.gallery-stage img:nth-child(2)').css('opacity')).toBe('0.25', 'frame 1')
           expect(data.target.find('.gallery-stage img:nth-child(3)').css('opacity')).toBe('1', 'frame 2')
           done()
-        }, 16)
-      }, 16)
+        }, 32)
+      }, 32)
     })
   })
 })

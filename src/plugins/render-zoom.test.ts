@@ -1,20 +1,20 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-zoom', () => {
 
   function doubleTap(x, y, cb) {
-    el.dispatchEvent(mouseEvent('mousedown', x, y))
+    t.getEl().dispatchEvent(t.mouseEvent('mousedown', x, y))
     setTimeout(() => {
-      el.dispatchEvent(mouseEvent('mousedown', x, y))
+      t.getEl().dispatchEvent(t.mouseEvent('mousedown', x, y))
       setTimeout(cb, 16)
     }, 16)
   }
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: [RED40x30, GREEN40x30, BLUE40x30],
+    t.get$El().spritespin({
+      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
       width: 40,
       height: 30,
 
@@ -25,7 +25,7 @@ describe('SpriteSpin.Plugins#render-zoom', () => {
       onComplete: done,
       plugins: ['zoom']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {

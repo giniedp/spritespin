@@ -28,9 +28,7 @@ module.exports = (config) => {
     ],
     files: [
       'node_modules/jquery/dist/jquery.js',
-      ...tsconfig.files,
-      'tools/**/*.test.ts',
-      'src/**/*.test.ts'
+      'src/**/*.ts',
     ],
     preprocessors: {
       '**/*.ts': ['karma-typescript'],
@@ -47,7 +45,8 @@ module.exports = (config) => {
         validateSyntax: false,
       },
       exclude: ['node_modules', 'release'],
-      compilerOptions: tsconfig.compilerOptions,
+      // compilerOptions: tsconfig.compilerOptions,
+      tsconfig: 'tsconfig.json',
       // tsconfig: 'tsconfig.json',
       // Pass options to remap-istanbul.
       remapOptions: {

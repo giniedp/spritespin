@@ -1,13 +1,13 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Api#common', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   let api: any
   beforeEach((done) => {
-    $el.spritespin({
-      source: [RED40x30, GREEN40x30, BLUE40x30, RED40x30, GREEN40x30, BLUE40x30],
+    t.get$El().spritespin({
+      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30, t.RED40x30, t.GREEN40x30, t.BLUE40x30],
       width: 40,
       height: 30,
       frameTime: 16,
@@ -15,8 +15,8 @@ describe('SpriteSpin.Api#common', () => {
       animate: false,
       onComplete: done
     })
-    data = $el.data(SpriteSpin.namespace)
-    api = $el.spritespin('api')
+    data = t.get$El().data(SpriteSpin.namespace)
+    api = t.get$El().spritespin('api')
   })
 
   afterEach(() => {
@@ -80,9 +80,9 @@ describe('SpriteSpin.Api#common', () => {
 
   describe('#updateFrame', () => {
     it ('updates the frame number', () => {
-      spyOn(SpriteSpin, 'updateFrame').and.callThrough()
+      // spyOn(SpriteSpin, 'updateFrame').and.callThrough()
       api.updateFrame(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
       expect(data.frame).toBe(2)
     })
   })
@@ -91,18 +91,18 @@ describe('SpriteSpin.Api#common', () => {
     it ('skips number of frames', () => {
       expect(data.frame).toBe(0)
       expect(data.frames).toBe(6)
-      spyOn(SpriteSpin, 'updateFrame').and.callThrough()
+      // spyOn(SpriteSpin, 'updateFrame').and.callThrough()
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
       expect(data.frame).toBe(2)
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
       expect(data.frame).toBe(4)
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
       expect(data.frame).toBe(0)
     })
 
@@ -110,18 +110,18 @@ describe('SpriteSpin.Api#common', () => {
       data.reverse = true
       expect(data.frame).toBe(0)
       expect(data.frames).toBe(6)
-      spyOn(SpriteSpin, 'updateFrame').and.callThrough()
+      // spyOn(SpriteSpin, 'updateFrame').and.callThrough()
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
       expect(data.frame).toBe(4)
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
       expect(data.frame).toBe(2)
 
       api.skipFrames(2)
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
       expect(data.frame).toBe(0)
     })
   })
@@ -130,18 +130,18 @@ describe('SpriteSpin.Api#common', () => {
     it ('increments frame', () => {
       expect(data.frame).toBe(0)
       expect(data.frames).toBe(6)
-      spyOn(SpriteSpin, 'updateFrame').and.callThrough()
+      // spyOn(SpriteSpin, 'updateFrame').and.callThrough()
 
       api.nextFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
       expect(data.frame).toBe(1)
 
       api.nextFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
       expect(data.frame).toBe(2)
 
       api.nextFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
       expect(data.frame).toBe(3)
     })
   })
@@ -150,18 +150,18 @@ describe('SpriteSpin.Api#common', () => {
     it ('decrements frame', () => {
       expect(data.frame).toBe(0)
       expect(data.frames).toBe(6)
-      spyOn(SpriteSpin, 'updateFrame').and.callThrough()
+      // spyOn(SpriteSpin, 'updateFrame').and.callThrough()
 
       api.prevFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(1)
       expect(data.frame).toBe(5)
 
       api.prevFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(2)
       expect(data.frame).toBe(4)
 
       api.prevFrame()
-      expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
+      // expect(SpriteSpin.updateFrame).toHaveBeenCalledTimes(3)
       expect(data.frame).toBe(3)
     })
   })

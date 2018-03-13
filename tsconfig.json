@@ -3,55 +3,26 @@
   "compilerOptions": {
     "target": "es5",
     "noResolve": true,
-    "outFile": "release/spritespin.js",
     "outDir": "release",
     "sourceMap": true,
     "inlineSources": true,
     "declaration": true,
     "newLine": "LF",
     "rootDir": "src",
-    "module": "none",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "alwaysStrict": true,
-    "noEmitOnError": false,
-    "removeComments": false,
     "noEmitHelpers": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "types": [
       "jasmine",
-      "node",
-      "jquery"
+      "jquery",
+      "node"
     ]
   },
-  "files": [
-    "src/spritespin.ts",
-    "src/utils/cursor.ts",
-    "src/utils/detectSubsampling.ts",
-    "src/utils/layout.ts",
-    "src/utils/measure.ts",
-    "src/utils/naturalSize.ts",
-    "src/utils/preload.ts",
-    "src/utils/sourceArray.ts",
-    "src/utils/utils.ts",
-
-    "src/api/common.ts",
-    "src/api/fullscreen.ts",
-
-    "src/plugins/input-click.ts",
-    "src/plugins/input-drag.ts",
-    "src/plugins/input-hold.ts",
-    "src/plugins/input-swipe.ts",
-    "src/plugins/render-360.ts",
-    "src/plugins/render-blur.ts",
-    "src/plugins/render-ease.ts",
-    "src/plugins/render-gallery.ts",
-    "src/plugins/render-panorama.ts",
-    "src/plugins/render-zoom.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "release",
-    "tools"
+  "include": [
+    "src/**/*"
   ]
 }

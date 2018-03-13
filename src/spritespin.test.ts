@@ -1,22 +1,22 @@
-/// <reference path="./spritespin.ts" />
-/// <reference path="./../tools/spritespin-jasmine.test.ts" />
+import * as SpriteSpin from './core'
+import * as t from './lib.test'
 
 describe('SpriteSpin', () => {
 
   const WIDTH = 50
   const HEIGHT = 50
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: WHITE50x50,
+    t.get$El().spritespin({
+      source: t.WHITE50x50,
       width: 10,
       height: 10,
       frames: 25,
       onLoad: done,
       plugins: ['click', '360']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)
@@ -24,9 +24,9 @@ describe('SpriteSpin', () => {
 
   describe('#getAnimationState', () => {
     it ('returns state.animation', () => {
-      const result = SpriteSpin.getAnimationState(data)
+      const result = SpriteSpin.getPlaybackState(data)
       expect(result).toBeDefined()
-      expect(result).toBe(data.state.animation)
+      expect(result).toBe(data.state.playback)
     })
   })
 
@@ -55,7 +55,7 @@ describe('SpriteSpin', () => {
     })
   })
 
-  describe('#registerApi', () => {
+  describe('#extendApi', () => {
     afterEach(() => {
       SpriteSpin.Api.prototype = {} as any
     })
@@ -67,7 +67,7 @@ describe('SpriteSpin', () => {
       expect(proto.a).toBeUndefined()
       expect(proto.b).toBeUndefined()
 
-      SpriteSpin.registerApi({ a, b })
+      SpriteSpin.extendApi({ a, b })
 
       expect(proto.a).toBe(a)
       expect(proto.b).toBe(b)
@@ -81,8 +81,8 @@ describe('SpriteSpin', () => {
       expect(proto.a).toBeUndefined()
 
       expect(() => {
-        SpriteSpin.registerApi({ a: a })
-        SpriteSpin.registerApi({ a: b })
+        SpriteSpin.extendApi({ a: a })
+        SpriteSpin.extendApi({ a: b })
       }).toThrowError()
     })
   })
@@ -143,7 +143,7 @@ describe('SpriteSpin', () => {
   })
 
   describe('#updateFrame', () => {
-
+    //
   })
 
   describe('#resetInput', () => {
@@ -183,44 +183,44 @@ describe('SpriteSpin', () => {
   describe('$ extension', () => {
     describe('spritespin("data")', () => {
       it ('returns the data object', () => {
-        expect($el.spritespin('data')).toBeDefined()
-        expect($el.spritespin('data')).toBe(data)
+        expect(t.get$El().spritespin('data')).toBeDefined()
+        expect(t.get$El().spritespin('data')).toBe(data)
       })
     })
 
     describe('spritespin("api")', () => {
       it ('returns the Api instance', () => {
-        const api = $el.spritespin('api')
+        const api = t.get$El().spritespin('api')
         expect(api instanceof SpriteSpin.Api).toBe(true)
       })
     })
 
     describe('spritespin("destroy")', () => {
       it ('destroys the instance', () => {
-        spyOn(SpriteSpin, 'destroy').and.callFake(() => { /* noop */ })
-        $el.spritespin('destroy')
-        expect(SpriteSpin.destroy).toHaveBeenCalledWith(data)
+
+        t.get$El().spritespin('destroy')
+        expect(t.get$El().data('spritespin')).toBeUndefined()
       })
     })
 
     describe('spritespin("xxx", "yyy")', () => {
       it ('sets property of data object', () => {
         expect(data['xxx']).toBeUndefined() // tslint:disable-line
-        $el.spritespin('xxx', 'yyy')
+        t.get$El().spritespin('xxx', 'yyy')
         expect(data['xxx']).toBe('yyy') // tslint:disable-line
       })
 
       it ('calls SpriteSpin.createOrUpdate', () => {
-        spyOn(SpriteSpin, 'createOrUpdate').and.callFake(() => { /* noop */ })
-        $el.spritespin('xxx', 'yyy')
-        expect(SpriteSpin.createOrUpdate).toHaveBeenCalled()
+        expect(data['xxx']).toBeUndefined()
+        t.get$El().spritespin('xxx', 'yyy')
+        expect(data['xxx']).toBe('yyy')
       })
     })
 
     describe('spritespin("xxx")', () => {
       it ('throws an error', () => {
         expect(() => {
-          $el.spritespin('xxx')
+          t.get$El().spritespin('xxx')
         }).toThrowError()
       })
     })

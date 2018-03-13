@@ -1,12 +1,11 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="./../spritespin.ts" />
-/// <reference path="./layout.ts" />
-
-const Utils = SpriteSpin.Utils
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
+import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {
 
   describe('#getOuterSize', () => {
+
     it ('returns width, height and aspect', () => {
       const result = Utils.getOuterSize({ width: 100, height: 200 } as any)
       expect(result.width).toBe(100)
@@ -25,14 +24,14 @@ describe('SpriteSpin.Utils', () => {
   })
 
   describe('#getInnerLayout', () => {
-    const data: SpriteSpin.Utils.Layoutable = {
+    const data: Utils.Layoutable = {
       target: null,
       width: 100, height: 200,
       frameWidth: 100, frameHeight: 200,
       sizeMode: 'original'
     }
-    let inner: SpriteSpin.Utils.SizeWithAspect
-    let outer: SpriteSpin.Utils.SizeWithAspect
+    let inner: Utils.SizeWithAspect
+    let outer: Utils.SizeWithAspect
     const modes: SpriteSpin.SizeMode[] = ['original', 'fit', 'fill', 'stretch']
 
     describe('with equal outer and inner size', () => {
@@ -43,7 +42,7 @@ describe('SpriteSpin.Utils', () => {
 
       modes.forEach((mode) => {
         describe(`with '${mode}' mode`, () => {
-          let result: SpriteSpin.Utils.Layout
+          let result: Utils.Layout
 
           beforeEach(() => {
             data.sizeMode = mode
@@ -73,7 +72,7 @@ describe('SpriteSpin.Utils', () => {
       })
 
       describe(`with 'original' mode`, () => {
-        let result: SpriteSpin.Utils.Layout
+        let result: Utils.Layout
 
         beforeEach(() => {
           data.sizeMode = 'original'
@@ -94,7 +93,7 @@ describe('SpriteSpin.Utils', () => {
       })
 
       describe(`with 'fit' mode`, () => {
-        let result: SpriteSpin.Utils.Layout
+        let result: Utils.Layout
 
         beforeEach(() => {
           data.sizeMode = 'fit'
@@ -115,7 +114,7 @@ describe('SpriteSpin.Utils', () => {
       })
 
       describe(`with 'fill' mode`, () => {
-        let result: SpriteSpin.Utils.Layout
+        let result: Utils.Layout
 
         beforeEach(() => {
           data.sizeMode = 'fill'

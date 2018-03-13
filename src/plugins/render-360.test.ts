@@ -1,15 +1,15 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-360', () => {
 
   const WIDTH = 50
   const HEIGHT = 50
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
 
   beforeEach((done) => {
-    $el.spritespin({
-      source: WHITE50x50,
+    t.get$El().spritespin({
+      source: t.WHITE50x50,
       width: 10,
       height: 10,
       frames: 25,
@@ -17,7 +17,7 @@ describe('SpriteSpin.Plugins#render-360', () => {
       renderer: 'canvas',
       plugins: ['360']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -27,7 +27,7 @@ describe('SpriteSpin.Plugins#render-360', () => {
   describe('renderer = canvas', () => {
 
     beforeEach((done) => {
-      $el.spritespin({
+      t.get$El().spritespin({
         onComplete: done,
         renderer: 'canvas'
       })
@@ -49,7 +49,7 @@ describe('SpriteSpin.Plugins#render-360', () => {
   describe('renderer = background', () => {
 
     beforeEach((done) => {
-      $el.spritespin({
+      t.get$El().spritespin({
         onComplete: done,
         renderer: 'background'
       })
@@ -68,14 +68,14 @@ describe('SpriteSpin.Plugins#render-360', () => {
     })
 
     it ('shows background on stage', () => {
-      expect(data.stage.css('background-image')).toContain(WHITE50x50)
+      expect(data.stage.css('background-image')).toContain(t.WHITE50x50)
     })
   })
 
   describe('renderer = image', () => {
 
     beforeEach((done) => {
-      $el.spritespin({
+      t.get$El().spritespin({
         onComplete: done,
         renderer: 'image'
       })

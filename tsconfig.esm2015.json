@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "release/esm2015",
+    "module": "es2015",
+    "target": "es2015"
+  },
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
+}

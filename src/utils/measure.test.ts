@@ -1,11 +1,9 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="./../spritespin.ts" />
-/// <reference path="./measure.ts" />
-/// <reference path="./preload.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
+import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {
 
-  const Utils = SpriteSpin.Utils
   const WIDTH = 50
   const HEIGHT = 50
 
@@ -13,7 +11,7 @@ describe('SpriteSpin.Utils', () => {
 
   beforeEach((done) => {
     Utils.preload({
-      source: [WHITE50x50],
+      source: [t.WHITE50x50],
       complete: (result) => {
         image = result[0]
         done()
@@ -23,7 +21,7 @@ describe('SpriteSpin.Utils', () => {
 
   describe('#measure', () => {
 
-    let result: SpriteSpin.Utils.SheetSpec[]
+    let result: Utils.SheetSpec[]
 
     describe('a sprite sheet', () => {
       const FRAMES = 95

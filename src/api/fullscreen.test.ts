@@ -1,5 +1,4 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
 
 describe('SpriteSpin.Api#fullscreen', () => {
   // untestable

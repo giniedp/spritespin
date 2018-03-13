@@ -1,13 +1,12 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="./preload.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
+import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {
 
-  const Utils = SpriteSpin.Utils
-
   describe('#preload', () => {
 
-    const source = [RED40x30, GREEN40x30, BLUE40x30]
+    const source = [t.RED40x30, t.GREEN40x30, t.BLUE40x30]
 
     function expectArrayOfImages(input, output) {
       expect(Array.isArray(output)).toBe(true)
@@ -17,9 +16,9 @@ describe('SpriteSpin.Utils', () => {
 
     it ('accepts string input', (done) => {
       Utils.preload({
-        source: RED40x30,
+        source: t.RED40x30,
         initiated: (result) => {
-          expectArrayOfImages([RED40x30], result)
+          expectArrayOfImages([t.RED40x30], result)
           done()
         }
       })

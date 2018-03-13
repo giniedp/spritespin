@@ -1,19 +1,19 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-panorama', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: WHITE40x30,
+    t.get$El().spritespin({
+      source: t.WHITE40x30,
       width: 10,
       height: 10,
       animate: false,
       onComplete: done,
       plugins: ['panorama']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -27,13 +27,13 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
     })
 
     it ('renders the image as background', () => {
-      expect(data.stage.css('background-image')).toContain(WHITE40x30)
+      expect(data.stage.css('background-image')).toContain(t.WHITE40x30)
     })
   })
 
   describe('horizontal', () => {
     beforeEach((done) => {
-      $el.spritespin({
+      t.get$El().spritespin({
         orientation: 'horizontal',
         width: 10,
         height: 30,
@@ -59,7 +59,7 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
 
   describe('vertical', () => {
     beforeEach((done) => {
-      $el.spritespin({
+      t.get$El().spritespin({
         orientation: 'vertical',
         width: 40,
         height: 10,

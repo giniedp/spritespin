@@ -1,15 +1,15 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '../'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#input-drag', () => {
 
   const FRAME_WIDHT = 10
   const FRAME_HEIGHT = 10
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
 
   beforeEach((done) => {
-    $el.spritespin({
-      source: WHITE50x50,
+    t.get$El().spritespin({
+      source: t.WHITE50x50,
       width: FRAME_WIDHT,
       height: FRAME_HEIGHT,
       frames: 25,
@@ -17,7 +17,7 @@ describe('SpriteSpin.Plugins#input-drag', () => {
       animate: false,
       plugins: ['drag', '360']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)
@@ -33,9 +33,9 @@ describe('SpriteSpin.Plugins#input-drag', () => {
     describe('without click', () => {
       it ('ignores events', () => {
         expect(data.frame).toBe(0)
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0)
-        mouseMove(el, FRAME_WIDHT / 2, 0)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, 0)
         expect(data.frame).toBe(0)
       })
     })
@@ -44,68 +44,68 @@ describe('SpriteSpin.Plugins#input-drag', () => {
 
       it ('sets "dragging" flag on mousedown', () => {
         expect(SpriteSpin.is(data, 'dragging')).toBe(false)
-        mouseDown(el, 0, 0)
+        t.mouseDown(t.getEl(), 0, 0)
         expect(SpriteSpin.is(data, 'dragging')).toBe(true)
       })
 
       it ('removes "dragging" flag on mouseup', () => {
         SpriteSpin.flag(data, 'dragging', true)
         expect(SpriteSpin.is(data, 'dragging')).toBe(true)
-        mouseUp(el, 0, 0)
+        t.mouseUp(t.getEl(), 0, 0)
         expect(SpriteSpin.is(data, 'dragging')).toBe(false)
       })
 
       it ('updates frame on horizontal movement', () => {
         expect(data.frame).toBe(0, 'initial frame')
-        mouseDown(el, 0, 0)
+        t.mouseDown(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'after click')
-        mouseMove(el, FRAME_WIDHT / 2, 0)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, 0)
         expect(data.frame).toBe(12, 'on move right')
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'on move left')
-        mouseMove(el, 0, FRAME_WIDHT / 2)
+        t.mouseMove(t.getEl(), 0, FRAME_WIDHT / 2)
         expect(data.frame).toBe(0, 'on move down')
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'on move up')
       })
 
       it ('updates frame on vertical movement', () => {
         data.orientation = 'vertical'
         expect(data.frame).toBe(0, 'initial frame')
-        mouseDown(el, 0, 0)
+        t.mouseDown(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'after click')
-        mouseMove(el, FRAME_WIDHT / 2, 0)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, 0)
         expect(data.frame).toBe(0, 'on move right')
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'on move left')
-        mouseMove(el, 0, FRAME_WIDHT / 2)
+        t.mouseMove(t.getEl(), 0, FRAME_WIDHT / 2)
         expect(data.frame).toBe(12, 'on move vertical')
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'on move vertical')
       })
 
       it ('updates frame on angle axis movement', () => {
         data.orientation = 45
         expect(data.frame).toBe(0, 'initial frame')
-        mouseDown(el, FRAME_WIDHT / 2, FRAME_WIDHT / 2)
+        t.mouseDown(t.getEl(), FRAME_WIDHT / 2, FRAME_WIDHT / 2)
         expect(data.frame).toBe(0, 'after click')
-        mouseMove(el, FRAME_WIDHT, FRAME_WIDHT)
+        t.mouseMove(t.getEl(), FRAME_WIDHT, FRAME_WIDHT)
         expect(data.frame).toBe(0, 'on move to lower right')
-        mouseMove(el, FRAME_WIDHT / 2, FRAME_WIDHT / 2)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, FRAME_WIDHT / 2)
         expect(data.frame).toBe(0, 'on move to center')
-        mouseMove(el, 0, FRAME_WIDHT / 2)
+        t.mouseMove(t.getEl(), 0, FRAME_WIDHT / 2)
         expect(data.frame).toBe(16, 'on move to lower left')
-        mouseMove(el, FRAME_WIDHT / 2, FRAME_WIDHT / 2)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, FRAME_WIDHT / 2)
         expect(data.frame).toBe(0, 'on move to center')
       })
 
       it ('updates the frame', () => {
         expect(data.frame).toBe(0, 'initial frame')
-        mouseDown(el, 0, 0)
+        t.mouseDown(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'after click')
-        mouseMove(el, FRAME_WIDHT / 2, 0)
+        t.mouseMove(t.getEl(), FRAME_WIDHT / 2, 0)
         expect(data.frame).toBe(12, 'on move right')
-        mouseMove(el, 0, 0)
+        t.mouseMove(t.getEl(), 0, 0)
         expect(data.frame).toBe(0, 'on move left')
       })
     })

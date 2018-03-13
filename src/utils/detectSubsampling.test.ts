@@ -1,10 +1,8 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="./preload.ts" />
-/// <reference path="./detectSubsampling.ts" />
+import * as t from '../lib.test'
+import * as Utils from './index'
 
 describe('SpriteSpin.Utils', () => {
 
-  const Utils = SpriteSpin.Utils
   const WIDTH = 50
   const HEIGHT = 50
 
@@ -12,7 +10,7 @@ describe('SpriteSpin.Utils', () => {
 
   beforeEach((done) => {
     Utils.preload({
-      source: [WHITE50x50],
+      source: [t.WHITE50x50],
       complete: (result) => {
         image = result[0]
         done()

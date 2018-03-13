@@ -1,12 +1,12 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-ease', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: [RED40x30, GREEN40x30, BLUE40x30],
+    t.get$El().spritespin({
+      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
       width: 40,
       height: 30,
 
@@ -14,7 +14,7 @@ describe('SpriteSpin.Plugins#render-ease', () => {
       onComplete: done,
       plugins: ['drag', 'ease']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -28,12 +28,12 @@ describe('SpriteSpin.Plugins#render-ease', () => {
     it ('doesnt break', (done) => {
       // can not test ease programmatically
       // thus just emulate mouse drag
-      mouseDown(el, 0, 0)
+      t.mouseDown(t.getEl(), 0, 0)
       setTimeout(() => {
-        mouseMove(el, 5, 5)
+        t.mouseMove(t.getEl(), 5, 5)
         setTimeout(() => {
-          mouseMove(el, 10, 5)
-          mouseUp(el, 10, 5)
+          t.mouseMove(t.getEl(), 10, 5)
+          t.mouseUp(t.getEl(), 10, 5)
           done()
         }, 16)
       }, 16)

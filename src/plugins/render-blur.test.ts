@@ -1,12 +1,12 @@
-/// <reference path="../../tools/spritespin-jasmine.test.ts" />
-/// <reference path="../spritespin.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-blur', () => {
 
-  let data: SpriteSpin.Instance
+  let data: SpriteSpin.Data
   beforeEach((done) => {
-    $el.spritespin({
-      source: [RED40x30, GREEN40x30, BLUE40x30],
+    t.get$El().spritespin({
+      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
       width: 40,
       height: 30,
 
@@ -14,7 +14,7 @@ describe('SpriteSpin.Plugins#render-blur', () => {
       onComplete: done,
       plugins: ['blur']
     })
-    data = $el.data(SpriteSpin.namespace)
+    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {

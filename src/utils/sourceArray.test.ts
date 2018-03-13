@@ -1,7 +1,8 @@
-/// <reference path="./sourceArray.ts" />
+import * as SpriteSpin from '..'
+import * as t from '../lib.test'
+import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {
-  const Utils = SpriteSpin.Utils
 
   describe('#sourceArray', () => {
     it ('generates array of urls', () => {

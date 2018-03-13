@@ -1,0 +1,85 @@
+import { getCursorPosition } from '../utils'
+import { Data } from './models'
+import { getState } from './state'
+
+export interface InputState {
+  oldX: number
+  oldY: number
+  currentX: number
+  currentY: number
+  startX: number
+  startY: number
+  clickframe: number
+  clicklane: number
+  dX: number
+  dY: number
+  ddX: number
+  ddY: number
+  ndX: number
+  ndY: number
+  nddX: number
+  nddY: number
+}
+
+export function getInputState(data: Data): InputState {
+  return getState(data, 'input')
+}
+
+/**
+ * Updates the input state of the SpriteSpin data using the given mouse or touch event.
+ */
+export function updateInput(e, data: Data) {
+  const cursor = getCursorPosition(e)
+  const state = getInputState(data)
+
+  // cache positions from previous frame
+  state.oldX = state.currentX
+  state.oldY = state.currentY
+
+  state.currentX = cursor.x
+  state.currentY = cursor.y
+
+  // Fix old position.
+  if (state.oldX === undefined || state.oldY === undefined) {
+    state.oldX = state.currentX
+    state.oldY = state.currentY
+  }
+
+  // Cache the initial click/touch position and store the frame number at which the click happened.
+  // Useful for different behavior implementations. This must be restored when the click/touch is released.
+  if (state.startX === undefined || state.startY === undefined) {
+    state.startX = state.currentX
+    state.startY = state.currentY
+    state.clickframe = data.frame
+    state.clicklane = data.lane
+  }
+
+  // Calculate the vector from start position to current pointer position.
+  state.dX = state.currentX - state.startX
+  state.dY = state.currentY - state.startY
+
+  // Calculate the vector from last frame position to current pointer position.
+  state.ddX = state.currentX - state.oldX
+  state.ddY = state.currentY - state.oldY
+
+  // Normalize vectors to range [-1:+1]
+  state.ndX = state.dX / data.target.innerWidth()
+  state.ndY = state.dY / data.target.innerHeight()
+
+  state.nddX = state.ddX / data.target.innerWidth()
+  state.nddY = state.ddY / data.target.innerHeight()
+}
+
+/**
+ * Resets the input state of the SpriteSpin data.
+ */
+export function resetInput(data: Data) {
+  const input = getInputState(data)
+  input.startX = input.startY = undefined
+  input.currentX = input.currentY = undefined
+  input.oldX = input.oldY = undefined
+  input.dX = input.dY = 0
+  input.ddX = input.ddY = 0
+  input.ndX = input.ndY = 0
+  input.nddX = input.nddY = 0
+}

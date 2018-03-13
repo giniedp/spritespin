@@ -1,21 +1,54 @@
 {
   "name": "spritespin",
+  "description": "jQuery plugin for creating flipbook animations",
   "version": "4.0.0",
+  "author": "Alexander Graefenstein",
+  "license": "MIT",
+  "keywords": [
+    "spritespin",
+    "360",
+    "animation",
+    "flipbook",
+    "panorama",
+    "jquery-plugin",
+    "ecosystem:jquery"
+  ],
+  "main": "release/spritespin.js",
+  "module": "release/esm5/index.js",
+  "es2015": "release/esm2015/index.js",
+  "typings": "release/typings/index.d.ts",
+  "files": [
+    "release",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/giniedp/spritespin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/giniedp/spritespin/issues"
+  },
   "engines": {
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "doc": "typedoc --hideGenerator --ignoreCompilerErrors --out ./doc --tsconfig ./tsconfig.json --mode file",
+    "doc": "typedoc --hideGenerator --ignoreCompilerErrors --out ./doc --tsconfig tsconfig.json --mode file --exclude '**/*.test.ts' --theme minimal",
     "lint": "tslint --config tslint.json src/**/*.ts",
     "lint:silent": "tslint --config tslint.json src/**/*.ts || true",
     "build": "tsc",
-    "build:es2015": "tsc --project ./tsconfig.es2015.json",
+    "build:esm5": "tsc --project ./tsconfig.esm5.json",
+    "build:esm2015": "tsc --project ./tsconfig.esm2015.json",
     "build:watch": "tsc -w",
     "test": "karma start --no-auto-watch --single-run",
     "test:watch": "karma start --auto-watch --no-single-run",
     "test:coverage": "IS_COVERAGE=yes karma start --single-run",
-    "test:coveralls": "IS_COVERALLS=yes karma start --single-run && cat coverage/lcov/lcovonly | ./node_modules/.bin/coveralls",
-    "serve": "pushd page && python -m SimpleHTTPServer 3000"
+    "test:coveralls": "IS_COVERALLS=yes karma start --single-run && cat coverage/lcov/lcovonly | ./node_modules/.bin/coveralls"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "jquery": ">1.11.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.54",
@@ -35,33 +68,13 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-safari-launcher": "^1.0.0",
     "karma-typescript": "^3.0.12",
+    "rollup": "^0.56.5",
+    "rollup-plugin-node-resolve": "^3.2.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
     "shelljs": "^0.8.1",
     "through-gulp": "^0.5.0",
     "tslint": "^5.7.0",
+    "typedoc": "^0.11.1",
     "typescript": "^2.7.2"
-  },
-  "description": "jQuery plugin for creating flipbook animations",
-  "main": "dist/spritespin.js",
-  "peerDependencies": {
-    "jquery": ">1.11.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/giniedp/spritespin.git"
-  },
-  "keywords": [
-    "spritespin",
-    "360",
-    "animation",
-    "flipbook",
-    "panorama",
-    "jquery-plugin",
-    "ecosystem:jquery"
-  ],
-  "author": "Alexander Graefenstein",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/giniedp/spritespin/issues"
-  },
-  "dependencies": {}
+  }
 }

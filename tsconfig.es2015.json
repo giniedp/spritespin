@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "target": "es2015",
-    "outFile": "release/es2015/spritespin.js"
-  }
-}
