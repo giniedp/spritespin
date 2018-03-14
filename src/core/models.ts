@@ -151,10 +151,6 @@ export interface Options extends CallbackOptions {
    */
   detectSubsampling?: boolean
   /**
-   * Number of pixels the user must drag within a frame to enable page scroll (for touch devices)
-   */
-  scrollThreshold?: number
-  /**
    * Number of images to preload. If nothing is set, all images are preloaded.
    */
   preloadCount?: number

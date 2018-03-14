@@ -78,7 +78,6 @@ export const defaults: Options = {
   senseLane         : undefined,    // Interaction sensitivity used by behavior implementations
   orientation       : 'horizontal', // Preferred axis for user interaction
   detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
-  scrollThreshold   : 50,           // Number of pixels the user must drag within a frame to enable page scroll (for touch devices)
   preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
 
   responsive        : undefined,

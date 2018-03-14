@@ -9,7 +9,7 @@ export function getCursorPosition(event) {
   }
   // get current touch or mouse position
   if (touches !== undefined && touches.length > 0) {
-    source = event.touches[0]
+    source = touches[0]
   }
   return {
     x: source.clientX || 0,

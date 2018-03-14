@@ -5,8 +5,9 @@ import * as SpriteSpin from '../core'
 const NAME = 'drag'
 
 interface DragState {
-  frame: number
-  lane: number
+  startAt?: number
+  frame?: number
+  lane?: number
 }
 
 function getState(data: SpriteSpin.Data) {
@@ -28,6 +29,13 @@ function dragStart(e, data: SpriteSpin.Data) {
   if (data.loading || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
     return
   }
+
+  // allow browser scroll only on double tap
+  const now = new Date().getTime()
+  if (state.startAt && (now - state.startAt > 200)) {
+    e.preventDefault()
+  }
+  state.startAt = now
 
   state.frame = data.frame || 0
   state.lane = data.lane || 0
@@ -63,15 +71,6 @@ function drag(e, data: SpriteSpin.Data) {
   const oldLane = data.lane
   SpriteSpin.updateFrame(data, Math.floor(state.frame), Math.floor(state.lane))
   SpriteSpin.stopAnimation(data)
-
-  if (/^touch.*/.test(e.name) && (oldFrame !== data.frame || oldLane !== data.lane)) {
-    // prevent touch scroll
-    e.preventDefault()
-    // stop dragging if the drag distance exceeds the scroll threshold.
-    if (data.scrollThreshold != null && (Math.abs(input.ddX) + Math.abs(input.ddY)) > data.scrollThreshold) {
-      dragEnd(e, data)
-    }
-  }
 }
 
 function mousemove(e, data) {
