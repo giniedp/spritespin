@@ -35,8 +35,6 @@ export function applyLayout(data: Data) {
   if (!data.canvas) { return }
   // apply layout on canvas
   data.canvas.css(layout).hide()
-  data.context.scale(data.canvasRatio, data.canvasRatio)
-
   // apply pixel ratio on canvas
   data.canvasRatio = data.canvasRatio || Utils.pixelRatio(data.context)
   if (typeof layout.width === 'number' && typeof layout.height === 'number') {
@@ -46,4 +44,6 @@ export function applyLayout(data: Data) {
     data.canvas[0].width = (size.width * data.canvasRatio)
     data.canvas[0].height = (size.height * data.canvasRatio)
   }
+  // width and height must be set before calling scale
+  data.context.scale(data.canvasRatio, data.canvasRatio)
 }
