@@ -77,6 +77,10 @@ gulp.task('build', ['build:esm5', 'build:esm2015', 'build:rollup', 'build:typing
   //
 })
 
+gulp.task('watch', ['build'], () => {
+  gulp.watch([ path.join('src', '**', '*.ts') ], ['build'])
+})
+
 gulp.task('publish', ['build'], (cb) => {
   shell
     .exec(`npm publish --access=public`, { async: true })
