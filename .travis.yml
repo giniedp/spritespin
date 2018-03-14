@@ -1,0 +1,8 @@
+language: node_js
+matrix:
+  include:
+    - os: osx
+addons:
+  firefox: "53.0"
+node_js:
+  - "8"

@@ -1,41 +1,81 @@
 {
   "name": "spritespin",
-  "version": "3.4.3",
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "scripts": {},
-  "devDependencies": {
-    "del": "^2.0.2",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
-    "gulp-docco": "^0.0.4",
-    "gulp-jade": "^1.1.0",
-    "gulp-jsdoc": "^0.1.5",
-    "gulp-sass": "^2.2.0",
-    "gulp-uglify": "^1.4.2",
-    "gulp-webserver": "^0.9.1",
-    "gulp-plumber": "^1.1.0",
-    "gulp-livereload": "^3.8.1",
-    "merge": "^1.2.0"
-  },
   "description": "jQuery plugin for creating flipbook animations",
-  "main": "release/spritespin.js",
-  "dependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/giniedp/spritespin.git"
-  },
+  "version": "4.0.1",
+  "author": "Alexander Graefenstein",
+  "license": "MIT",
   "keywords": [
     "spritespin",
     "360",
     "animation",
     "flipbook",
-    "panorama"
+    "panorama",
+    "jquery-plugin",
+    "ecosystem:jquery"
   ],
-  "author": "Alexander Graefenstein",
-  "license": "MIT",
+  "main": "release/spritespin.js",
+  "module": "release/esm5/index.js",
+  "es2015": "release/esm2015/index.js",
+  "typings": "release/typings/index.d.ts",
+  "files": [
+    "release",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/giniedp/spritespin.git"
+  },
   "bugs": {
     "url": "https://github.com/giniedp/spritespin/issues"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "doc": "typedoc --hideGenerator --ignoreCompilerErrors --out ./doc --tsconfig tsconfig.json --mode file --exclude '**/*.test.ts' --theme minimal",
+    "lint": "tslint --config tslint.json src/**/*.ts",
+    "lint:silent": "tslint --config tslint.json src/**/*.ts || true",
+    "build": "tsc",
+    "build:esm5": "tsc --project ./tsconfig.esm5.json",
+    "build:esm2015": "tsc --project ./tsconfig.esm2015.json",
+    "build:watch": "tsc -w",
+    "test": "karma start --no-auto-watch --single-run",
+    "test:watch": "karma start --auto-watch --no-single-run",
+    "test:coverage": "IS_COVERAGE=yes karma start --single-run",
+    "test:coveralls": "IS_COVERALLS=yes karma start --single-run && cat coverage/lcov/lcovonly | ./node_modules/.bin/coveralls"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "jquery": ">1.11.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.5.54",
+    "@types/jquery": "^3.2.12",
+    "@types/node": "^8.0.27",
+    "coveralls": "^3.0.0",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.0",
+    "jasmine-core": "^2.8.0",
+    "jquery": "^3.2.1",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jasmine": "1.1.0",
+    "karma-mocha-reporter": "^2.2.4",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-typescript": "^3.0.12",
+    "rollup": "^0.56.5",
+    "rollup-plugin-node-resolve": "^3.2.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "shelljs": "^0.8.1",
+    "through-gulp": "^0.5.0",
+    "tslint": "^5.7.0",
+    "typedoc": "^0.11.1",
+    "typescript": "^2.7.2"
   }
 }

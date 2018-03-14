@@ -3,6 +3,8 @@
 .idea
 .sass-cache/
 .vscode
+.coveralls.yml
 node_modules
-bower_components
-dist
+coverage
+doc
+release

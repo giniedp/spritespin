@@ -1,128 +1,88 @@
-'use strict';
+'use strict'
 
-var del = require('del');
-var gulp = require('gulp');
-var merge = require('merge');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var sass = require("gulp-sass");
-var jade = require('gulp-jade');
-var docco = require('gulp-docco');
-var plumber = require('gulp-plumber');
-var webserver = require('gulp-webserver');
-var livereload = require('gulp-livereload');
+const del = require('del')
+const gulp = require('gulp')
+const uglify = require('gulp-uglify')
+const concat = require('gulp-concat')
+const path = require('path')
+const shell = require('shelljs')
+const rollup = require('rollup')
 
-var source = [
-  'src/spritespin.js',
-  'src/spritespin.api.js',
-  'src/spritespin.api-*.js',
-  'src/spritespin.beh-*.js',
-  'src/spritespin.mod-*.js'
-];
+const dstDir = path.join(__dirname, 'release')
 
-function src(){
-  return gulp.src.apply(gulp, arguments)
-  .pipe(plumber(function (err) {
-    console.error(err.message || err);
-  }))
-}
+gulp.task('clean', () => del(dstDir))
 
-gulp.task('clean', function(){
-  del([
-    'page/docs',
-    'page/*.*'
-  ])
-});
+gulp.task('build:esm5', ['clean'], (cb) => {
+  shell
+    .exec('yarn run build:esm5', { async: true })
+    .on('exit', (code) => cb(code === 0 ? null : code))
+})
 
-//
-// LIBRARY TASKS
-//
+gulp.task('build:esm2015', ['clean'], (cb) => {
+  shell
+    .exec('yarn run build:esm2015', { async: true })
+    .on('exit', (code) => cb(code === 0 ? null : code))
+})
 
-gulp.task('spritespin', function(){
-  return src(source)
-    .pipe(concat("spritespin.js"))
-    .pipe(gulp.dest('page'))
-    .pipe(gulp.dest('release'))
-    .pipe(livereload())
-    .pipe(concat("spritespin.min.js"))
-    .pipe(uglify({
-      mangle: false,
-      compress: true
-    }))
-    .pipe(gulp.dest('page'))
-    .pipe(gulp.dest('release'));
-});
+gulp.task('build:rollup', ['build:esm5'], () => {
+  const resolve = require('rollup-plugin-node-resolve')
+  const sourcemaps = require('rollup-plugin-sourcemaps')
+  const globals = {
+    '$': 'jquery',
+  }
 
-//
-// WEBSITE TASKS
-//
+  return rollup.rollup({
+    amd: {id: `SpriteSpin`},
+    input: path.join(dstDir, 'esm5', 'index.js'),
+    onwarn: (warning, warn) => {
+      if (warning.code === 'THIS_IS_UNDEFINED') {return}
+      warn(warning);
+    },
+    plugins: [resolve(), sourcemaps()],
+    external: Object.keys(globals),
+  })
+  .then((bundle) => {
+    return bundle.write({
+      format: 'umd',
+      sourcemap: true,
+      file: path.join(dstDir, 'spritespin.js'),
+      name: 'SpriteSpin',
+      globals: globals,
+      exports: 'named',
+    })
+  })
+})
 
-gulp.task('page:scripts', function() {
-  return gulp.src([
-    'bower_components/jquery/dist/jquery.js',
-    'bower_components/prism/prism.js',
-    'bower_components/prism/components/prism-glsl.js',
-    'bower_components/prism/components/prism-css.js',
-    'bower_components/prism/components/prism-markup.js',
-    'bower_components/prism/components/prism-javascript.js',
-    'bower_components/prism/plugins/autolinker/prism-autolinker.js',
-    'bower_components/prism/plugins/line-numbers/prism-line-numbers.js',
-    'bower_components/prism/plugins/normalize-whitespace/prism-normalize-whitespace.js',
-    'src/page/page.js',
-  ])
-  .pipe(concat('page.js'))
-  .pipe(gulp.dest('page'))
-  .pipe(livereload());
-});
+gulp.task('build:uglify', ['build:rollup'], () => {
+  return gulp
+    .src(path.join(dstDir, 'spritespin.js'))
+    .pipe(uglify())
+    .pipe(concat('spritespin.min.js'))
+    .pipe(gulp.dest(dstDir))
+})
 
-gulp.task('page:html', function() {
-  return src('src/page/**/*.jade')
-    .pipe(jade({ pretty: true }))
-    .pipe(gulp.dest('page'))
-    .pipe(concat('page.html'))
-    .pipe(livereload());
-});
+gulp.task('build:typings', ['build:esm5', 'build:esm2015'], () => {
+  return gulp
+    .src([ path.join(dstDir, 'esm2015', '**', '*.d.ts') ])
+    .pipe(gulp.dest(path.join(dstDir, 'typings')))
+    .on('end', () => {
+      del([
+        path.join(dstDir, 'esm2015', '**', '*.d.ts'),
+        path.join(dstDir, 'esm5', '**', '*.d.ts')
+      ])
+    })
+})
 
-gulp.task('page:style', function() {
-  return src('src/page/style/style.scss')
-    .pipe(sass({
-      // includePaths: ["bower_components/kube-scss/scss"]
-    }).on("error", sass.logError))
-    .pipe(concat('style.css'))
-    .pipe(gulp.dest('page'))
-    .pipe(livereload());
-});
+gulp.task('build', ['build:esm5', 'build:esm2015', 'build:rollup', 'build:typings', 'build:uglify'], () => {
+  //
+})
 
-gulp.task('page:docs', function(){
-  return gulp.src(source)
-    .pipe(docco({ layout: 'parallel' }))
-    .pipe(gulp.dest('page/docs'))
-});
+gulp.task('watch', ['build'], () => {
+  gulp.watch([ path.join('src', '**', '*.ts') ], ['build'])
+})
 
-//
-//
-//
-
-gulp.task('page', ['page:scripts', 'page:style', 'page:scripts', 'page:html', 'page:docs']);
-gulp.task('build', ['spritespin', 'page']);
-gulp.task('default', ['build']);
-
-gulp.task('watch', ['build'], function(){
-  gulp.watch("src/*.js", ['spritespin']);
-  gulp.watch("src/page/**/*.js", ['page:scripts']);
-  gulp.watch("src/page/**/*.jade", ['page:html']);
-  gulp.watch("src/page/**/*.scss", ['page:style']);
-});
-
-gulp.task('serve', function() {
-  gulp.src('page')
-    .pipe(webserver({
-      host: "0.0.0.0",
-      port: 3000,
-      livereload: true,
-      directoryListing: false,
-      open: false
-    }));
-});
-
-
+gulp.task('publish', ['build'], (cb) => {
+  shell
+    .exec(`npm publish --access=public`, { async: true })
+    .on('exit', (code) => cb(code === 0 ? null : code))
+})

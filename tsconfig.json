@@ -1,0 +1,28 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es5",
+    "noResolve": true,
+    "outDir": "release",
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+    "newLine": "LF",
+    "rootDir": "src",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "noEmitHelpers": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "jquery",
+      "node"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
