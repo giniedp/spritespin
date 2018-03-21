@@ -99,3 +99,11 @@ export function applyAnimation(data: Data) {
     state.handler = window.setInterval(() => updateAnimation(data), state.frameTime)
   }
 }
+
+/**
+ * Starts the animation playback
+ */
+export function startAnimation(data: Data) {
+  data.animate = true
+  applyAnimation(data)
+}

@@ -114,6 +114,10 @@ export interface Options extends CallbackOptions {
    */
   animate?: boolean
   /**
+   * If true, retains the animation after user iser interaction
+   */
+  retainAnimate?: boolean
+  /**
    * If true, animation playback is reversed
    */
   reverse?: boolean

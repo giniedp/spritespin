@@ -68,6 +68,7 @@ export const defaults: Options = {
   frame             : 0,            // Initial (and current) frame number
   frameTime         : 40,           // Time in ms between updates. 40 is exactly 25 FPS
   animate           : true,         // If true starts the animation on load
+  retainAnimate     : false,        // If true, retains the animation after user interaction
   reverse           : false,        // If true animation is played backward
   loop              : true,         // If true loops the animation
   stopFrame         : 0,            // Stops the animation at this frame if loop is disabled

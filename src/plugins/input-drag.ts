@@ -8,6 +8,7 @@ interface DragState {
   startAt?: number
   frame?: number
   lane?: number
+  wasPlaying?: boolean
 }
 
 function getState(data: SpriteSpin.Data) {
@@ -36,6 +37,7 @@ function dragStart(e, data: SpriteSpin.Data) {
     e.preventDefault()
   }
   state.startAt = now
+  state.wasPlaying = !!SpriteSpin.getPlaybackState(data).handler
 
   state.frame = data.frame || 0
   state.lane = data.lane || 0
@@ -47,6 +49,9 @@ function dragEnd(e, data: SpriteSpin.Data) {
   if (SpriteSpin.is(data, 'dragging')) {
     SpriteSpin.flag(data, 'dragging', false)
     SpriteSpin.resetInput(data)
+    if (data.retainAnimate && getState(data).wasPlaying) {
+      SpriteSpin.startAnimation(data)
+    }
   }
 }
 
