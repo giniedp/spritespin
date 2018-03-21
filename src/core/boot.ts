@@ -233,6 +233,7 @@ export function createOrUpdate(options: Options) {
 export function destroy(data: Data) {
   popInstance(data)
   stopAnimation(data)
+  data.target.trigger('onDestroy', data)
   Utils.unbind(data.target)
   data.target.removeData(namespace)
 }
