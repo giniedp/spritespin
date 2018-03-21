@@ -13,7 +13,7 @@ export function extendApi(methods: { [key: string]: any }) {
   for (const key in methods) {
     if (methods.hasOwnProperty(key)) {
       if (api[key]) {
-        $.error('API method is already defined: ' + key)
+        throw new Error('API method is already defined: ' + key)
       } else {
         api[key] = methods[key]
       }

@@ -29,7 +29,7 @@ function onInit(e, data: SpriteSpin.Data) {
   const state = getState(data)
   state.source = getOption(data, 'zoomSource', data.source)
   state.doubleClickTime = getOption(data, 'zoomDoubleClickTime', 500)
-  state.stage = state.stage || $("<div class='zoom-stage'></div>")
+  state.stage = state.stage || Utils.$("<div class='zoom-stage'></div>")
   state.stage.css({
     width    : '100%',
     height   : '100%',

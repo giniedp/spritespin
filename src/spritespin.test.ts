@@ -1,5 +1,6 @@
 import * as SpriteSpin from './core'
 import * as t from './lib.test'
+import { $ } from './utils'
 
 describe('SpriteSpin', () => {
 
@@ -8,6 +9,7 @@ describe('SpriteSpin', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
+    $.noConflict(true)
     t.get$El().spritespin({
       source: t.WHITE50x50,
       width: 10,

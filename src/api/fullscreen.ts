@@ -1,4 +1,5 @@
 import { boot, Data, extendApi, namespace, SizeMode } from '../core'
+import { $ } from '../utils'
 
 export interface Options {
   source?: string | string[],

@@ -35,7 +35,7 @@ function getOption(data, name, fallback) {
 function init(e, data: SpriteSpin.Data) {
   const state = getState(data)
 
-  state.canvas = state.canvas || $("<canvas class='blur-layer'></canvas>")
+  state.canvas = state.canvas || Utils.$("<canvas class='blur-layer'></canvas>")
   state.context = state.context || state.canvas[0].getContext('2d')
   state.steps = state.steps || []
   state.fadeTime = Math.max(getOption(data, 'blurFadeTime', 200), 1)

@@ -32,7 +32,7 @@ function load(e, data: SpriteSpin.Data) {
   state.frame = data.frame
   state.speed = getOption(data, 'gallerySpeed', 500)
   state.opacity = getOption(data, 'galleryOpacity', 0.25)
-  state.stage = getOption(data, 'galleryStage', $('<div></div>'))
+  state.stage = getOption(data, 'galleryStage', Utils.$('<div></div>'))
 
   state.stage.empty().addClass('gallery-stage').prependTo(data.stage)
 
@@ -41,7 +41,7 @@ function load(e, data: SpriteSpin.Data) {
     const naturalSize = Utils.naturalSize(image)
     const scale = data.height / naturalSize.height
 
-    const img = $(image)
+    const img = Utils.$(image)
     state.stage.append(img)
     state.images.push(img)
     state.offsets.push(-size + (data.width - image.width * scale) / 2)

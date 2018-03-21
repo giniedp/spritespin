@@ -1,5 +1,6 @@
 import * as SpriteSpin from '..'
 import * as t from '../lib.test'
+import { $ } from '../utils'
 
 describe('SpriteSpin.Plugins#render-zoom', () => {
 

@@ -1,3 +1,4 @@
+export * from './jquery'
 export * from './cursor'
 export * from './detectSubsampling'
 export * from './layout'

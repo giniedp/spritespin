@@ -6,6 +6,8 @@ import { Data, Options } from './models'
 import { applyAnimation, stopAnimation } from './playback'
 import { applyPlugins } from './plugins'
 
+const $ = Utils.$
+
 let counter = 0
 /**
  * Collection of all SpriteSpin instances
