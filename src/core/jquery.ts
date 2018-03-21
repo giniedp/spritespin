@@ -14,7 +14,10 @@ function extension(obj, value) {
   }
   if (obj === 'destroy') {
     return $(this).each(() => {
-      destroy($(this).data(namespace))
+      const data = $(this).data(namespace)
+      if (data) {
+        destroy(data)
+      }
     })
   }
   if (arguments.length === 2 && typeof obj === 'string') {
