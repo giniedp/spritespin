@@ -1,7 +1,7 @@
 function padNumber(num: number, length: number, pad: string): string {
   let result = String(num)
   while (result.length < length) {
-    result = String(pad) + num
+    result = String(pad) + result
   }
   return result
 }
