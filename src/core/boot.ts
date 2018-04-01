@@ -134,7 +134,9 @@ export function boot(data: Data) {
 
   data.source = Utils.toArray(data.source)
   data.loading = true
-  data.target.addClass('loading').trigger('onInit', data)
+  data.target
+    .addClass('loading')
+    .trigger('onInit', data)
   Utils.preload({
     source: data.source,
     preloadCount: data.preloadCount,
@@ -170,7 +172,7 @@ export function create(options: Options): Data {
 
   // SpriteSpin is not initialized
   // Create default settings object and extend with given options
-  const data = $.extend({}, defaults, options) as Data
+  const data = $.extend(true, {}, defaults, options) as Data
 
   // ensure source is set
   data.source = data.source || []
@@ -253,7 +255,12 @@ export function createOrUpdate(options: Options): Data {
 export function destroy(data: Data) {
   popInstance(data)
   stopAnimation(data)
-  data.target.trigger('onDestroy', data)
+  data.target
+    .trigger('onDestroy', data)
+    .html(null)
+    .attr('style', null)
+    .attr('unselectable', null)
+    .removeClass(['spritespin-instance', 'with-canvas'])
   Utils.unbind(data.target)
   data.target.removeData(namespace)
 }
