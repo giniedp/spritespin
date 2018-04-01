@@ -67,8 +67,8 @@ gulp.task('build:uglify', ['build:rollup'], () => {
 
 gulp.task('build', ['build:tsc', 'build:esm2015', 'build:rollup', 'build:uglify'])
 
-gulp.task('watch', ['build'], () => {
-  gulp.watch([ path.join('src', '**', '*.ts') ], ['build'])
+gulp.task('watch', ['build', 'api:json'], () => {
+  gulp.watch([ path.join('src', '**', '*.ts') ], ['build', 'api:json'])
 })
 
 gulp.task('publish', ['build'], (cb) => {
