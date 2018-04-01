@@ -32,10 +32,10 @@ function onDraw(e, data: SpriteSpin.Data) {
     return
   }
 
-  const scaleX = sprite.sampledWidth / data.stage.innerWidth()
-  const scaleY = sprite.sampledHeight / data.stage.innerHeight()
-  const top = Math.floor(-sprite.sampledX * scaleY)
-  const left = Math.floor(-sprite.sampledY * scaleX)
+  const scaleX = data.stage.innerWidth() / sprite.sampledWidth
+  const scaleY = data.stage.innerHeight() / sprite.sampledHeight
+  const top = Math.floor(-sprite.sampledY * scaleY)
+  const left = Math.floor(-sprite.sampledX * scaleX)
   const width = Math.floor(sheet.sampledWidth * scaleX)
   const height = Math.floor(sheet.sampledHeight * scaleY)
   if (data.renderer === 'background') {
