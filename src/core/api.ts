@@ -1,14 +1,19 @@
+// tslint:disable ban-types
 import { Data } from './models'
 
+/**
+ * @internal
+ */
 export class Api {
   constructor(public data: Data) { }
 }
 
 /**
- * Helper method that allows to extend the api with more methods.
- * Receives an object with named functions that are extensions to the API.
+ * Adds methods to the SpriteSpin api
+ *
+ * @public
  */
-export function extendApi(methods: { [key: string]: any }) {
+export function extendApi(methods: { [key: string]: Function }) {
   const api = Api.prototype
   for (const key in methods) {
     if (methods.hasOwnProperty(key)) {

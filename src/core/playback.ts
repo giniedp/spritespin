@@ -2,10 +2,21 @@ import { clamp, wrap } from '../utils'
 import { Data } from './models'
 import { getState } from './state'
 
+/**
+ * Gets the playback state
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
+ */
 export function getPlaybackState(data: Data): PlaybackState {
   return getState(data, 'playback')
 }
 
+/**
+ * The playback state
+ *
+ * @public
+ */
 export interface PlaybackState {
   frameTime: number
   lastFrame: number
@@ -61,9 +72,14 @@ function updateAfter(data: Data) {
 }
 
 /**
- * Updates the frame number of the SpriteSpin data. Performs an auto increment if no frame number is given.
+ * Updates the frame or lane number of the SpriteSpin data.
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
+ * @param frame - The frame number to set
+ * @param lane - The lane number to set
  */
-export function updateFrame(data: Data, frame: number, lane?: number) {
+export function updateFrame(data: Data, frame?: number, lane?: number) {
   updateBefore(data)
   if (frame != null) {
     updateInputFrame(data, frame)
@@ -75,7 +91,10 @@ export function updateFrame(data: Data, frame: number, lane?: number) {
 }
 
 /**
- * Stops the running animation on given SpriteSpin data.
+ * Stops the running animation.
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
  */
 export function stopAnimation(data: Data) {
   data.animate = false
@@ -87,7 +106,13 @@ export function stopAnimation(data: Data) {
 }
 
 /**
- * Starts animation on given SpriteSpin data if animation is enabled.
+ * Starts animation playback if needed.
+ *
+ * @remarks
+ * Starts animation playback if `animate` property is `true` and the animation is not yet running.
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
  */
 export function applyAnimation(data: Data) {
   const state = getPlaybackState(data)
@@ -102,6 +127,12 @@ export function applyAnimation(data: Data) {
 
 /**
  * Starts the animation playback
+ *
+ * @remarks
+ * Starts the animation playback and also sets the `animate` property to `true`
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
  */
 export function startAnimation(data: Data) {
   data.animate = true

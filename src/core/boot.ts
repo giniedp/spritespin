@@ -70,6 +70,8 @@ let lazyinit = () => {
 
 /**
  * (re)binds all spritespin events on the target element
+ *
+ * @internal
  */
 export function applyEvents(data: Data) {
   const target = data.target
@@ -118,7 +120,12 @@ function applyMetrics(data: Data) {
 }
 
 /**
- * Runs the boot process. (re)initializes plugins, (re)initializes the layout, (re)binds events and loads source images.
+ * Runs the boot process.
+ *
+ * @remarks
+ * (re)initializes plugins, (re)initializes the layout, (re)binds events and loads source images.
+ *
+ * @internal
  */
 export function boot(data: Data) {
   applyPlugins(data)
@@ -155,6 +162,8 @@ export function boot(data: Data) {
 
 /**
  * Creates a new SpriteSpin instance
+ *
+ * @public
  */
 export function create(options: Options): Data {
   const target = options.target
@@ -213,9 +222,11 @@ export function create(options: Options): Data {
 }
 
 /**
- * Creates a new SpriteSpin instance, or updates it if it is already present
+ * Creates a new SpriteSpin instance, or updates an existing one
+ *
+ * @public
  */
-export function createOrUpdate(options: Options) {
+export function createOrUpdate(options: Options): Data {
   lazyinit()
 
   let data  = options.target.data(namespace) as Data
@@ -225,10 +236,19 @@ export function createOrUpdate(options: Options) {
     $.extend(data, options)
   }
   boot(data)
+
+  return data
 }
 
 /**
- * Stops running animation, unbinds all events and deletes the data on the target element of the given data object.
+ * Destroys the SpriteSpin instance
+ *
+ * @remarks
+ * - stops running animation
+ * - unbinds all events
+ * - deletes the data on the target element
+ *
+ * @public
  */
 export function destroy(data: Data) {
   popInstance(data)

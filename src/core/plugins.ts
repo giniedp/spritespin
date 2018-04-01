@@ -4,8 +4,14 @@ import { Data } from './models'
 const plugins = {}
 
 /**
- * Registers a module implementation as an available extension to SpriteSpin.
+ * Registers a plugin.
+ *
+ * @remarks
  * Use this to add custom Rendering or Updating modules that can be addressed with the 'module' option.
+ *
+ * @public
+ * @param name - The name of the plugin
+ * @param plugin - The plugin implementation
  */
 export function registerPlugin(name, plugin) {
   if (plugins[name]) {
@@ -17,17 +23,32 @@ export function registerPlugin(name, plugin) {
   return plugin
 }
 
+/**
+ * Registers a plugin.
+ *
+ * @public
+ * @deprecated Use {@link registerPlugin} instead
+ * @param name - The name of the plugin
+ * @param plugin - The plugin implementation
+ */
 export function registerModule(name, plugin) {
   warn('"registerModule" is deprecated, use "registerPlugin" instead')
   registerPlugin(name, plugin)
 }
 
+/**
+ * Gets an active plugin by name
+ *
+ * @internal
+ * @param name - The name of the plugin
+ */
 export function getPlugin(name) {
   return plugins[name]
 }
 
 /**
  * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
+ * @internal
  */
 export function applyPlugins(data: Data) {
   fixPlugins(data)

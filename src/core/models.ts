@@ -2,6 +2,11 @@ import { PreloadProgress, SheetSpec } from '../utils'
 
 export type Callback = (e: any, data: Data) => void
 
+/**
+ * Additional callback options for SpriteSpin
+ *
+ * @public
+ */
 export interface CallbackOptions {
   /**
    * Occurs when the plugin has been initialized, but before loading the source files.
@@ -37,6 +42,11 @@ export type SizeMode = 'original' | 'fit' | 'fill' | 'stretch'
 export type RenderMode = 'canvas' | 'image' | 'background'
 export type Orientation = 'horizontal' | 'vertical'
 
+/**
+ * Options for SpriteSpin
+ *
+ * @public
+ */
 export interface Options extends CallbackOptions {
   /**
    * The target element which should hold the spritespin instance. This is usually aready specified by the jQuery selector but can be overridden here.
@@ -44,22 +54,31 @@ export interface Options extends CallbackOptions {
   target?: any,
 
   /**
-   * Image URL or array of urls that should be used.
+   * Image URL or array of urls to be used.
    */
   source: string | string[]
 
   /**
-   * The display width in pixels. Width and height should match the aspect ratio of the frames.
+   * The display width in pixels.
+   *
+   * @remarks
+   * Width and height should match the aspect ratio of the frames.
    */
   width?: number
 
   /**
-   * The display height in pixels. Width and height should match the aspect ratio of the frames.
+   * The display height in pixels.
+   *
+   * @remarks
+   * Width and height should match the aspect ratio of the frames.
    */
   height?: number
 
   /**
-   * This is the number of frames for a full 360 rotation. If multiple lanes are used, each lane must have this amount of frames.
+   * Number of frames for a full 360 rotation.
+   *
+   * @remarks
+   * If multiple lanes are used, each lane must have this amount of frames.
    */
   frames: number
 
@@ -98,11 +117,17 @@ export interface Options extends CallbackOptions {
   renderer?: RenderMode
 
   /**
-   * The initial sequence number to play. This value is updated each frame and also represends the current lane number.
+   * The initial sequence number to play.
+   *
+   * @remarks
+   * This value is updated each frame and also represends the current lane number.
    */
   lane?: number
   /**
-   * Initial frame number. This value is updated each frame and also represends the current frame number.
+   * Initial frame number.
+   *
+   * @remarks
+   * This value is updated each frame and also represends the current frame number.
    */
   frame?: number
   /**
@@ -122,7 +147,7 @@ export interface Options extends CallbackOptions {
    */
   reverse?: boolean
   /**
-   * If true, continues to play the animation in a loop without stopping.
+   * If true, continues playback in a loop.
    */
   loop?: boolean
   /**
@@ -160,7 +185,10 @@ export interface Options extends CallbackOptions {
   preloadCount?: number
 
   /**
-   * If true, display width can be controlled by CSS. width and height must still both be set and are used to calculate the aspect ratio.
+   * If true, display width can be controlled by CSS.
+   *
+   * @remarks
+   * Width and height must still both be set and are used to calculate the aspect ratio.
    */
   responsive?: boolean
 
@@ -170,6 +198,11 @@ export interface Options extends CallbackOptions {
   plugins?: any[]
 }
 
+/**
+ * The instance data of SpriteSpin
+ *
+ * @public
+ */
 export interface Data extends Options {
   /**
    * The unique spritespin instance identifier

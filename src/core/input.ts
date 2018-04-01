@@ -2,6 +2,11 @@ import { getCursorPosition } from '../utils'
 import { Data } from './models'
 import { getState } from './state'
 
+/**
+ * Describes a SpriteSpin input state
+ *
+ * @public
+ */
 export interface InputState {
   oldX: number
   oldY: number
@@ -21,12 +26,22 @@ export interface InputState {
   nddY: number
 }
 
+/**
+ * Gets the current input state
+ *
+ * @public
+ * @param data - The SpriteSpin instance data
+ */
 export function getInputState(data: Data): InputState {
   return getState(data, 'input')
 }
 
 /**
- * Updates the input state of the SpriteSpin data using the given mouse or touch event.
+ * Updates the input state using a mous or touch event.
+ *
+ * @public
+ * @param e - The input event
+ * @param data - The SpriteSpin instance data
  */
 export function updateInput(e, data: Data) {
   const cursor = getCursorPosition(e)
@@ -71,7 +86,9 @@ export function updateInput(e, data: Data) {
 }
 
 /**
- * Resets the input state of the SpriteSpin data.
+ * Resets the input state.
+ *
+ * @public
  */
 export function resetInput(data: Data) {
   const input = getInputState(data)

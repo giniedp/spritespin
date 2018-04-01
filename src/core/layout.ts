@@ -3,6 +3,8 @@ import { Data } from './models'
 
 /**
  * Applies css attributes to layout the SpriteSpin containers.
+ *
+ * @internal
  */
 export function applyLayout(data: Data) {
   // disable selection
