@@ -27,12 +27,16 @@ export function applyLayout(data: Data) {
   data.target.css({
     width    : size.width,
     height   : size.height,
-    position : 'relative',
-    overflow : 'hidden'
+    position : 'relative'
   })
 
   // apply layout on stage
-  data.stage.css(layout).hide()
+  data.stage
+    .css(layout)
+    .css({
+      overflow : 'hidden'
+    })
+    .hide()
 
   if (!data.canvas) { return }
   // apply layout on canvas
