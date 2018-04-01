@@ -46,7 +46,7 @@ module.exports = (config) => {
       },
       exclude: ['node_modules', 'release'],
       // compilerOptions: tsconfig.compilerOptions,
-      tsconfig: 'tsconfig.json',
+      tsconfig: 'tsconfig.cjs.json',
       // tsconfig: 'tsconfig.json',
       // Pass options to remap-istanbul.
       remapOptions: {

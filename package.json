@@ -14,9 +14,9 @@
     "ecosystem:jquery"
   ],
   "main": "release/spritespin.js",
-  "module": "release/esm5/index.js",
+  "module": "release/src/index.js",
+  "typings": "release/src/index.d.ts",
   "es2015": "release/esm2015/index.js",
-  "typings": "release/typings/index.d.ts",
   "files": [
     "release",
     "README.md",
@@ -34,12 +34,11 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "doc": "typedoc --hideGenerator --ignoreCompilerErrors --out ./doc --tsconfig tsconfig.json --mode file --exclude '**/*.test.ts' --theme minimal",
     "lint": "tslint --config tslint.json src/**/*.ts",
     "lint:silent": "tslint --config tslint.json src/**/*.ts || true",
-    "build": "tsc",
-    "build:esm5": "tsc --project ./tsconfig.esm5.json",
-    "build:esm2015": "tsc --project ./tsconfig.esm2015.json",
+    "build": "tsc --project tsconfig.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm2015": "tsc --project tsconfig.esm2015.json",
     "build:watch": "tsc -w",
     "test": "karma start --no-auto-watch --single-run",
     "test:watch": "karma start --auto-watch --no-single-run",
@@ -51,6 +50,7 @@
     "jquery": ">1.11.0"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^5.5.2",
     "@types/jasmine": "^2.5.54",
     "@types/jquery": "^3.2.12",
     "@types/node": "^8.0.27",

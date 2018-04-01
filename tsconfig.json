@@ -3,13 +3,13 @@
   "compilerOptions": {
     "target": "es5",
     "noResolve": true,
-    "outDir": "release",
+    "outDir": "release/src",
     "sourceMap": true,
     "inlineSources": true,
     "declaration": true,
     "newLine": "LF",
     "rootDir": "src",
-    "module": "commonjs",
+    "module": "es2015",
     "moduleResolution": "node",
     "alwaysStrict": true,
     "noEmitHelpers": true,
@@ -22,7 +22,8 @@
       "node"
     ]
   },
-  "include": [
-    "src/**/*"
+  "exclude": [
+    "src/**/*.test.ts",
+    "node_modules"
   ]
 }

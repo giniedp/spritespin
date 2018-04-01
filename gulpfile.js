@@ -9,22 +9,26 @@ const shell = require('shelljs')
 const rollup = require('rollup')
 
 const dstDir = path.join(__dirname, 'release')
+const srcDir = path.join(__dirname, 'src')
+const docDir = path.join(dstDir, 'doc')
+
+function exec(command, cb) {
+  shell
+    .exec(command, { async: true })
+    .on('exit', (code) => cb(code === 0 ? null : code))
+}
 
 gulp.task('clean', () => del(dstDir))
 
-gulp.task('build:esm5', ['clean'], (cb) => {
-  shell
-    .exec('yarn run build:esm5', { async: true })
-    .on('exit', (code) => cb(code === 0 ? null : code))
+gulp.task('build:tsc', ['clean'], (cb) => {
+  exec('yarn run build', cb)
 })
 
 gulp.task('build:esm2015', ['clean'], (cb) => {
-  shell
-    .exec('yarn run build:esm2015', { async: true })
-    .on('exit', (code) => cb(code === 0 ? null : code))
+  exec('yarn run build:esm2015', cb)
 })
 
-gulp.task('build:rollup', ['build:esm5'], () => {
+gulp.task('build:rollup', ['build:tsc'], () => {
   const resolve = require('rollup-plugin-node-resolve')
   const sourcemaps = require('rollup-plugin-sourcemaps')
   const globals = {
@@ -33,7 +37,7 @@ gulp.task('build:rollup', ['build:esm5'], () => {
 
   return rollup.rollup({
     amd: {id: `SpriteSpin`},
-    input: path.join(dstDir, 'esm5', 'index.js'),
+    input: path.join(dstDir, 'src', 'index.js'),
     onwarn: (warning, warn) => {
       if (warning.code === 'THIS_IS_UNDEFINED') {return}
       warn(warning);
@@ -61,28 +65,34 @@ gulp.task('build:uglify', ['build:rollup'], () => {
     .pipe(gulp.dest(dstDir))
 })
 
-gulp.task('build:typings', ['build:esm5', 'build:esm2015'], () => {
-  return gulp
-    .src([ path.join(dstDir, 'esm2015', '**', '*.d.ts') ])
-    .pipe(gulp.dest(path.join(dstDir, 'typings')))
-    .on('end', () => {
-      del([
-        path.join(dstDir, 'esm2015', '**', '*.d.ts'),
-        path.join(dstDir, 'esm5', '**', '*.d.ts')
-      ])
-    })
-})
-
-gulp.task('build', ['build:esm5', 'build:esm2015', 'build:rollup', 'build:typings', 'build:uglify'], () => {
-  //
-})
+gulp.task('build', ['build:tsc', 'build:esm2015', 'build:rollup', 'build:uglify'])
 
 gulp.task('watch', ['build'], () => {
   gulp.watch([ path.join('src', '**', '*.ts') ], ['build'])
 })
 
 gulp.task('publish', ['build'], (cb) => {
-  shell
-    .exec(`npm publish --access=public`, { async: true })
-    .on('exit', (code) => cb(code === 0 ? null : code))
+  exec('npm publish --access=public', cb)
+})
+
+gulp.task('api:json', ['build'], () => {
+  const ae = require('@microsoft/api-extractor')
+  new ae.Extractor({
+    compiler: {
+      configType: 'tsconfig',
+      rootFolder: __dirname
+    },
+    project: {
+      entryPointSourceFile: path.join(dstDir, 'src', 'index.d.ts')
+    },
+    apiReviewFile: {
+      enabled: false
+    },
+    apiJsonFile: {
+      enabled: true,
+      outputFolder: path.join(dstDir)
+    }
+  }, {
+    localBuild: true,
+  }).processProject();
 })
