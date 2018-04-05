@@ -88,6 +88,11 @@ export interface Options extends CallbackOptions {
   framesX?: number
 
   /**
+   * Number of frames in one column of a single sprite sheet.
+   */
+  framesY?: number
+
+  /**
    * Number of sequences.
    */
   lanes?: number

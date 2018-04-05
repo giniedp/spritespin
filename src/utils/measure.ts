@@ -6,6 +6,7 @@ import { naturalSize } from './naturalSize'
 export interface MeasureSheetOptions {
   frames: number
   framesX?: number
+  framesY?: number
   detectSubsampling?: boolean
 }
 
@@ -45,6 +46,8 @@ export interface SpriteSpec {
 export function measure(images: HTMLImageElement[], options: MeasureSheetOptions): SheetSpec[] {
   if (images.length === 1) {
     return [measureSheet(images[0], options)]
+  } else if (options.framesX && options.framesY) {
+    return measureMutipleSheets(images, options)
   } else {
     return measureFrames(images, options)
   }
@@ -82,6 +85,23 @@ function measureFrames(images: HTMLImageElement[], options: MeasureSheetOptions)
     // TODO: optimize
     // dont measure images with same size twice
     const sheet = measureSheet(images[id], { frames: 1, framesX: 1, detectSubsampling: options.detectSubsampling })
+    sheet.id = id
+    result.push(sheet)
+  }
+  return result
+}
+
+function measureMutipleSheets(images: HTMLImageElement[], options: MeasureSheetOptions): SheetSpec[] {
+  const result: SheetSpec[] = []
+  for (let id = 0; id < images.length; id++) {
+    // TODO: optimize
+    // dont measure images with same size twice
+    const sheet = measureSheet(images[id], {
+      frames: undefined,
+      framesX: options.framesX,
+      framesY: options.framesY,
+      detectSubsampling: options.detectSubsampling
+    })
     sheet.id = id
     result.push(sheet)
   }
