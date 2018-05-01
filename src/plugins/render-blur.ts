@@ -41,7 +41,7 @@ function init(e, data: SpriteSpin.Data) {
   state.fadeTime = Math.max(getOption(data, 'blurFadeTime', 200), 1)
   state.frameTime = Math.max(getOption(data, 'blurFrameTime', data.frameTime), 16)
   state.trackTime = null
-  state.cssBlur = !!getOption(data, 'blurCss', data.frameTime)
+  state.cssBlur = !!getOption(data, 'blurCss', false)
 
   const inner = Utils.getInnerSize(data)
   const outer = data.responsive ? Utils.getComputedSize(data) : Utils.getOuterSize(data)
