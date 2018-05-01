@@ -114,10 +114,17 @@ function applyCssBlur(canvas, d) {
   })
 }
 
+function clearFrame(data: SpriteSpin.Data, state: BlurState) {
+  state.canvas.show()
+  const w = state.canvas[0].width / data.canvasRatio
+  const h = state.canvas[0].height / data.canvasRatio
+  // state.context.clearRect(0, 0, w, h)
+}
+
 function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
   if (step.alpha <= 0) { return }
 
-  const specs = Utils.findSpecs(data.metrics, data.frames, data.frame, data.lane)
+  const specs = Utils.findSpecs(data.metrics, data.frames, step.frame, step.lane)
   const sheet = specs.sheet
   const sprite = specs.sprite
   if (!sheet || !sprite) { return }
@@ -129,7 +136,7 @@ function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
   state.canvas.show()
   const w = state.canvas[0].width / data.canvasRatio
   const h = state.canvas[0].height / data.canvasRatio
-  state.context.clearRect(0, 0, w, h)
+  state.context.globalAlpha = step.alpha
   state.context.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
 }
 
@@ -141,6 +148,7 @@ function tick(data: SpriteSpin.Data) {
   }
 
   let d = 0
+  clearFrame(data, state)
   state.context.clearRect(0, 0, data.width, data.height)
   for (const step of state.steps) {
     step.live = Math.max(step.live - step.step, 0)
