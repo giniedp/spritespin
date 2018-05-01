@@ -106,7 +106,7 @@ function killLoop(data: SpriteSpin.Data) {
 }
 
 function applyCssBlur(canvas, d) {
-  const amount = Math.min(Math.max((d / 2) - 4, 0), 1.5)
+  const amount = Math.min(Math.max((d / 2) - 4, 0), 2.5)
   const blur = `blur(${amount}px)`
   canvas.css({
     '-webkit-filter': blur,
