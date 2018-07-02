@@ -136,13 +136,13 @@ export function boot(data: Data) {
   data.loading = true
   data.target
     .addClass('loading')
-    .trigger('onInit', data)
+    .trigger('onInit.' + namespace, data)
   Utils.preload({
     source: data.source,
     preloadCount: data.preloadCount,
     progress: (progress) => {
       data.progress = progress
-      data.target.trigger('onProgress', data)
+      data.target.trigger('onProgress.' + namespace, data)
     },
     complete: (images) => {
       data.images = images
@@ -154,10 +154,10 @@ export function boot(data: Data) {
       data.stage.show()
       data.target
         .removeClass('loading')
-        .trigger('onLoad', data)
-        .trigger('onFrame', data)
-        .trigger('onDraw', data)
-        .trigger('onComplete', data)
+        .trigger('onLoad.' + namespace, data)
+        .trigger('onFrame.' + namespace, data)
+        .trigger('onDraw.' + namespace, data)
+        .trigger('onComplete.' + namespace, data)
     }
   })
 }
