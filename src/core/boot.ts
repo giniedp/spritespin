@@ -177,7 +177,10 @@ export function create(options: Options): Data {
   // ensure source is set
   data.source = data.source || []
   // ensure plugins are set
-  data.plugins = data.plugins || []
+  data.plugins = data.plugins || [
+    '360',
+    'drag'
+  ]
 
   // if image tags are contained inside this DOM element
   // use these images as the source files

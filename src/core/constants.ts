@@ -84,8 +84,5 @@ export const defaults: Options = {
   preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
 
   responsive        : undefined,
-  plugins           : [
-    '360',
-    'drag'
-  ]
+  plugins           : undefined
 }
