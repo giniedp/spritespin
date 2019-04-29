@@ -224,13 +224,13 @@ function wheel(e: JQueryMouseEventObject, data: SpriteSpin.Data) {
       signY *= state.useWheel
     }
 
-    if (state.stage.is(':visible') && signY < 0) {
-      e.preventDefault()
-      showZoom(data)
-    }
-    if (!state.stage.is(':visible') && signY > 0) {
+    if (state.stage.is(':visible') && signY > 0) {
       e.preventDefault()
       hideZoom(data)
+    }
+    if (!state.stage.is(':visible') && signY < 0) {
+      e.preventDefault()
+      showZoom(data)
     }
   }
 }
