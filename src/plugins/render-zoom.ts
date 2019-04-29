@@ -8,6 +8,7 @@ const NAME = 'zoom'
 interface ZoomState {
   source: string[]
   stage: any
+  pinFrame: boolean
 
   oldX: number
   oldY: number
@@ -16,6 +17,7 @@ interface ZoomState {
 
   clickTime: number
   doubleClickTime: number
+  useWheel: boolean | number
 }
 
 function getState(data) {
@@ -28,6 +30,8 @@ function getOption(data, name, fallback) {
 function onInit(e, data: SpriteSpin.Data) {
   const state = getState(data)
   state.source = getOption(data, 'zoomSource', data.source)
+  state.pinFrame = getOption(data, 'zoomPinFrame', true)
+  state.useWheel = getOption(data, 'zoomUseWheel', false)
   state.doubleClickTime = getOption(data, 'zoomDoubleClickTime', 500)
   state.stage = state.stage || Utils.$("<div class='zoom-stage'></div>")
   state.stage.css({
@@ -59,9 +63,11 @@ function updateInput(e, data: SpriteSpin.Data) {
 
   e.preventDefault()
 
-  // hack into drag/move module and disable dragging
-  // prevents frame change during zoom mode
-  SpriteSpin.flag(data, 'dragging', false)
+  if (state.pinFrame) {
+    // hack into drag/move module and disable dragging
+    // prevents frame change during zoom mode
+    SpriteSpin.flag(data, 'dragging', false)
+  }
 
   // grab touch/cursor position
   const cursor = Utils.getCursorPosition(e)
@@ -187,14 +193,46 @@ function toggleZoom(data) {
     throw new Error('zoom module is not initialized or is not available.')
   }
   if (state.stage.is(':visible')) {
-    state.stage.fadeOut()
-    data.stage.fadeIn()
+    showZoom(data)
   } else {
-    state.stage.fadeIn()
-    data.stage.fadeOut()
+    hideZoom(data)
     return true
   }
   return false
+}
+
+function showZoom(data) {
+  const state = getState(data)
+  state.stage.fadeOut()
+  data.stage.fadeIn()
+}
+
+function hideZoom(data) {
+  const state = getState(data)
+  state.stage.fadeIn()
+  data.stage.fadeOut()
+}
+
+function wheel(e: JQueryMouseEventObject, data: SpriteSpin.Data) {
+  const state = getState(data)
+  if (!data.loading && state.useWheel) {
+
+    const we = e.originalEvent as WheelEvent
+
+    let signY = we.deltaY === 0 ? 0 : we.deltaY > 0 ? 1 : -1
+    if (typeof state.useWheel === 'number') {
+      signY *= state.useWheel
+    }
+
+    if (state.stage.is(':visible') && signY < 0) {
+      e.preventDefault()
+      showZoom(data)
+    }
+    if (!state.stage.is(':visible') && signY > 0) {
+      e.preventDefault()
+      hideZoom(data)
+    }
+  }
 }
 
 SpriteSpin.registerPlugin(NAME, {
@@ -204,6 +242,7 @@ SpriteSpin.registerPlugin(NAME, {
   touchstart: onClick,
   mousemove: onMove,
   touchmove: onMove,
+  wheel: wheel,
 
   onInit: onInit,
   onDestroy: onDestroy,
