@@ -27,7 +27,7 @@ function getAxis(data: SpriteSpin.Data) {
 
 function dragStart(e, data: SpriteSpin.Data) {
   const state = getState(data)
-  if (data.loading || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
+  if (data.loading || SpriteSpin.is(data, 'dragging') || data['zoomPinFrame'] && !data.stage.is(':visible')) {
     return
   }
 

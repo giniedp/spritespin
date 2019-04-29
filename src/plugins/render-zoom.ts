@@ -8,7 +8,6 @@ const NAME = 'zoom'
 interface ZoomState {
   source: string[]
   stage: any
-  pinFrame: boolean
 
   oldX: number
   oldY: number
@@ -18,20 +17,23 @@ interface ZoomState {
   clickTime: number
   doubleClickTime: number
   useWheel: boolean | number
+  useClick: number
+  pinFrame: boolean
 }
 
 function getState(data) {
   return SpriteSpin.getPluginState(data, NAME) as ZoomState
 }
 function getOption(data, name, fallback) {
-  return data[name] || fallback
+  return name in data ? data[name] : fallback
 }
 
 function onInit(e, data: SpriteSpin.Data) {
   const state = getState(data)
   state.source = getOption(data, 'zoomSource', data.source)
-  state.pinFrame = getOption(data, 'zoomPinFrame', true)
   state.useWheel = getOption(data, 'zoomUseWheel', false)
+  state.useClick = getOption(data, 'zoomUseClick', true)
+  state.pinFrame = getOption(data, 'zoomPinFrame', true)
   state.doubleClickTime = getOption(data, 'zoomDoubleClickTime', 500)
   state.stage = state.stage || Utils.$("<div class='zoom-stage'></div>")
   state.stage.css({
@@ -104,8 +106,12 @@ function updateInput(e, data: SpriteSpin.Data) {
 }
 
 function onClick(e, data: SpriteSpin.Data) {
-  e.preventDefault()
   const state = getState(data)
+  if (!state.useClick) {
+    return
+  }
+
+  e.preventDefault()
   // simulate double click
 
   const clickTime = new Date().getTime()
@@ -226,11 +232,11 @@ function wheel(e: JQueryMouseEventObject, data: SpriteSpin.Data) {
 
     if (state.stage.is(':visible') && signY > 0) {
       e.preventDefault()
-      hideZoom(data)
+      showZoom(data)
     }
     if (!state.stage.is(':visible') && signY < 0) {
       e.preventDefault()
-      showZoom(data)
+      hideZoom(data)
     }
   }
 }
