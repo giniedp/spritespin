@@ -1,7 +1,17 @@
 import { error, warn } from '../utils'
-import { Data } from './models'
+import { Callback, CallbackOptions, Data } from './models'
 
-const plugins = {}
+/**
+ * Describes a SpriteSpin plugin
+ *
+ * @public
+ */
+export interface SpriteSpinPlugin extends CallbackOptions {
+  [key: string]: Callback | string
+  name?: string
+}
+
+const plugins: { [key: string]: SpriteSpinPlugin } = {}
 
 /**
  * Registers a plugin.
@@ -13,7 +23,7 @@ const plugins = {}
  * @param name - The name of the plugin
  * @param plugin - The plugin implementation
  */
-export function registerPlugin(name, plugin) {
+export function registerPlugin(name: string, plugin: SpriteSpinPlugin) {
   if (plugins[name]) {
     error(`Plugin name "${name}" is already taken`)
     return
@@ -31,7 +41,7 @@ export function registerPlugin(name, plugin) {
  * @param name - The name of the plugin
  * @param plugin - The plugin implementation
  */
-export function registerModule(name, plugin) {
+export function registerModule(name: string, plugin: SpriteSpinPlugin) {
   warn('"registerModule" is deprecated, use "registerPlugin" instead')
   registerPlugin(name, plugin)
 }
