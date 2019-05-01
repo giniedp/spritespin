@@ -198,6 +198,11 @@ export interface Options extends CallbackOptions {
   responsive?: boolean
 
   /**
+   * Time range in ms when touch scroll will be disabled during interaction with SpriteSpin
+   */
+  touchScrollTimer?: [number, number]
+
+  /**
    * Array of plugins to load
    */
   plugins?: any[]

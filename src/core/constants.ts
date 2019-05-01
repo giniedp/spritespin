@@ -83,6 +83,7 @@ export const defaults: Options = {
   detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
   preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
 
+  touchScrollTimer  : [200, 1500],  // Time range in ms when touch scroll will be disabled during interaction with SpriteSpin
   responsive        : undefined,
   plugins           : undefined
 }
