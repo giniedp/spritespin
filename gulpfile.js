@@ -75,24 +75,43 @@ gulp.task('publish', ['build'], (cb) => {
   exec('npm publish --access=public', cb)
 })
 
-gulp.task('api:json', ['build'], () => {
+gulp.task('api:json', ['build'], (cb) => {
   const ae = require('@microsoft/api-extractor')
-  new ae.Extractor({
-    compiler: {
-      configType: 'tsconfig',
-      rootFolder: __dirname
-    },
-    project: {
-      entryPointSourceFile: path.join(dstDir, 'src', 'index.d.ts')
-    },
-    apiReviewFile: {
-      enabled: false
-    },
-    apiJsonFile: {
-      enabled: true,
-      outputFolder: path.join(dstDir)
+  const config = ae.ExtractorConfig.prepare({
+    configObject: {
+      compiler: {
+        tsconfigFilePath: path.join(__dirname, 'tsconfig.json'),
+      },
+      apiReport: {
+        enabled: false,
+        reportFileName: 'spritespin.api.md',
+        reportFolder: path.join(__dirname, 'doc'),
+        reportTempFolder: path.join(__dirname, 'tmp'),
+      },
+      docModel: {
+        enabled: true,
+        apiJsonFilePath: path.join(__dirname, 'doc', 'spritespin.api.json'),
+      },
+      dtsRollup: {
+        enabled: false,
+      },
+      projectFolder: path.join(dstDir, 'src'),
+      mainEntryPointFilePath: path.join(dstDir, 'src', 'index.d.ts'),
     }
-  }, {
+  })
+  config.packageFolder = process.cwd()
+  config.packageJson = require('./package.json')
+
+  const result = ae.Extractor.invoke(config, {
+    // Equivalent to the "--local" command-line parameter
     localBuild: true,
-  }).processProject();
+
+    // Equivalent to the "--verbose" command-line parameter
+    showVerboseMessages: true
+  })
+  if (result.succeeded) {
+    exec('./node_modules/.bin/api-documenter markdown -i doc -o doc', cb)
+  } else {
+    cb(1)
+  }
 })
