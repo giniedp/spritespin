@@ -206,6 +206,14 @@ export interface Options extends CallbackOptions {
    * Array of plugins to load
    */
   plugins?: any[]
+
+  /**
+   * Allows to download images from foreign origins
+   *
+   * @remarks
+   * https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+   */
+  crossOrigin?: string
 }
 
 /**

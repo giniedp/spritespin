@@ -12,6 +12,7 @@ function noop() {
 
 export interface PreloadOptions {
   source: string | string[]
+  crossOrigin?: string
   preloadCount?: number
   initiated?: (images: HTMLImageElement[]) => void
   progress?: (p: PreloadProgress) => void
@@ -67,6 +68,8 @@ export function preload(opts: PreloadOptions) {
     const img = new Image()
     // push result
     images.push(img)
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+    img.crossOrigin = opts.crossOrigin
     // bind logic, dont care about abort/errors
     img.onload = img.onabort = img.onerror = tick
     // begin load

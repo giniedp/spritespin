@@ -139,6 +139,7 @@ export function boot(data: Data) {
     .trigger('onInit.' + namespace, data)
   Utils.preload({
     source: data.source,
+    crossOrigin: data.crossOrigin,
     preloadCount: data.preloadCount,
     progress: (progress) => {
       data.progress = progress

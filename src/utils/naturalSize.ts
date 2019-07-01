@@ -19,6 +19,7 @@ export function naturalSize(image: HTMLImageElement) {
   //
   // assume that the src has already been downloaded, so no onload callback is needed.
   img = img || new Image()
+  img.crossOrigin = image.crossOrigin
   img.src = image.src
   return {
     height: img.height,
