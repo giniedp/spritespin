@@ -14,7 +14,7 @@ export function naturalSize(image: HTMLImageElement) {
 
   // browsers that do not support naturalWidth and naturalHeight properties have to fall back to the width and
   // height properties. However, the image might have a css style applied so width and height would return the
-  // css size. To avoid thet create a new Image object that is free of css rules and grab width and height
+  // css size. To avoid that create a new Image object that is free of css rules and grab width and height
   // properties
   //
   // assume that the src has already been downloaded, so no onload callback is needed.

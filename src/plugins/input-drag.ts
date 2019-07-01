@@ -46,7 +46,7 @@ function dragStart(e, data: SpriteSpin.Data) {
   // If we would try to cancel the 'touchmove' event during a scroll
   // chrome browser raises an error
   //
-  // When a user interacts with sprite spin, we dont know whether the intention
+  // When a user interacts with sprite spin, we don't know whether the intention
   // is to scroll the page or to roll the spin.
   //
   // On first interaction with SpriteSpin the scroll is not disabled

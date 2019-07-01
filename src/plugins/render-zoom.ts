@@ -148,7 +148,7 @@ function onDraw(e, data: SpriteSpin.Data) {
 
   // calculate the frame index
   const index = data.lane * data.frames + data.frame
-  // get the zoom image. Use original frames as fallback. This won't work for spritesheets
+  // get the zoom image. Use original frames as fallback. This won't work for sprite sheets
   const source = state.source[index]
   const spec = Utils.findSpecs(data.metrics, data.frames, data.frame, data.lane)
 

@@ -70,7 +70,7 @@ export function preload(opts: PreloadOptions) {
     images.push(img)
     // https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
     img.crossOrigin = opts.crossOrigin
-    // bind logic, dont care about abort/errors
+    // bind logic, don't care about abort/errors
     img.onload = img.onabort = img.onerror = tick
     // begin load
     img.src = url

@@ -60,7 +60,7 @@ export const defaults: Options = {
   width             : undefined,    // actual display width
   height            : undefined,    // actual display height
   frames            : undefined,    // Total number of frames
-  framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a spritesheet)
+  framesX           : undefined,    // Number of frames in one row of sprite sheet (if source is a sprite sheet)
   lanes             : 1,            // Number of 360 sequences. Used for 3D like effect.
   sizeMode          : undefined,    //
 
@@ -80,7 +80,7 @@ export const defaults: Options = {
   sense             : 1,            // Interaction sensitivity used by behavior implementations
   senseLane         : undefined,    // Interaction sensitivity used by behavior implementations
   orientation       : 'horizontal', // Preferred axis for user interaction
-  detectSubsampling : true,         // Tries to detect whether the images are downsampled by the browser.
+  detectSubsampling : true,         // Tries to detect whether the images are down sampled by the browser.
   preloadCount      : undefined,    // Number of frames to preload. If nothing is set, all frames are preloaded.
 
   touchScrollTimer  : [200, 1500],  // Time range in ms when touch scroll will be disabled during interaction with SpriteSpin

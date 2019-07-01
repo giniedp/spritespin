@@ -37,7 +37,7 @@ export function getInputState(data: Data): InputState {
 }
 
 /**
- * Updates the input state using a mous or touch event.
+ * Updates the input state using a mouse or touch event.
  *
  * @public
  * @param e - The input event

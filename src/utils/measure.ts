@@ -83,7 +83,7 @@ function measureFrames(images: HTMLImageElement[], options: MeasureSheetOptions)
   const result: SheetSpec[] = []
   for (let id = 0; id < images.length; id++) {
     // TODO: optimize
-    // dont measure images with same size twice
+    // don't measure images with same size twice
     const sheet = measureSheet(images[id], { frames: 1, framesX: 1, detectSubsampling: options.detectSubsampling })
     sheet.id = id
     result.push(sheet)
@@ -95,7 +95,7 @@ function measureMutipleSheets(images: HTMLImageElement[], options: MeasureSheetO
   const result: SheetSpec[] = []
   for (let id = 0; id < images.length; id++) {
     // TODO: optimize
-    // dont measure images with same size twice
+    // don't measure images with same size twice
     const sheet = measureSheet(images[id], {
       frames: undefined,
       framesX: options.framesX,

@@ -33,7 +33,7 @@ export interface CallbackOptions {
    */
   onDraw?: Callback
   /**
-   * Occurs when spritespin has been loaded and the first draw operation is complente
+   * Occurs when spritespin has been loaded and the first draw operation is complete
    */
   onComplete?: Callback
 }
@@ -49,7 +49,7 @@ export type Orientation = 'horizontal' | 'vertical'
  */
 export interface Options extends CallbackOptions {
   /**
-   * The target element which should hold the spritespin instance. This is usually aready specified by the jQuery selector but can be overridden here.
+   * The target element which should hold the spritespin instance. This is usually already specified by the jQuery selector but can be overridden here.
    */
   target?: any,
 
@@ -125,14 +125,14 @@ export interface Options extends CallbackOptions {
    * The initial sequence number to play.
    *
    * @remarks
-   * This value is updated each frame and also represends the current lane number.
+   * This value is updated each frame and also represents the current lane number.
    */
   lane?: number
   /**
    * Initial frame number.
    *
    * @remarks
-   * This value is updated each frame and also represends the current frame number.
+   * This value is updated each frame and also represents the current frame number.
    */
   frame?: number
   /**
@@ -144,7 +144,7 @@ export interface Options extends CallbackOptions {
    */
   animate?: boolean
   /**
-   * If true, retains the animation after user iser interaction
+   * If true, retains the animation after user user interaction
    */
   retainAnimate?: boolean
   /**
@@ -181,7 +181,7 @@ export interface Options extends CallbackOptions {
    */
   orientation?: Orientation | number
   /**
-   * If true, tries to detect whether the images are downsampled by the browser.
+   * If true, tries to detect whether the images are down sampled by the browser.
    */
   detectSubsampling?: boolean
   /**
