@@ -1,4 +1,4 @@
-export function getCursorPosition(event) {
+export function getCursorPosition(event: any) {
   let touches = event.touches
   let source = event
 

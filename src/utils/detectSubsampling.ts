@@ -1,5 +1,5 @@
-let canvas
-let context
+let canvas: HTMLCanvasElement
+let context: CanvasRenderingContext2D
 
 function detectionContext() {
   if (context) {

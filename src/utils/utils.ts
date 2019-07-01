@@ -19,14 +19,14 @@ export function toArray<T>(value: T | T[]): T[] {
 /**
  * clamps the given value by the given min and max values
  */
-export function clamp(value, min, max) {
+export function clamp(value: number, min: number, max: number) {
   return (value > max ? max : (value < min ? min : value))
 }
 
 /**
  *
  */
-export function wrap(value, min, max, size) {
+export function wrap(value: number, min: number, max: number, size: number) {
   while (value > max) { value -= size }
   while (value < min) { value += size }
   return value
@@ -44,10 +44,10 @@ export function prevent(e) {
  * Binds on the given target and event the given function.
  * The SpriteSpin namespace is attached to the event name
  */
-export function bind(target, event, func) {
+export function bind(target: JQuery, event: string, func: (...args: any[]) => any) {
   if (func) {
     target.bind(event + '.' + namespace, (e) => {
-      func.apply(target, [e, target.spritespin('data')])
+      func.apply(target, [e, (target as any).spritespin('data')])
     })
   }
 }
@@ -55,7 +55,7 @@ export function bind(target, event, func) {
 /**
  * Unbinds all SpriteSpin events from given target element
  */
-export function unbind(target: any): void {
+export function unbind(target: JQuery): void {
   target.unbind('.' + namespace)
 }
 

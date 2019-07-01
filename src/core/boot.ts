@@ -1,5 +1,4 @@
 import * as Utils from '../utils'
-import { Api } from './api'
 import { callbackNames, defaults, eventNames, eventsToPrevent, namespace } from './constants'
 import { applyLayout } from './layout'
 import { Data, Options } from './models'
