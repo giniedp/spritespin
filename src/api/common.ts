@@ -49,8 +49,8 @@ SpriteSpin.extendApi({
   },
 
   // Updates SpriteSpin to the specified frame.
-  updateFrame: function(frame) {
-    SpriteSpin.updateFrame(this.data, frame)
+  updateFrame: function(frame, lane) {
+    SpriteSpin.updateFrame(this.data, frame, lane)
     return this
   },
 
