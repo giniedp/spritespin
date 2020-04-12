@@ -7,5 +7,3 @@ export * from './models'
 export * from './playback'
 export * from './plugins'
 export * from './state'
-
-import './jquery'

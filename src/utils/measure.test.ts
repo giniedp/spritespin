@@ -7,7 +7,7 @@ describe('SpriteSpin.Utils', () => {
   const WIDTH = 50
   const HEIGHT = 50
 
-  let image
+  let image: HTMLImageElement
 
   beforeEach((done) => {
     Utils.preload({

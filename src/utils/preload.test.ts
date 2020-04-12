@@ -1,4 +1,3 @@
-import * as SpriteSpin from '..'
 import * as t from '../lib.test'
 import * as Utils from '../utils'
 
@@ -8,10 +7,10 @@ describe('SpriteSpin.Utils', () => {
 
     const source = [t.RED40x30, t.GREEN40x30, t.BLUE40x30]
 
-    function expectArrayOfImages(input, output) {
+    function expectArrayOfImages(input: any, output: any) {
       expect(Array.isArray(output)).toBe(true)
       expect(output.length).toBe(input.length)
-      expect(output.every((it) => it instanceof Image)).toBe(true)
+      expect(output.every((it: any) => it instanceof Image)).toBe(true)
     }
 
     it ('accepts string input', (done) => {

@@ -1,15 +1,15 @@
 import * as SpriteSpin from '../core'
+import { isVisible } from '../utils'
 
 (() => {
 
 const NAME = 'wheel'
-function wheel(e: JQueryMouseEventObject, data: SpriteSpin.Data) {
-  if (!data.loading && data.stage.is(':visible')) {
+function wheel(e: WheelEvent, data: SpriteSpin.Data) {
+  if (!data.loading && isVisible(data.stage)) {
     e.preventDefault()
 
-    const we = e.originalEvent as WheelEvent
-    const signX = we.deltaX === 0 ? 0 : we.deltaX > 0 ? 1 : -1
-    const signY = we.deltaY === 0 ? 0 : we.deltaY > 0 ? 1 : -1
+    const signX = e.deltaX === 0 ? 0 : e.deltaX > 0 ? 1 : -1
+    const signY = e.deltaY === 0 ? 0 : e.deltaY > 0 ? 1 : -1
 
     SpriteSpin.updateFrame(data, data.frame + signY, data.lane + signX)
   }

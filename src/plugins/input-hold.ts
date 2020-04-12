@@ -1,6 +1,5 @@
 import * as SpriteSpin from '../core'
-
-(() => {
+import { innerWidth, isVisible, offset } from '../utils'
 
 const NAME = 'hold'
 
@@ -28,8 +27,8 @@ function restoreOptions(data: SpriteSpin.Data) {
   data.reverse = state.reverse
 }
 
-function start(e, data: SpriteSpin.Data) {
-  if (SpriteSpin.is(data, 'loading') || SpriteSpin.is(data, 'dragging') || !data.stage.is(':visible')) {
+function start(e: MouseEvent, data: SpriteSpin.Data) {
+  if (SpriteSpin.is(data, 'loading') || SpriteSpin.is(data, 'dragging') || !isVisible(data.stage)) {
     return
   }
   rememberOptions(data)
@@ -39,7 +38,7 @@ function start(e, data: SpriteSpin.Data) {
   SpriteSpin.applyAnimation(data)
 }
 
-function stop(e, data: SpriteSpin.Data) {
+function stop(e: Event, data: SpriteSpin.Data) {
   SpriteSpin.flag(data, 'dragging', false)
   SpriteSpin.resetInput(data)
   SpriteSpin.stopAnimation(data)
@@ -47,7 +46,7 @@ function stop(e, data: SpriteSpin.Data) {
   SpriteSpin.applyAnimation(data)
 }
 
-function update(e, data: SpriteSpin.Data) {
+function update(e: MouseEvent, data: SpriteSpin.Data) {
   if (!SpriteSpin.is(data, 'dragging')) {
     return
   }
@@ -55,13 +54,13 @@ function update(e, data: SpriteSpin.Data) {
   const input = SpriteSpin.getInputState(data)
 
   let half, delta
-  const target = data.target, offset = target.offset()
+  const target = data.target, off = offset(target)
   if (data.orientation === 'horizontal') {
-    half = target.innerWidth() / 2
-    delta = (input.currentX - offset.left - half) / half
+    half = innerWidth(target) / 2
+    delta = (input.currentX - off.left - half) / half
   } else {
     half = (data.height / 2)
-    delta = (input.currentY - offset.top - half) / half
+    delta = (input.currentY - off.top - half) / half
   }
   data.reverse = delta < 0
   delta = delta < 0 ? -delta : delta
@@ -73,7 +72,7 @@ function update(e, data: SpriteSpin.Data) {
   }
 }
 
-function onFrame(e, data: SpriteSpin.Data) {
+function onFrame(e: Event, data: SpriteSpin.Data) {
   data.animate = true
   SpriteSpin.applyAnimation(data)
 }
@@ -93,5 +92,3 @@ SpriteSpin.registerPlugin(NAME, {
 
   onFrame: onFrame
 })
-
-})()

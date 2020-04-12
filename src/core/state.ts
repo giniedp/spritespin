@@ -12,6 +12,10 @@ export function getState<T = any>(data: Data, name: string): T {
   return data.state[name]
 }
 
+function createState<T>(): T {
+  return {} as any
+}
+
 /**
  * Gets a plugin state object by name.
  *
@@ -23,9 +27,11 @@ export function getState<T = any>(data: Data, name: string): T {
  * @param data - The SpriteSpin instance data
  * @param name - The name of the plugin
  */
-export function getPluginState<T = any>(data: Data, name: string): T {
-  const state = getState<T>(data, 'plugin')
-  state[name] = state[name] || {}
+export function getPluginState<T extends object = any>(data: Data, name: string, orCreate: (data: Data) => T = createState): T {
+  const state = getState<{ [key: string]: T}>(data, 'plugin')
+  if (!state[name]) {
+    state[name] = orCreate(data)
+  }
   return state[name]
 }
 

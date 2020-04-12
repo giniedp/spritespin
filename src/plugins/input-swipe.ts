@@ -1,6 +1,5 @@
 import * as SpriteSpin from '../core'
-
-(() => {
+import { getOption } from '../utils'
 
 const NAME = 'swipe'
 
@@ -9,27 +8,24 @@ interface SwipeState {
   snap: number
 }
 
-function getState(data) {
+function getState(data: SpriteSpin.Data) {
   return SpriteSpin.getPluginState(data, NAME) as SwipeState
 }
-function getOption(data, name, fallback) {
-  return data[name] || fallback
-}
 
-function init(e, data) {
+function init(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
-  state.fling = getOption(data, 'swipeFling', 10)
-  state.snap = getOption(data, 'swipeSnap', 0.50)
+  state.fling = getOption(data as any, 'swipeFling', 10)
+  state.snap = getOption(data as any, 'swipeSnap', 0.50)
 }
 
-function start(e, data: SpriteSpin.Data) {
+function start(e: MouseEvent, data: SpriteSpin.Data) {
   if (!data.loading && !SpriteSpin.is(data, 'dragging')) {
     SpriteSpin.updateInput(e, data)
     SpriteSpin.flag(data, 'dragging', true)
   }
 }
 
-function update(e, data: SpriteSpin.Data) {
+function update(e: MouseEvent, data: SpriteSpin.Data) {
   if (!SpriteSpin.is(data, 'dragging')) {
     return
   }
@@ -39,7 +35,7 @@ function update(e, data: SpriteSpin.Data) {
   SpriteSpin.updateFrame(data, frame, lane)
 }
 
-function end(e, data: SpriteSpin.Data) {
+function end(e: Event, data: SpriteSpin.Data) {
   if (!SpriteSpin.is(data, 'dragging')) {
     return
   }
@@ -52,7 +48,7 @@ function end(e, data: SpriteSpin.Data) {
   const lane = data.lane
   const snap = state.snap
   const fling = state.fling
-  let dS, dF
+  let dS: number, dF: number
   if (data.orientation === 'horizontal') {
     dS = input.ndX
     dF = input.ddX
@@ -85,5 +81,3 @@ SpriteSpin.registerPlugin(NAME, {
   touchend: end,
   touchcancel: end
 })
-
-})()

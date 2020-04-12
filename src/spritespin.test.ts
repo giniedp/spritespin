@@ -1,6 +1,5 @@
-import * as SpriteSpin from './core'
+import * as SpriteSpin from '.'
 import * as t from './lib.test'
-import { $ } from './utils'
 
 describe('SpriteSpin', () => {
 
@@ -9,8 +8,7 @@ describe('SpriteSpin', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
-    $.noConflict(true)
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
       width: 10,
       height: 10,
@@ -18,7 +16,6 @@ describe('SpriteSpin', () => {
       onLoad: done,
       plugins: ['click', '360']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)
@@ -29,6 +26,7 @@ describe('SpriteSpin', () => {
       const result = SpriteSpin.getPlaybackState(data)
       expect(result).toBeDefined()
       expect(result).toBe(data.state.playback)
+
     })
   })
 
@@ -136,12 +134,13 @@ describe('SpriteSpin', () => {
       expect(input.oldY).toBe(7)
     })
 
-    it ('consumes touch events', () => {
-      // initial update sets values
-      SpriteSpin.updateInput({ touches: [{ clientX: 5, clientY: 5 }]}, data)
-      expect(input.oldX).toBe(5)
-      expect(input.oldY).toBe(5)
-    })
+    // TODO:
+    // it ('consumes touch events', () => {
+    //   // initial update sets values
+    //   SpriteSpin.updateInput({ touches: [{ clientX: 5, clientY: 5 }]}, data)
+    //   expect(input.oldX).toBe(5)
+    //   expect(input.oldY).toBe(5)
+    // })
   })
 
   describe('#updateFrame', () => {
@@ -153,8 +152,7 @@ describe('SpriteSpin', () => {
     ['current', 'start', 'old'].forEach((name) => {
 
       it (`resets ${name}X and ${name}Y`, () => {
-        let input: SpriteSpin.InputState
-        input = SpriteSpin.getInputState(data)
+        const input: any = SpriteSpin.getInputState(data)
         input[`${name}X`] = 10
         input[`${name}Y`] = 10
 
@@ -168,8 +166,7 @@ describe('SpriteSpin', () => {
 
     ['d', 'dd', 'nd', 'ndd'].forEach((name) => {
       it (`resets ${name}X and ${name}Y`, () => {
-        let input: SpriteSpin.InputState
-        input = SpriteSpin.getInputState(data)
+        const input: any = SpriteSpin.getInputState(data)
         input[`${name}X`] = 10
         input[`${name}Y`] = 10
 
@@ -182,49 +179,50 @@ describe('SpriteSpin', () => {
     })
   })
 
-  describe('$ extension', () => {
-    describe('spritespin("data")', () => {
-      it ('returns the data object', () => {
-        expect(t.get$El().spritespin('data')).toBeDefined()
-        expect(t.get$El().spritespin('data')).toBe(data)
-      })
-    })
+  // TODO:
+  // describe('$ extension', () => {
+  //   describe('spritespin("data")', () => {
+  //     it ('returns the data object', () => {
+  //       expect(t.get$El().spritespin('data')).toBeDefined()
+  //       expect(t.get$El().spritespin('data')).toBe(data)
+  //     })
+  //   })
 
-    describe('spritespin("api")', () => {
-      it ('returns the Api instance', () => {
-        const api = t.get$El().spritespin('api')
-        expect(api instanceof SpriteSpin.Api).toBe(true)
-      })
-    })
+  //   describe('spritespin("api")', () => {
+  //     it ('returns the Api instance', () => {
+  //       const api = t.get$El().spritespin('api')
+  //       expect(api instanceof SpriteSpin.Api).toBe(true)
+  //     })
+  //   })
 
-    describe('spritespin("destroy")', () => {
-      it ('destroys the instance', () => {
+  //   describe('spritespin("destroy")', () => {
+  //     it ('destroys the instance', () => {
 
-        t.get$El().spritespin('destroy')
-        expect(t.get$El().data('spritespin')).toBeUndefined()
-      })
-    })
+  //       t.get$El().spritespin('destroy')
+  //       expect(t.get$El().data('spritespin')).toBeUndefined()
+  //     })
+  //   })
 
-    describe('spritespin("xxx", "yyy")', () => {
-      it ('sets property of data object', () => {
-        expect(data['xxx']).toBeUndefined() // tslint:disable-line
-        t.get$El().spritespin('xxx', 'yyy')
-        expect(data['xxx']).toBe('yyy') // tslint:disable-line
-      })
+  //   describe('spritespin("xxx", "yyy")', () => {
+  //     it ('sets property of data object', () => {
+  //       expect(data['xxx']).toBeUndefined() // tslint:disable-line
+  //       t.get$El().spritespin('xxx', 'yyy')
+  //       expect(data['xxx']).toBe('yyy') // tslint:disable-line
+  //     })
 
-      it ('calls SpriteSpin.createOrUpdate', () => {
-        expect(data['xxx']).toBeUndefined()
-        t.get$El().spritespin('xxx', 'yyy')
-        expect(data['xxx']).toBe('yyy')
-      })
-    })
+  //     it ('calls SpriteSpin.createOrUpdate', () => {
+  //       expect(data['xxx']).toBeUndefined()
+  //       t.get$El().spritespin('xxx', 'yyy')
+  //       expect(data['xxx']).toBe('yyy')
+  //     })
+  //   })
 
-    describe('spritespin("xxx")', () => {
-      it ('throws an error', () => {
-        expect(() => {
-          t.get$El().spritespin('xxx')
-        }).toThrowError()
-      })
-    })
-  })
+  //   describe('spritespin("xxx")', () => {
+  //     it ('throws an error', () => {
+  //       expect(() => {
+  //         t.get$El().spritespin('xxx')
+  //       }).toThrowError()
+  //     })
+  //   })
+  // })
 })

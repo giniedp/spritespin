@@ -1,13 +1,16 @@
 import * as SpriteSpin from '..'
 import * as t from '../lib.test'
+import { CommonApi } from './common'
 
 describe('SpriteSpin.Api#common', () => {
 
   let data: SpriteSpin.Data
-  let api: any
+  let api: CommonApi
   beforeEach((done) => {
-    t.get$El().spritespin({
-      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30, t.RED40x30, t.GREEN40x30, t.BLUE40x30],
+    const source = [t.RED40x30, t.GREEN40x30, t.BLUE40x30, t.RED40x30, t.GREEN40x30, t.BLUE40x30]
+    data = SpriteSpin.spritespin(t.getEl(), {
+      source: source,
+      frames: source.length,
       width: 40,
       height: 30,
       frameTime: 16,
@@ -15,8 +18,7 @@ describe('SpriteSpin.Api#common', () => {
       animate: false,
       onComplete: done
     })
-    data = t.get$El().data(SpriteSpin.namespace)
-    api = t.get$El().spritespin('api')
+    api = data.api as any
   })
 
   afterEach(() => {

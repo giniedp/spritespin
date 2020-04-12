@@ -36,7 +36,7 @@ export function preload(opts: PreloadOptions) {
   src = typeof input === 'string' ? [input] : input
   // const src: string[] =  ? [opts.source] : opts.source
 
-  const images = []
+  const images: HTMLImageElement[] = []
   const targetCount = (opts.preloadCount || src.length)
   const onInitiated = opts.initiated || noop
   const onProgress = opts.progress || noop
@@ -46,7 +46,7 @@ export function preload(opts: PreloadOptions) {
   let completed = false
   let firstLoaded = false
 
-  const tick = function () { // tslint:disable-line
+  const tick = function (this: HTMLImageElement) { // tslint:disable-line
     count += 1
 
     onProgress({

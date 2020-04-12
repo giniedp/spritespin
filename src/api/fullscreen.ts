@@ -1,14 +1,22 @@
-import { boot, Data, extendApi, namespace, SizeMode } from '../core'
-import { $ } from '../utils'
+import { boot, Data, extendApi, getPluginState, SizeMode } from '../core'
 
 export interface Options {
   source?: string | string[],
   sizeMode?: SizeMode
 }
 
-function pick(target, names: string[]): string {
+interface FullscreenApiState {
+  onChange?: EventListener
+  onOrientationChane?: EventListener
+}
+
+function getState(data: Data) {
+  return getPluginState<FullscreenApiState>(data, 'fullscreen-api')
+}
+
+function pick(target: any, names: string[]): string {
   for (const name of names) {
-    if (target[name] || name in target) {
+    if (name in target) {
       return name
     }
   }
@@ -50,40 +58,50 @@ const browser = {
         'onMSFullscreenError']).replace(/^on/, '')
 }
 
-const changeEvent = browser.fullscreenchange + '.' + namespace + '-fullscreen'
-function unbindChangeEvent() {
-  $(document).unbind(changeEvent)
+function unbindChangeEvent(data: Data) {
+  const state = getState(data)
+  if (state.onChange) {
+    document.removeEventListener(browser.fullscreenchange, state.onChange)
+    state.onChange = null
+  }
 }
 
-function bindChangeEvent(callback) {
-  unbindChangeEvent()
-  $(document).bind(changeEvent, callback)
+function bindChangeEvent(data: Data, callback: EventListener) {
+  unbindChangeEvent(data)
+  const state = getState(data)
+  state.onChange = callback
+  document.addEventListener(browser.fullscreenchange, state.onChange)
 }
 
-const orientationEvent = 'orientationchange.' + namespace + '-fullscreen'
-function unbindOrientationEvent() {
-  $(window).unbind(orientationEvent)
+function unbindOrientationEvent(data: Data) {
+  const state = getState(data)
+  if (state.onOrientationChane) {
+    window.removeEventListener('orientationchange', state.onOrientationChane)
+    state.onOrientationChane = null
+  }
 }
-function bindOrientationEvent(callback) {
-  unbindOrientationEvent()
-  $(window).bind(orientationEvent, callback)
+function bindOrientationEvent(data: Data, callback: EventListener) {
+  unbindOrientationEvent(data)
+  const state = getState(data)
+  state.onOrientationChane = callback
+  window.addEventListener('orientationchange', state.onOrientationChane)
 }
 
-function requestFullscreenNative(e) {
-  e = e || document.documentElement
-  e[browser.requestFullscreen]()
+function requestFullscreenNative(e: Element) {
+  const el: any = e || document.documentElement
+  el[browser.requestFullscreen]()
 }
 
 export function exitFullscreen() {
-  return document[browser.exitFullscreen]()
+  return (document as any)[browser.exitFullscreen]()
 }
 
 export function fullscreenEnabled() {
-  return document[browser.fullscreenEnabled]
+  return (document as any)[browser.fullscreenEnabled]
 }
 
 export function fullscreenElement() {
-  return document[browser.fullscreenElement]
+  return (document as any)[browser.fullscreenElement]
 }
 
 export function isFullscreen() {
@@ -92,9 +110,9 @@ export function isFullscreen() {
 
 export function toggleFullscreen(data: Data, opts: Options) {
   if (isFullscreen()) {
-    this.apiRequestFullscreen(opts)
+    requestFullscreen(data, opts)
   } else {
-    this.exitFullscreen()
+    exitFullscreen()
   }
 }
 
@@ -122,17 +140,17 @@ export function requestFullscreen(data: Data, opts: Options) {
     boot(data)
   }
 
-  bindChangeEvent(() => {
+  bindChangeEvent(data, () => {
     if (isFullscreen()) {
       enter()
-      bindOrientationEvent(enter)
+      bindOrientationEvent(data, enter)
     } else {
-      unbindChangeEvent()
-      unbindOrientationEvent()
+      unbindChangeEvent(data)
+      unbindOrientationEvent(data)
       exit()
     }
   })
-  requestFullscreenNative(data.target[0])
+  requestFullscreenNative(data.target)
 }
 
 extendApi({

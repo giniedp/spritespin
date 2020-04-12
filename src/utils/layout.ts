@@ -1,11 +1,12 @@
 import { SizeMode } from '../core/models'
+import { innerHeight, innerWidth } from './utils'
 
 export interface Layoutable {
   width?: number
   height?: number
   frameWidth?: number
   frameHeight?: number
-  target: any
+  target: HTMLElement
   sizeMode?: SizeMode
 }
 
@@ -31,8 +32,8 @@ export interface SizeWithAspect {
  *
  */
 export function getOuterSize(data: Layoutable): SizeWithAspect {
-  const width = Math.floor(data.width || data.frameWidth || data.target.innerWidth())
-  const height = Math.floor(data.height || data.frameHeight || data.target.innerHeight())
+  const width = Math.floor(data.width || data.frameWidth || innerWidth(data.target))
+  const height = Math.floor(data.height || data.frameHeight || innerHeight(data.target))
   return {
     aspect: width / height,
     height,
@@ -44,7 +45,7 @@ export function getComputedSize(data: Layoutable): SizeWithAspect {
   const size = getOuterSize(data)
   if (typeof window.getComputedStyle !== 'function') { return size }
 
-  const style = window.getComputedStyle(data.target[0])
+  const style = window.getComputedStyle(data.target)
   if (!style.width) { return size }
 
   size.width = Math.floor(Number(style.width.replace('px', '')))
@@ -56,8 +57,8 @@ export function getComputedSize(data: Layoutable): SizeWithAspect {
  *
  */
 export function getInnerSize(data: Layoutable): SizeWithAspect {
-  const width = Math.floor(data.frameWidth || data.width || data.target.innerWidth())
-  const height = Math.floor(data.frameHeight || data.height || data.target.innerHeight())
+  const width = Math.floor(data.frameWidth || data.width || innerWidth(data.target))
+  const height = Math.floor(data.frameHeight || data.height || innerHeight(data.target))
   return {
     aspect: width / height,
     height,

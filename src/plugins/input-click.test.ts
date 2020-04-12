@@ -6,7 +6,7 @@ describe('SpriteSpin.Plugins#input-click', () => {
   let data: SpriteSpin.Data
 
   beforeEach((done) => {
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
       width: 10,
       height: 10,
@@ -14,7 +14,6 @@ describe('SpriteSpin.Plugins#input-click', () => {
       onLoad: done,
       plugins: ['click', '360']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)

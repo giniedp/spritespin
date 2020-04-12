@@ -1,12 +1,13 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
+import { fadeOut, hide, fadeIn } from '../utils'
 
 interface State {
-  stage: JQuery<HTMLElement>
+  stage: HTMLElement
+  label: HTMLElement
+  progress: HTMLElement
 }
 
+const NAME = 'progress'
 const template = `
 <div class='spritespin-progress'>
   <div class='spritespin-progress-label'></div>
@@ -18,39 +19,35 @@ function getState(data: SpriteSpin.Data) {
   return SpriteSpin.getPluginState<State>(data, NAME)
 }
 
-const NAME = 'progress'
-function onInit(e, data: SpriteSpin.Data) {
+function onInit(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   if (!state.stage) {
-    state.stage = Utils.$(template)
-    state.stage.appendTo(data.target)
+    state.stage = document.createElement('div')
+    state.stage.outerHTML = template
+    state.label = state.stage.querySelector('.spritespin-progress-label')
+    state.progress = state.stage.querySelector('.spritespin-progress-bar')
+    data.target.appendChild(state.stage)
   }
 
-  state.stage.find('.spritespin-progress-label')
-    .text(`0%`)
-    .css({ 'text-align': 'center' })
-  state.stage.find('.spritespin-progress-bar').css({
-    width: `0%`
-  })
+  state.label.textContent = '0%'
+  state.label.style.textAlign = 'center'
+  state.progress.style.width = '0%'
 
-  state.stage.hide().fadeIn()
+  hide(state.stage)
+  fadeIn(state.stage)
 }
-function onProgress(e, data: SpriteSpin.Data) {
+function onProgress(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
-  state.stage.find('.spritespin-progress-label')
-    .text(`${data.progress.percent}%`)
-    .css({ 'text-align': 'center' })
-  state.stage.find('.spritespin-progress-bar').css({
-    width: `${data.progress.percent}%`
-  })
+  state.label.textContent = `${data.progress.percent}%`
+  state.progress.style.width = `${data.progress.percent}%`
 }
 
-function onLoad(e, data: SpriteSpin.Data) {
-  Utils.$(getState(data).stage).fadeOut()
+function onLoad(e: Event, data: SpriteSpin.Data) {
+  fadeOut(getState(data).stage)
 }
 
-function onDestroy(e, data: SpriteSpin.Data) {
-  Utils.$(getState(data).stage).remove()
+function onDestroy(e: Event, data: SpriteSpin.Data) {
+  getState(data).stage.remove()
 }
 
 SpriteSpin.registerPlugin(NAME, {
@@ -60,5 +57,3 @@ SpriteSpin.registerPlugin(NAME, {
   onLoad: onLoad,
   onDestroy: onDestroy
 })
-
-})()

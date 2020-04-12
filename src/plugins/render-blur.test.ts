@@ -5,8 +5,10 @@ describe('SpriteSpin.Plugins#render-blur', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
-    t.get$El().spritespin({
-      source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
+    const source = [t.RED40x30, t.GREEN40x30, t.BLUE40x30]
+    data = SpriteSpin.spritespin(t.getEl(), {
+      source: source,
+      frames: source.length,
       width: 40,
       height: 30,
 
@@ -14,7 +16,6 @@ describe('SpriteSpin.Plugins#render-blur', () => {
       onComplete: done,
       plugins: ['blur']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {

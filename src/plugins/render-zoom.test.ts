@@ -1,10 +1,10 @@
 import * as SpriteSpin from '..'
 import * as t from '../lib.test'
-import { $ } from '../utils'
+import { isVisible } from '../utils'
 
 describe('SpriteSpin.Plugins#render-zoom', () => {
 
-  function doubleTap(x, y, cb) {
+  function doubleTap(x: number, y: number, cb: () => void) {
     t.getEl().dispatchEvent(t.mouseEvent('mousedown', x, y))
     setTimeout(() => {
       t.getEl().dispatchEvent(t.mouseEvent('mousedown', x, y))
@@ -14,8 +14,9 @@ describe('SpriteSpin.Plugins#render-zoom', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: [t.RED40x30, t.GREEN40x30, t.BLUE40x30],
+      frames: 3,
       width: 40,
       height: 30,
 
@@ -25,8 +26,7 @@ describe('SpriteSpin.Plugins#render-zoom', () => {
       animate: false,
       onComplete: done,
       plugins: ['zoom']
-    })
-    data = t.get$El().data(SpriteSpin.namespace)
+    } as any)
   })
 
   afterEach(() => {
@@ -39,28 +39,21 @@ describe('SpriteSpin.Plugins#render-zoom', () => {
     })
 
     it ('adds a zoom-stage element', () => {
-      expect(data.target.find('.zoom-stage').length).toBe(1)
+      expect(data.target.querySelectorAll('.zoom-stage').length).toBe(1)
     })
 
     it ('hides zoom-stage initially', () => {
-      expect(data.target.find('.zoom-stage').is(':visible')).toBe(false)
+      expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
     })
   })
 
   describe('double tap', () => {
-    beforeEach(() => {
-      $.fx.off = true
-    })
-    afterEach(() => {
-      $.fx.off = false
-    })
-
     it ('toggles zoom-stage', (done) => {
-      expect(data.target.find('.zoom-stage').is(':visible')).toBe(false)
+      expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
       doubleTap(0, 0, () => {
-        expect(data.target.find('.zoom-stage').is(':visible')).toBe(true)
+        expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(true)
         doubleTap(0, 0, () => {
-          expect(data.target.find('.zoom-stage').is(':visible')).toBe(false)
+          expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
           done()
         })
       })

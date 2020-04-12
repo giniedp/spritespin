@@ -1,5 +1,5 @@
 import { clamp, wrap } from '../utils'
-import { namespace } from './constants'
+import { handleEvent } from './events'
 import { Data } from './models'
 import { getState } from './state'
 /**
@@ -65,10 +65,10 @@ function updateBefore(data: Data) {
 function updateAfter(data: Data) {
   const state = getPlaybackState(data)
   if (state.lastFrame !== data.frame || state.lastLane !== data.lane) {
-    data.target.trigger('onFrameChanged.' + namespace, data)
+    handleEvent(data, 'onFrameChanged')
   }
-  data.target.trigger('onFrame.' + namespace, data)
-  data.target.trigger('onDraw.' + namespace, data)
+  handleEvent(data, 'onFrame')
+  handleEvent(data, 'onDraw')
 }
 
 /**

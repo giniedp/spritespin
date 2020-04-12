@@ -1,81 +1,108 @@
 import * as SpriteSpin from '../core'
 
-// tslint:disable:object-literal-shorthand
-// tslint:disable:only-arrow-functions
+export type CommonApi = SpriteSpin.Api & CommonApiFunctions
 
-SpriteSpin.extendApi({
-  // Gets a value indicating whether the animation is currently running.
-  isPlaying: function() {
+export interface CommonApiFunctions extends SpriteSpin.ApiExtension {
+  /**
+   * Gets a value indicating whether the animation is currently running.
+   */
+  isPlaying: () => boolean
+  /**
+   * Gets a value indicating whether the animation looping is enabled.
+   */
+  isLooping: () => boolean
+  /**
+   * Starts/Stops the animation playback
+   */
+  toggleAnimation: () => void
+  /**
+   * Stops animation playback
+   */
+  stopAnimation: () => void
+  /**
+   * Starts animation playback
+   */
+  startAnimation: () => void
+  /**
+   * Sets a value indicating whether the animation should be looped or not.
+   * This might start the animation (if the 'animate' data attribute is set to true)
+   */
+  loop: (value: boolean) => void
+  /**
+   * Gets the current frame number
+   */
+  currentFrame: () => number
+  /**
+   * Updates SpriteSpin to the specified frame.
+   */
+  updateFrame: (frame: number, lane?: number) => void
+  /**
+   * Skips the given number of frames
+   */
+  skipFrames: (step: number) => void
+  /**
+   * Updates SpriteSpin so that the next frame is shown
+   */
+  nextFrame: () => void
+  /**
+   * Updates SpriteSpin so that the previous frame is shown
+   */
+  prevFrame: () => void
+  /**
+   * Starts the animations that will play until the given frame number is reached
+   * options:
+   *   force [boolean] starts the animation, even if current frame is the target frame
+   *   nearest [boolean] animates to the direction with minimum distance to the target frame
+   */
+  playTo: (frame: number, options?: { force?: boolean, nearest?: boolean}) => void
+}
+
+SpriteSpin.extendApi<CommonApiFunctions>({
+  isPlaying: function(this: CommonApi) {
     return SpriteSpin.getPlaybackState(this.data).handler != null
   },
-
-  // Gets a value indicating whether the animation looping is enabled.
-  isLooping: function() {
+  isLooping: function(this: CommonApi) {
     return this.data.loop
   },
-
-  // Starts/Stops the animation playback
-  toggleAnimation: function() {
+  toggleAnimation: function(this: CommonApi) {
     if (this.isPlaying()) {
       this.stopAnimation()
     } else {
       this.startAnimation()
     }
   },
-
-  // Stops animation playback
-  stopAnimation: function() {
-    this.data.animate = false
-    SpriteSpin.stopAnimation(this.data)
+  stopAnimation: function(this: CommonApi) {
+      this.data.animate = false
+      SpriteSpin.stopAnimation(this.data)
   },
-
-  // Starts animation playback
-  startAnimation: function() {
+  startAnimation: function(this: CommonApi) {
     this.data.animate = true
     SpriteSpin.applyAnimation(this.data)
   },
-
-  // Sets a value indicating whether the animation should be looped or not.
-  // This might start the animation (if the 'animate' data attribute is set to true)
-  loop: function(value) {
+  loop: function(this: CommonApi, value: boolean) {
     this.data.loop = value
     SpriteSpin.applyAnimation(this.data)
     return this
   },
-
-  // Gets the current frame number
-  currentFrame: function() {
+  currentFrame: function(this: CommonApi) {
     return this.data.frame
   },
-
-  // Updates SpriteSpin to the specified frame.
-  updateFrame: function(frame, lane) {
+  updateFrame: function(this: CommonApi, frame: number, lane?: number) {
     SpriteSpin.updateFrame(this.data, frame, lane)
     return this
   },
-
-  // Skips the given number of frames
-  skipFrames: function(step) {
+  skipFrames: function(this: CommonApi, step: number) {
     const data = this.data
     SpriteSpin.updateFrame(data, data.frame + (data.reverse ? - step : + step))
     return this
   },
-
-  // Updates SpriteSpin so that the next frame is shown
-  nextFrame: function() {
+  nextFrame: function(this: CommonApi) {
     return this.skipFrames(1)
   },
-
-  // Updates SpriteSpin so that the previous frame is shown
-  prevFrame: function() {
+  prevFrame: function(this: CommonApi) {
     return this.skipFrames(-1)
   },
-
-  // Starts the animations that will play until the given frame number is reached
-  // options:
-  //   force [boolean] starts the animation, even if current frame is the target frame
-  //   nearest [boolean] animates to the direction with minimum distance to the target frame
-  playTo: function(frame, options) {
+  playTo: function(this: CommonApi, frame, options) {
     const data = this.data
     options = options || {}
     if (!options.force && data.frame === frame) {

@@ -1,69 +1,36 @@
-import * as Utils from '../utils'
-import { callbackNames, defaults, eventNames, eventsToPrevent, namespace } from './constants'
+import { defaults, eventNames, eventsToPrevent, namespace } from './constants'
+import { handleEvent, unbindEvents, bindEvent } from './events'
+import { findInstance, popInstance, pushInstance } from './instances'
 import { applyLayout } from './layout'
-import { Data, Options } from './models'
+import { Data, Options, Api } from './models'
 import { applyAnimation, stopAnimation } from './playback'
 import { applyPlugins } from './plugins'
+import { show, measure, findSpecs, toArray, preload } from '../utils'
 
-const $ = Utils.$
-
-let counter = 0
-/**
- * Collection of all SpriteSpin instances
- */
-export const instances: {[key: string]: Data} = {}
-
-function pushInstance(data: Data) {
-  counter += 1
-  data.id = String(counter)
-  instances[data.id] = data
-}
-
-function popInstance(data: Data) {
-  delete instances[data.id]
-}
-
-function eachInstance(cb) {
-  for (const id in instances) {
-    if (instances.hasOwnProperty(id)) {
-      cb(instances[id])
-    }
-  }
-}
-
-let lazyinit = () => {
-  // replace function with a noop
-  // this logic must run only once
-  lazyinit = () => { /* noop */ }
-
-  function onEvent(eventName, e) {
-    eachInstance((data: Data) => {
-      for (const module of data.plugins) {
-        if (typeof module[eventName] === 'function') {
-          module[eventName].apply(data.target, [e, data])
-        }
-      }
+function bindEvents(data: Data, target: EventTarget) {
+  for (const  eventName of eventNames) {
+    const internalName = target === document ? 'document' +  eventName : eventName
+    bindEvent(data, target, eventName, (e: Event) => {
+      handleEvent(data, internalName, e)
     })
   }
+}
 
-  function onResize() {
-    eachInstance((data: Data) => {
+function bindPreventEvents(data: Data) {
+  for (const eName of eventsToPrevent) {
+    bindEvent(data, data.target, eName, (e: Event) => e.preventDefault())
+  }
+}
+
+function bindResizeEvents(data: Data) {
+  let resizeTimeout: number = null
+  bindEvent(data, window, 'resize', (e: Event) => {
+    window.clearTimeout(resizeTimeout)
+    resizeTimeout = window.setTimeout(() => {
       if (data.responsive) {
         boot(data)
       }
-    })
-  }
-
-  for (const eventName of eventNames) {
-    $(window.document).bind(eventName + '.' + namespace, (e) => {
-      onEvent('document' + eventName, e)
-    })
-  }
-
-  let resizeTimeout = null
-  $(window).on('resize', () => {
-    window.clearTimeout(resizeTimeout)
-    resizeTimeout = window.setTimeout(onResize, 100)
+    }, 100)
   })
 }
 
@@ -73,44 +40,22 @@ let lazyinit = () => {
  * @internal
  */
 export function applyEvents(data: Data) {
-  const target = data.target
-
   // Clear all SpriteSpin events on the target element
-  Utils.unbind(target)
+  unbindEvents(data)
 
-  // disable all default browser behavior on the following events
-  // mainly prevents image drag operation
-  for (const eName of eventsToPrevent) {
-    Utils.bind(target, eName, Utils.prevent)
-  }
-
-  // Bind module functions to SpriteSpin events
-  for (const plugin of data.plugins) {
-    for (const eName of eventNames) {
-      Utils.bind(target, eName, plugin[eName])
-    }
-    for (const eName of callbackNames) {
-      Utils.bind(target, eName, plugin[eName])
-    }
-  }
-
-  // bind auto start function to load event.
-  Utils.bind(target, 'onLoad', (e, d) => {
-    applyAnimation(d)
-  })
-
-  // bind all user events that have been passed on initialization
-  for (const eName of callbackNames) {
-    Utils.bind(target, eName, data[eName])
-  }
+  bindResizeEvents(data)
+  bindPreventEvents(data)
+  bindEvents(data, document)
+  bindEvents(data, data.target)
+  bindEvent(data, data.target, `onLoad.${namespace}`, (e: Event, d: Data) => applyAnimation(d))
 }
 
 function applyMetrics(data: Data) {
   if (!data.images) {
     data.metrics = []
   }
-  data.metrics = Utils.measure(data.images, data)
-  const spec = Utils.findSpecs(data.metrics, data.frames, 0, 0)
+  data.metrics = measure(data.images, data)
+  const spec = findSpecs(data.metrics, data.frames, 0, 0)
   if (spec.sprite) {
     // TODO: try to remove frameWidth/frameHeight
     data.frameWidth = spec.sprite.width
@@ -131,18 +76,17 @@ export function boot(data: Data) {
   applyEvents(data)
   applyLayout(data)
 
-  data.source = Utils.toArray(data.source)
+  data.source = toArray(data.source)
   data.loading = true
-  data.target
-    .addClass('loading')
-    .trigger('onInit.' + namespace, data)
-  Utils.preload({
+  data.target.classList.add('loading')
+  handleEvent(data, 'onInit')
+  preload({
     source: data.source,
     crossOrigin: data.crossOrigin,
     preloadCount: data.preloadCount,
     progress: (progress) => {
       data.progress = progress
-      data.target.trigger('onProgress.' + namespace, data)
+      handleEvent(data, 'onProgress')
     },
     complete: (images) => {
       data.images = images
@@ -151,13 +95,12 @@ export function boot(data: Data) {
 
       applyMetrics(data)
       applyLayout(data)
-      data.stage.show()
-      data.target
-        .removeClass('loading')
-        .trigger('onLoad.' + namespace, data)
-        .trigger('onFrame.' + namespace, data)
-        .trigger('onDraw.' + namespace, data)
-        .trigger('onComplete.' + namespace, data)
+      show(data.stage)
+      data.target.classList.remove('loading')
+      handleEvent(data, 'onLoad')
+      handleEvent(data, 'onFrame')
+      handleEvent(data, 'onDraw')
+      handleEvent(data, 'onComplete')
     }
   })
 }
@@ -167,12 +110,13 @@ export function boot(data: Data) {
  *
  * @public
  */
-export function create(options: Options): Data {
-  const target = options.target
-
-  // SpriteSpin is not initialized
-  // Create default settings object and extend with given options
-  const data = $.extend(true, {}, defaults, options) as Data
+export function create(options: Options & { target: HTMLElement | string }): Data {
+  const target = getElement(options.target)
+  const data: Data = {
+    ...JSON.parse(JSON.stringify(defaults)),
+    ...options,
+    target
+  } as any
 
   // ensure source is set
   data.source = data.source || []
@@ -184,11 +128,11 @@ export function create(options: Options): Data {
 
   // if image tags are contained inside this DOM element
   // use these images as the source files
-  target.find('img').each(() => {
+  target.querySelectorAll('img').forEach((item) => {
     if (!Array.isArray(data.source)) {
       data.source = []
     }
-    data.source.push($(this).attr('src'))
+    data.source.push(item.getAttribute('src'))
   })
 
   // build inner html
@@ -196,19 +140,18 @@ export function create(options: Options): Data {
   //   <div class='spritespin-stage'></div>
   //   <canvas class='spritespin-canvas'></canvas>
   // </div>
-  target
-    .empty()
-    .addClass('spritespin-instance')
-    .append("<div class='spritespin-stage'></div>")
+  target.classList.add('spritespin-instance')
+  target.innerHTML = "<div class='spritespin-stage'></div>"
 
   // add the canvas element if canvas rendering is enabled and supported
   if (data.renderer === 'canvas') {
     const canvas = document.createElement('canvas')
     if (!!(canvas.getContext && canvas.getContext('2d'))) {
-      data.canvas = $(canvas).addClass('spritespin-canvas') as any
+      data.canvas = canvas
+      data.canvas.classList.add('spritespin-canvas')
       data.context = canvas.getContext('2d')
-      target.append(data.canvas)
-      target.addClass('with-canvas')
+      target.appendChild(data.canvas)
+      target.classList.add('with-canvas')
     } else {
       // fallback to image rendering mode
       data.renderer = 'image'
@@ -217,10 +160,9 @@ export function create(options: Options): Data {
 
   // setup references to DOM elements
   data.target = target
-  data.stage = target.find('.spritespin-stage')
-
+  data.stage = target.querySelector('.spritespin-stage')
+  data.api = new Api(data)
   // store the data
-  target.data(namespace, data)
   pushInstance(data)
 
   return data
@@ -231,17 +173,19 @@ export function create(options: Options): Data {
  *
  * @public
  */
-export function createOrUpdate(options: Options): Data {
-  lazyinit()
-
-  let data  = options.target.data(namespace) as Data
+export function createOrUpdate(options: Options & { target: HTMLElement | string }): Data {
+  options.target = getElement(options.target)
+  let data = findInstance(options.target)
   if (!data) {
     data = create(options)
   } else {
-    $.extend(data, options)
+    for (const key in options) {
+      if (options.hasOwnProperty(key)) {
+        (data as any)[key] = (options as any)[key]
+      }
+    }
   }
   boot(data)
-
   return data
 }
 
@@ -251,19 +195,69 @@ export function createOrUpdate(options: Options): Data {
  * @remarks
  * - stops running animation
  * - unbinds all events
- * - deletes the data on the target element
+ * - resets element state
  *
  * @public
  */
 export function destroy(data: Data) {
   popInstance(data)
   stopAnimation(data)
-  data.target
-    .trigger('onDestroy', data)
-    .html(null)
-    .attr('style', null)
-    .attr('unselectable', null)
-    .removeClass(['spritespin-instance', 'with-canvas'])
-  Utils.unbind(data.target)
-  data.target.removeData(namespace)
+  handleEvent(data, 'onDestroy')
+  unbindEvents(data)
+  data.target.innerHTML = ''
+  data.target.setAttribute('style', null)
+  data.target.setAttribute('unselectable', null)
+  data.target.classList.remove('spritespin-instance', 'with-canvas')
+}
+
+export function spritespin(options: Options & { target: string | HTMLElement}): Data
+export function spritespin(target: HTMLElement | string, option: 'destroy'): void
+export function spritespin(target: HTMLElement | string, option: 'data'): Data
+export function spritespin(target: HTMLElement | string, option?: Partial<Options>): Data
+export function spritespin<K extends keyof Data>(target: HTMLElement, key: K): Data[K]
+export function spritespin<K extends keyof Data>(target: HTMLElement, key: K, value: Data[K]): Data
+export function spritespin() {
+  if (arguments.length === 0) {
+    throw new Error('Invalid arguments')
+  }
+  if (arguments.length === 1) {
+    return createOrUpdate(arguments[0])
+  }
+
+  const target: HTMLElement = getElement(arguments[0])
+  if (!target) {
+    throw new Error('Invalid arguments')
+  }
+
+  const option = arguments[1]
+  if (typeof option !== 'string') {
+    return createOrUpdate({
+      ...option,
+      target
+    })
+  }
+
+  const data = findInstance(target)
+  switch (option) {
+    case 'data':
+    case undefined:
+    case null: {
+      return data
+    }
+    case 'destroy': {
+      data.api = data.api || new Api(data)
+      return data
+    }
+  }
+
+  if (arguments.length === 3) {
+    (data as any)[option] = arguments[2]
+    return createOrUpdate(data)
+  } else {
+    return (data as any)[option]
+  }
+}
+
+function getElement(target: HTMLElement | string): HTMLElement {
+  return typeof target === 'string' ? document.querySelector(target) : target
 }

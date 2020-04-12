@@ -1,13 +1,13 @@
 import { error, warn } from '../utils'
-import { Callback, CallbackOptions, Data } from './models'
+import { SpriteSpinCallback, LifeCycleOptions, Data } from './models'
 
 /**
  * Describes a SpriteSpin plugin
  *
  * @public
  */
-export interface SpriteSpinPlugin extends CallbackOptions {
-  [key: string]: Callback | string
+export interface SpriteSpinPlugin extends LifeCycleOptions {
+  [key: string]: SpriteSpinCallback | string
   name?: string
 }
 
@@ -52,7 +52,7 @@ export function registerModule(name: string, plugin: SpriteSpinPlugin) {
  * @internal
  * @param name - The name of the plugin
  */
-export function getPlugin(name) {
+export function getPlugin(name: string) {
   return plugins[name]
 }
 
@@ -77,23 +77,21 @@ export function applyPlugins(data: Data) {
 }
 
 function fixPlugins(data: Data) {
-  // tslint:disable no-string-literal
-
-  if (data['mods']) {
-    warn('"mods" option is deprecated, use "plugins" instead')
-    data.plugins = data['mods']
-    delete data['mods']
+  if ('mods' in data) {
+    warn('"mods" option is deprecated, use "plugins" instead');
+    (data as any).plugins = (data as any).mods as any
+    delete (data as any).mods
   }
 
-  if (data['behavior']) {
+  if (data.behavior) {
     warn('"behavior" option is deprecated, use "plugins" instead')
-    data.plugins.push(data['behavior'])
-    delete data['behavior']
+    data.plugins.push(data.behavior)
+    delete data.behavior
   }
 
-  if (data['module']) {
+  if (data.module) {
     warn('"module" option is deprecated, use "plugins" instead')
-    data.plugins.push(data['module'])
-    delete data['module']
+    data.plugins.push(data.module)
+    delete data.module
   }
 }

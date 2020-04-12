@@ -1,21 +1,20 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
-
-const floor = Math.floor
+import { css, hide, innerHeight, innerWidth, show, findSpecs } from '../utils'
 
 const NAME = '360'
 
-function onLoad(e, data: SpriteSpin.Data) {
-  data.stage.find('.spritespin-frames').detach()
-  if (data.renderer === 'image') {
-    $(data.images).addClass('spritespin-frames').appendTo(data.stage)
+function onLoad(e: Event, data: SpriteSpin.Data) {
+  data.stage.querySelectorAll('.spritespin-frames').forEach((it) => it.remove())
+  if (data.renderer === 'image' && Array.isArray(data.images)) {
+    for (const image of data.images) {
+      image.classList.add('spritespin-frames')
+      data.stage.appendChild(image)
+    }
   }
 }
 
-function onDraw(e, data: SpriteSpin.Data) {
-  const specs = Utils.findSpecs(data.metrics, data.frames, data.frame, data.lane)
+function onDraw(e: Event, data: SpriteSpin.Data) {
+  const specs = findSpecs(data.metrics, data.frames, data.frame, data.lane)
   const sheet = specs.sheet
   const sprite = specs.sprite
 
@@ -24,22 +23,22 @@ function onDraw(e, data: SpriteSpin.Data) {
   const image = data.images[sheet.id]
 
   if (data.renderer === 'canvas') {
-    data.canvas.show()
-    const w = data.canvas[0].width / data.canvasRatio
-    const h = data.canvas[0].height / data.canvasRatio
+    show(data.canvas)
+    const w = data.canvas.width / data.canvasRatio
+    const h = data.canvas.height / data.canvasRatio
     data.context.clearRect(0, 0, w, h)
     data.context.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
     return
   }
 
-  const scaleX = data.stage.innerWidth() / sprite.sampledWidth
-  const scaleY = data.stage.innerHeight() / sprite.sampledHeight
+  const scaleX = innerWidth(data.stage) / sprite.sampledWidth
+  const scaleY = innerHeight(data.stage) / sprite.sampledHeight
   const top = Math.floor(-sprite.sampledY * scaleY)
   const left = Math.floor(-sprite.sampledX * scaleX)
   const width = Math.floor(sheet.sampledWidth * scaleX)
   const height = Math.floor(sheet.sampledHeight * scaleY)
   if (data.renderer === 'background') {
-    data.stage.css({
+    css(data.stage, {
       'background-image'    : `url('${src}')`,
       'background-position' : `${left}px ${top}px`,
       'background-repeat'   : 'no-repeat',
@@ -52,8 +51,11 @@ function onDraw(e, data: SpriteSpin.Data) {
     return
   }
 
-  $(data.images).hide()
-  $(image).show().css({
+  for (const img of data.images) {
+    hide(img)
+  }
+  show(image)
+  css(image, {
     position: 'absolute',
     top: top,
     left: left,
@@ -68,5 +70,3 @@ SpriteSpin.registerPlugin(NAME, {
   onLoad,
   onDraw
 })
-
-})()

@@ -4,8 +4,6 @@ const IS_COVERALLS = !!process.env.IS_COVERALLS
 const IS_COVERAGE = IS_COVERALLS || !!process.env.IS_COVERAGE
 const IS_TRAVIS = !!process.env.TRAVIS
 
-const tsconfig = require('./tsconfig.json')
-
 module.exports = (config) => {
   config.set({
     plugins: [
@@ -18,16 +16,17 @@ module.exports = (config) => {
       'karma-mocha-reporter',
     ],
     logLevel: 'info',
+    basePath: __dirname,
 
     frameworks: [
       'jasmine',
       'karma-typescript',
     ],
     browsers: [
-      IS_TRAVIS ? 'Firefox' : 'Chrome'
+      IS_TRAVIS ? 'Firefox' : 'ChromeHeadless'
     ],
     files: [
-      'node_modules/jquery/dist/jquery.js',
+      // 'node_modules/jquery/dist/jquery.js',
       'src/**/*.ts',
     ],
     preprocessors: {
@@ -46,15 +45,14 @@ module.exports = (config) => {
       },
       exclude: ['node_modules', 'release'],
       // compilerOptions: tsconfig.compilerOptions,
-      tsconfig: 'tsconfig.cjs.json',
-      // tsconfig: 'tsconfig.json',
+      tsconfig: 'tsconfig.test.json',
       // Pass options to remap-istanbul.
-      remapOptions: {
-        // a regex for excluding files from remapping
-        // exclude: '',
-        // a function for handling error messages
-        warn: (msg) => console.log(msg)
-      },
+      // remapOptions: {
+      //   // a regex for excluding files from remapping
+      //   // exclude: '',
+      //   // a function for handling error messages
+      //   warn: (msg) => console.log(msg)
+      // },
       converageOptions: {
         instrumentation: IS_COVERAGE,
         exclude: /\.(d|spec|test)\.ts/i,

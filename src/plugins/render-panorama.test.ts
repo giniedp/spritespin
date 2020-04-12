@@ -5,15 +5,15 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE40x30,
+      frames: 1,
       width: 10,
       height: 10,
       animate: false,
       onComplete: done,
       plugins: ['panorama']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -27,13 +27,13 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
     })
 
     it ('renders the image as background', () => {
-      expect(data.stage.css('background-image')).toContain(t.WHITE40x30)
+      expect(data.stage.style.backgroundImage).toContain(t.WHITE40x30)
     })
   })
 
   describe('horizontal', () => {
     beforeEach((done) => {
-      t.get$El().spritespin({
+      SpriteSpin.spritespin(data.target, {
         orientation: 'horizontal',
         width: 10,
         height: 30,
@@ -51,15 +51,15 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
 
     it('shifts image horizontally', () => {
       SpriteSpin.updateFrame(data, 1, data.lane)
-      expect(data.stage.css('background-position')).toBe('1px 0px')
+      expect(data.stage.style.backgroundPosition).toBe('1px 0px')
       SpriteSpin.updateFrame(data, 2, data.lane)
-      expect(data.stage.css('background-position')).toBe('2px 0px')
+      expect(data.stage.style.backgroundPosition).toBe('2px 0px')
     })
   })
 
   describe('vertical', () => {
     beforeEach((done) => {
-      t.get$El().spritespin({
+      SpriteSpin.spritespin(data.target, {
         orientation: 'vertical',
         width: 40,
         height: 10,
@@ -77,9 +77,9 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
 
     it('shifts image vertically', () => {
       SpriteSpin.updateFrame(data, 1, data.lane)
-      expect(data.stage.css('background-position')).toBe('0px 1px')
+      expect(data.stage.style.backgroundPosition).toBe('0px 1px')
       SpriteSpin.updateFrame(data, 2, data.lane)
-      expect(data.stage.css('background-position')).toBe('0px 2px')
+      expect(data.stage.style.backgroundPosition).toBe('0px 2px')
     })
   })
 })

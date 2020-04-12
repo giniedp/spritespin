@@ -1,9 +1,8 @@
+import 'tslib'
 export * from './core'
 export { sourceArray } from './utils'
 
 import {
-  $,
-  bind,
   clamp,
   detectSubsampling,
   error,
@@ -13,7 +12,6 @@ import {
   getInnerLayout,
   getInnerSize,
   getOuterSize,
-  isFunction,
   Layout,
   Layoutable,
   log,
@@ -25,21 +23,17 @@ import {
   preload,
   PreloadOptions,
   PreloadProgress,
-  prevent,
   SheetSpec,
   SizeWithAspect,
   sourceArray,
   SourceArrayOptions,
   SpriteSpec,
   toArray,
-  unbind,
   warn,
   wrap
 } from './utils'
 
 export const Utils = {
-  $,
-  bind,
   clamp,
   detectSubsampling,
   error,
@@ -49,17 +43,14 @@ export const Utils = {
   getInnerLayout,
   getInnerSize,
   getOuterSize,
-  isFunction,
   log,
   measure,
   naturalSize,
   noop,
   pixelRatio,
   preload,
-  prevent,
   sourceArray,
   toArray,
-  unbind,
   warn,
   wrap
 }

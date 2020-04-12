@@ -1,13 +1,11 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
+import { css, hide, isVisible, getCursorPosition, findSpecs, fadeOut, fadeIn, clamp, getOption } from '../utils'
 
 const NAME = 'zoom'
 
 interface ZoomState {
   source: string[]
-  stage: any
+  stage: HTMLElement
 
   oldX: number
   oldY: number
@@ -21,22 +19,20 @@ interface ZoomState {
   pinFrame: boolean
 }
 
-function getState(data) {
+function getState(data: SpriteSpin.Data) {
   return SpriteSpin.getPluginState(data, NAME) as ZoomState
 }
-function getOption(data, name, fallback) {
-  return name in data ? data[name] : fallback
-}
 
-function onInit(e, data: SpriteSpin.Data) {
+function onInit(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
-  state.source = getOption(data, 'zoomSource', data.source)
-  state.useWheel = getOption(data, 'zoomUseWheel', false)
-  state.useClick = getOption(data, 'zoomUseClick', true)
-  state.pinFrame = getOption(data, 'zoomPinFrame', true)
-  state.doubleClickTime = getOption(data, 'zoomDoubleClickTime', 500)
-  state.stage = state.stage || Utils.$("<div class='zoom-stage'></div>")
-  state.stage.css({
+  state.source = getOption(data as any, 'zoomSource', data.source)
+  state.useWheel = getOption(data as any, 'zoomUseWheel', false)
+  state.useClick = getOption(data as any, 'zoomUseClick', true)
+  state.pinFrame = getOption(data as any, 'zoomPinFrame', true)
+  state.doubleClickTime = getOption(data as any, 'zoomDoubleClickTime', 500)
+  state.stage = state.stage || document.createElement('div')
+  state.stage.classList.add('zoom-stage')
+  css(state.stage, {
     width    : '100%',
     height   : '100%',
     top      : 0,
@@ -45,11 +41,11 @@ function onInit(e, data: SpriteSpin.Data) {
     right    : 0,
     position : 'absolute'
   })
-  .appendTo(data.target)
-  .hide()
+  data.target.appendChild(state.stage)
+  hide(state.stage)
 }
 
-function onDestroy(e, data: SpriteSpin.Data) {
+function onDestroy(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   if (state.stage) {
     state.stage.remove()
@@ -57,9 +53,9 @@ function onDestroy(e, data: SpriteSpin.Data) {
   }
 }
 
-function updateInput(e, data: SpriteSpin.Data) {
+function updateInput(e: MouseEvent, data: SpriteSpin.Data) {
   const state = getState(data)
-  if (!state.stage.is(':visible')) {
+  if (!isVisible(state.stage)) {
     return
   }
 
@@ -72,7 +68,7 @@ function updateInput(e, data: SpriteSpin.Data) {
   }
 
   // grab touch/cursor position
-  const cursor = Utils.getCursorPosition(e)
+  const cursor = getCursorPosition(e)
   // normalize cursor position into [0:1] range
   const x = cursor.x / data.width
   const y = cursor.y / data.height
@@ -99,13 +95,13 @@ function updateInput(e, data: SpriteSpin.Data) {
   }
 
   // accumulate display coordinates
-  state.currentX = Utils.clamp(state.currentX + dx, 0, 1)
-  state.currentY = Utils.clamp(state.currentY + dy, 0, 1)
+  state.currentX = clamp(state.currentX + dx, 0, 1)
+  state.currentY = clamp(state.currentY + dy, 0, 1)
 
   SpriteSpin.updateFrame(data, data.frame, data.lane)
 }
 
-function onClick(e, data: SpriteSpin.Data) {
+function onClick(e: MouseEvent, data: SpriteSpin.Data) {
   const state = getState(data)
   if (!state.useClick) {
     return
@@ -136,21 +132,21 @@ function onClick(e, data: SpriteSpin.Data) {
   }
 }
 
-function onMove(e, data: SpriteSpin.Data) {
+function onMove(e: MouseEvent, data: SpriteSpin.Data) {
   const state = getState(data)
-  if (state.stage.is(':visible')) {
+  if (isVisible(state.stage)) {
     updateInput(e, data)
   }
 }
 
-function onDraw(e, data: SpriteSpin.Data) {
+function onDraw(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
 
   // calculate the frame index
   const index = data.lane * data.frames + data.frame
   // get the zoom image. Use original frames as fallback. This won't work for sprite sheets
   const source = state.source[index]
-  const spec = Utils.findSpecs(data.metrics, data.frames, data.frame, data.lane)
+  const spec = findSpecs(data.metrics, data.frames, data.frame, data.lane)
 
   // get display position
   let x = state.currentX
@@ -167,7 +163,7 @@ function onDraw(e, data: SpriteSpin.Data) {
     y = Math.floor(y * 100)
 
     // update background image and position
-    state.stage.css({
+    css(state.stage, {
       'background-repeat'   : 'no-repeat',
       'background-image'    : `url('${source}')`,
       'background-position' : `${x}% ${y}%`
@@ -180,7 +176,7 @@ function onDraw(e, data: SpriteSpin.Data) {
     const top = -Math.floor(sprite.sampledY + y * (sprite.sampledHeight - data.height))
     const width = sheet.sampledWidth
     const height = sheet.sampledHeight
-    state.stage.css({
+    css(state.stage, {
       'background-image'    : `url('${src}')`,
       'background-position' : `${left}px ${top}px`,
       'background-repeat'   : 'no-repeat',
@@ -193,12 +189,12 @@ function onDraw(e, data: SpriteSpin.Data) {
   }
 }
 
-function toggleZoom(data) {
+function toggleZoom(data: SpriteSpin.Data) {
   const state = getState(data)
   if (!state.stage) {
     throw new Error('zoom module is not initialized or is not available.')
   }
-  if (state.stage.is(':visible')) {
+  if (isVisible(state.stage)) {
     showZoom(data)
   } else {
     hideZoom(data)
@@ -207,34 +203,32 @@ function toggleZoom(data) {
   return false
 }
 
-function showZoom(data) {
+function showZoom(data: SpriteSpin.Data) {
   const state = getState(data)
-  state.stage.fadeOut()
-  data.stage.fadeIn()
+  fadeOut(state.stage)
+  fadeIn(data.stage)
 }
 
-function hideZoom(data) {
+function hideZoom(data: SpriteSpin.Data) {
   const state = getState(data)
-  state.stage.fadeIn()
-  data.stage.fadeOut()
+  fadeIn(state.stage)
+  fadeOut(data.stage)
 }
 
-function wheel(e: JQueryMouseEventObject, data: SpriteSpin.Data) {
+function wheel(e: WheelEvent, data: SpriteSpin.Data) {
   const state = getState(data)
   if (!data.loading && state.useWheel) {
 
-    const we = e.originalEvent as WheelEvent
-
-    let signY = we.deltaY === 0 ? 0 : we.deltaY > 0 ? 1 : -1
+    let signY = e.deltaY === 0 ? 0 : e.deltaY > 0 ? 1 : -1
     if (typeof state.useWheel === 'number') {
       signY *= state.useWheel
     }
 
-    if (state.stage.is(':visible') && signY > 0) {
+    if (isVisible(state.stage) && signY > 0) {
       e.preventDefault()
       showZoom(data)
     }
-    if (!state.stage.is(':visible') && signY < 0) {
+    if (!isVisible(state.stage) && signY < 0) {
       e.preventDefault()
       hideZoom(data)
     }
@@ -256,7 +250,5 @@ SpriteSpin.registerPlugin(NAME, {
 })
 
 SpriteSpin.extendApi({
-  toggleZoom: function() { toggleZoom(this.data) } // tslint:disable-line
+  toggleZoom: function(this: SpriteSpin.Api) { toggleZoom(this.data) }
 })
-
-})()

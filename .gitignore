@@ -6,5 +6,5 @@
 .coveralls.yml
 node_modules
 coverage
-doc
+docs
 release

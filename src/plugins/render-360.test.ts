@@ -1,6 +1,6 @@
 import * as SpriteSpin from '..'
 import * as t from '../lib.test'
-import { $ } from '../utils'
+import { isVisible } from '../utils'
 
 describe('SpriteSpin.Plugins#render-360', () => {
 
@@ -9,7 +9,7 @@ describe('SpriteSpin.Plugins#render-360', () => {
   let data: SpriteSpin.Data
 
   beforeEach((done) => {
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
       width: 10,
       height: 10,
@@ -18,7 +18,6 @@ describe('SpriteSpin.Plugins#render-360', () => {
       renderer: 'canvas',
       plugins: ['360']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
 
   afterEach(() => {
@@ -28,74 +27,73 @@ describe('SpriteSpin.Plugins#render-360', () => {
   describe('renderer = canvas', () => {
 
     beforeEach((done) => {
-      t.get$El().spritespin({
+      SpriteSpin.spritespin(data.target, {
         onComplete: done,
         renderer: 'canvas'
       })
     })
 
     it ('has empty stage', () => {
-      expect(data.stage.find('*').length).toBe(0)
+      expect(data.stage.querySelectorAll('*').length).toBe(0)
     })
 
     it ('shows the stage element', () => {
-      expect(data.stage.is(':visible')).toBe(true)
+      expect(isVisible(data.stage)).toBe(true)
     })
 
     it ('shows the canvas element', () => {
-      expect(data.canvas.is(':visible')).toBe(true)
+      expect(isVisible(data.canvas)).toBe(true)
     })
   })
 
   describe('renderer = background', () => {
-
     beforeEach((done) => {
-      t.get$El().spritespin({
+      SpriteSpin.spritespin(data.target, {
         onComplete: done,
         renderer: 'background'
       })
     })
 
     it ('has empty stage', () => {
-      expect(data.stage.find('*').length).toBe(0)
+      expect(data.stage.querySelectorAll('*').length).toBe(0)
     })
 
     it ('shows the stage element', () => {
-      expect(data.stage.is(':visible')).toBe(true)
+      expect(isVisible(data.stage)).toBe(true)
     })
 
     it ('hides the canvas element', () => {
-      expect(data.canvas.is(':visible')).toBe(false)
+      expect(isVisible(data.canvas)).toBe(false)
     })
 
     it ('shows background on stage', () => {
-      expect(data.stage.css('background-image')).toContain(t.WHITE50x50)
+      expect(data.stage.style.backgroundImage).toContain(t.WHITE50x50)
     })
   })
 
   describe('renderer = image', () => {
 
     beforeEach((done) => {
-      t.get$El().spritespin({
+      SpriteSpin.spritespin(data.target, {
         onComplete: done,
         renderer: 'image'
       })
     })
 
     it ('has images inside stage', () => {
-      expect(data.stage.find('img').length).toBe(1)
+      expect(data.stage.querySelectorAll('img').length).toBe(1)
     })
 
     it ('shows the stage element', () => {
-      expect(data.stage.is(':visible')).toBe(true)
+      expect(isVisible(data.stage)).toBe(true)
     })
 
     it ('hides the canvas element', () => {
-      expect(data.canvas.is(':visible')).toBe(false)
+      expect(isVisible(data.canvas)).toBe(false)
     })
 
     it ('shows the image element', () => {
-      expect($(data.images[0]).is(':visible')).toBe(true)
+      expect(isVisible(data.images[0])).toBe(true)
     })
   })
 })

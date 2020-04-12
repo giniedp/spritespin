@@ -1,7 +1,5 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
+import { show, css, getOption, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, findSpecs } from '../utils'
 
 const NAME = 'blur'
 
@@ -14,7 +12,7 @@ interface BlurStep {
   alpha: number
 }
 interface BlurState {
-  canvas: any
+  canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   steps: BlurStep[]
   fadeTime: number
@@ -25,36 +23,35 @@ interface BlurState {
   timeout: number
 }
 
-function getState(data) {
+function getState(data: SpriteSpin.Data) {
   return SpriteSpin.getPluginState(data, NAME) as BlurState
 }
-function getOption(data, name, fallback) {
-  return data[name] || fallback
-}
 
-function init(e, data: SpriteSpin.Data) {
+function init(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
 
-  state.canvas = state.canvas || Utils.$("<canvas class='blur-layer'></canvas>")
-  state.context = state.context || state.canvas[0].getContext('2d')
+  state.canvas = state.canvas || document.createElement('canvas')
+  state.canvas.classList.add('blur-layer')
+  state.context = state.context || state.canvas.getContext('2d')
   state.steps = state.steps || []
-  state.fadeTime = Math.max(getOption(data, 'blurFadeTime', 200), 1)
-  state.frameTime = Math.max(getOption(data, 'blurFrameTime', data.frameTime), 16)
+  state.fadeTime = Math.max(getOption(data as any, 'blurFadeTime', 200), 1)
+  state.frameTime = Math.max(getOption(data as any, 'blurFrameTime', data.frameTime), 16)
   state.trackTime = null
-  state.cssBlur = !!getOption(data, 'blurCss', false)
+  state.cssBlur = !!getOption(data as any, 'blurCss', false)
 
-  const inner = Utils.getInnerSize(data)
-  const outer = data.responsive ? Utils.getComputedSize(data) : Utils.getOuterSize(data)
-  const css = Utils.getInnerLayout(data.sizeMode, inner, outer)
+  const inner = getInnerSize(data)
+  const outer = data.responsive ? getComputedSize(data) : getOuterSize(data)
+  const layout = getInnerLayout(data.sizeMode, inner, outer)
 
-  state.canvas[0].width = data.width * data.canvasRatio
-  state.canvas[0].height = data.height * data.canvasRatio
-  state.canvas.css(css).show()
+  state.canvas.width = data.width * data.canvasRatio
+  state.canvas.height = data.height * data.canvasRatio
+  css(state.canvas, layout)
+  show(state.canvas)
   state.context.scale(data.canvasRatio, data.canvasRatio)
-  data.target.append(state.canvas)
+  data.target.appendChild(state.canvas)
 }
 
-function onFrame(e, data) {
+function onFrame(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   trackFrame(data)
   if (state.timeout == null) {
@@ -81,8 +78,8 @@ function trackFrame(data: SpriteSpin.Data) {
   })
 }
 
-const toRemove = []
-function removeOldFrames(frames) {
+const toRemove: number[] = []
+function removeOldFrames(frames: BlurStep[]) {
   toRemove.length = 0
   for (let i = 0; i < frames.length; i += 1) {
     if (frames[i].alpha <= 0) {
@@ -105,26 +102,26 @@ function killLoop(data: SpriteSpin.Data) {
   state.timeout = null
 }
 
-function applyCssBlur(canvas, d) {
+function applyCssBlur(canvas: HTMLElement, d: number) {
   const amount = Math.min(Math.max((d / 2) - 4, 0), 2.5)
   const blur = `blur(${amount}px)`
-  canvas.css({
+  css(canvas, {
     '-webkit-filter': blur,
     filter: blur
   })
 }
 
 function clearFrame(data: SpriteSpin.Data, state: BlurState) {
-  state.canvas.show()
-  const w = state.canvas[0].width / data.canvasRatio
-  const h = state.canvas[0].height / data.canvasRatio
+  show(state.canvas)
+  const w = state.canvas.width / data.canvasRatio
+  const h = state.canvas.height / data.canvasRatio
   // state.context.clearRect(0, 0, w, h)
 }
 
 function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
   if (step.alpha <= 0) { return }
 
-  const specs = Utils.findSpecs(data.metrics, data.frames, step.frame, step.lane)
+  const specs = findSpecs(data.metrics, data.frames, step.frame, step.lane)
   const sheet = specs.sheet
   const sprite = specs.sprite
   if (!sheet || !sprite) { return }
@@ -133,9 +130,9 @@ function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
   const image = data.images[sheet.id]
   if (image.complete === false) { return }
 
-  state.canvas.show()
-  const w = state.canvas[0].width / data.canvasRatio
-  const h = state.canvas[0].height / data.canvasRatio
+  show(state.canvas)
+  const w = state.canvas.width / data.canvasRatio
+  const h = state.canvas.height / data.canvasRatio
   state.context.globalAlpha = step.alpha
   state.context.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
 }
@@ -171,5 +168,3 @@ SpriteSpin.registerPlugin(NAME, {
   onLoad: init,
   onFrameChanged: onFrame
 })
-
-})()

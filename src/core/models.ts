@@ -1,41 +1,44 @@
 import { PreloadProgress, SheetSpec } from '../utils'
 
-export type Callback = (e: any, data: Data) => void
+/**
+ * A callback function
+ */
+export type SpriteSpinCallback = (this: HTMLElement, e: Event, data: Data) => void
 
 /**
  * Additional callback options for SpriteSpin
  *
  * @public
  */
-export interface CallbackOptions {
+export interface LifeCycleOptions {
   /**
    * Occurs when the plugin has been initialized, but before loading the source files.
    */
-  onInit?: Callback
+  onInit?: SpriteSpinCallback
   /**
    * Occurs when any source file has been loaded and the progress has changed.
    */
-  onProgress?: Callback
+  onProgress?: SpriteSpinCallback
   /**
    * Occurs when all source files have been loaded and spritespin is ready to update and draw.
    */
-  onLoad?: Callback
+  onLoad?: SpriteSpinCallback
   /**
    * Occurs when the frame number has been updated (e.g. during animation)
    */
-  onFrame?: Callback
+  onFrame?: SpriteSpinCallback
   /**
    * Occurs when the frame number has changed.
    */
-  onFrameChanged?: Callback
+  onFrameChanged?: SpriteSpinCallback
   /**
    * Occurs when all update is complete and frame can be drawn
    */
-  onDraw?: Callback
+  onDraw?: SpriteSpinCallback
   /**
    * Occurs when spritespin has been loaded and the first draw operation is complete
    */
-  onComplete?: Callback
+  onComplete?: SpriteSpinCallback
 }
 
 export type SizeMode = 'original' | 'fit' | 'fill' | 'stretch'
@@ -47,11 +50,11 @@ export type Orientation = 'horizontal' | 'vertical'
  *
  * @public
  */
-export interface Options extends CallbackOptions {
+export interface Options extends LifeCycleOptions {
   /**
    * The target element which should hold the spritespin instance. This is usually already specified by the jQuery selector but can be overridden here.
    */
-  target?: any,
+  target?: HTMLElement,
 
   /**
    * Image URL or array of urls to be used.
@@ -270,17 +273,17 @@ export interface Data extends Options {
   /**
    * The target element
    */
-  target: JQuery
+  target: HTMLElement
 
   /**
    * The inner stage element
    */
-  stage: JQuery
+  stage: HTMLElement
 
   /**
    * The inner canvas element
    */
-  canvas: JQuery<HTMLCanvasElement>
+  canvas: HTMLCanvasElement
 
   /**
    * The 2D context of the canvas element
@@ -291,4 +294,28 @@ export interface Data extends Options {
    * The pixel ratio of the canvas element
    */
   canvasRatio: number
+
+  /**
+   *
+   */
+  api: Api
+}
+
+/**
+ * A spritespin api function
+ */
+export type ApiFunction<T extends Api = Api> = (this: T, ...args: any[]) => any
+
+/**
+ * The spritespin api instance
+ */
+export class Api {
+  constructor(public data: Data) { }
+}
+
+/**
+ * An object with extension methods for spritespin api
+ */
+export interface ApiExtension {
+  [key: string]: ApiFunction
 }

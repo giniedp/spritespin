@@ -1,7 +1,5 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
+import { getOption } from '../utils'
 
 const max = Math.max
 const min = Math.min
@@ -32,32 +30,28 @@ interface EaseState {
   frameStep: number
 }
 
-function getState(data) {
+function getState(data: SpriteSpin.Data) {
   return SpriteSpin.getPluginState(data, NAME) as EaseState
 }
 
-function getOption(data, name, fallback) {
-  return data[name] || fallback
-}
-
-function init(e, data: SpriteSpin.Data) {
+function init(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
-  state.maxSamples = max(getOption(data, 'easeMaxSamples', 5), 0)
-  state.damping = max(min(getOption(data, 'easeDamping', 0.9), 0.999), 0)
-  state.abortTime = max(getOption(data, 'easeAbortTime', 250), 16)
-  state.updateTime = max(getOption(data, 'easeUpdateTime', data.frameTime), 16)
+  state.maxSamples = max(getOption(data as any, 'easeMaxSamples', 5), 0)
+  state.damping = max(min(getOption(data as any, 'easeDamping', 0.9), 0.999), 0)
+  state.abortTime = max(getOption(data as any, 'easeAbortTime', 250), 16)
+  state.updateTime = max(getOption(data as any, 'easeUpdateTime', data.frameTime), 16)
   state.samples = []
   state.steps = []
 }
 
-function update(e, data: SpriteSpin.Data) {
+function update(e: Event, data: SpriteSpin.Data) {
   if (SpriteSpin.is(data, 'dragging')) {
     killLoop(data)
     sampleInput(data)
   }
 }
 
-function end(e, data: SpriteSpin.Data) {
+function end(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   const samples = state.samples
 
@@ -158,5 +152,3 @@ SpriteSpin.registerPlugin(NAME, {
   touchend: end,
   touchcancel: end
 })
-
-})()

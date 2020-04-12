@@ -1,4 +1,4 @@
-import { getCursorPosition } from '../utils'
+import { getCursorPosition, innerHeight, innerWidth } from '../utils'
 import { Data } from './models'
 import { getState } from './state'
 
@@ -43,7 +43,7 @@ export function getInputState(data: Data): InputState {
  * @param e - The input event
  * @param data - The SpriteSpin instance data
  */
-export function updateInput(e, data: Data) {
+export function updateInput(e: { clientX: number, clientY: number }, data: Data) {
   const cursor = getCursorPosition(e)
   const state = getInputState(data)
 
@@ -78,11 +78,11 @@ export function updateInput(e, data: Data) {
   state.ddY = state.currentY - state.oldY
 
   // Normalize vectors to range [-1:+1]
-  state.ndX = state.dX / data.target.innerWidth()
-  state.ndY = state.dY / data.target.innerHeight()
+  state.ndX = state.dX / innerWidth(data.target)
+  state.ndY = state.dY / innerHeight(data.target)
 
-  state.nddX = state.ddX / data.target.innerWidth()
-  state.nddY = state.ddY / data.target.innerHeight()
+  state.nddX = state.ddX / innerWidth(data.target)
+  state.nddY = state.ddY / innerHeight(data.target)
 }
 
 /**

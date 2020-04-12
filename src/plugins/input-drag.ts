@@ -1,6 +1,5 @@
 import * as SpriteSpin from '../core'
-
-(() => {
+import { isVisible } from '../utils'
 
 const NAME = 'drag'
 
@@ -28,7 +27,7 @@ function getAxis(data: SpriteSpin.Data) {
   return Math.PI / 2
 }
 
-function onInit(e, data: SpriteSpin.Data) {
+function onInit(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   const d = [200, 1500]
   const t = data.touchScrollTimer || d
@@ -36,9 +35,9 @@ function onInit(e, data: SpriteSpin.Data) {
   state.maxTime = t[1] || d[1]
 }
 
-function dragStart(e, data: SpriteSpin.Data) {
+function dragStart(e: MouseEvent, data: SpriteSpin.Data) {
   const state = getState(data)
-  if (data.loading || SpriteSpin.is(data, 'dragging') || data['zoomPinFrame'] && !data.stage.is(':visible')) {
+  if (data.loading || SpriteSpin.is(data, 'dragging') || (data as any).zoomPinFrame && !isVisible(data.stage)) {
     return
   }
 
@@ -74,7 +73,7 @@ function dragStart(e, data: SpriteSpin.Data) {
   SpriteSpin.updateInput(e, data)
 }
 
-function dragEnd(e, data: SpriteSpin.Data) {
+function dragEnd(e: MouseEvent, data: SpriteSpin.Data) {
   if (SpriteSpin.is(data, 'dragging')) {
     getState(data).endAt = new Date().getTime()
     SpriteSpin.flag(data, 'dragging', false)
@@ -85,7 +84,7 @@ function dragEnd(e, data: SpriteSpin.Data) {
   }
 }
 
-function drag(e, data: SpriteSpin.Data) {
+function drag(e: MouseEvent, data: SpriteSpin.Data) {
   const state = getState(data)
   const input = SpriteSpin.getInputState(data)
   if (!SpriteSpin.is(data, 'dragging')) { return }
@@ -108,7 +107,7 @@ function drag(e, data: SpriteSpin.Data) {
   SpriteSpin.stopAnimation(data)
 }
 
-function mousemove(e, data) {
+function mousemove(e: MouseEvent, data: SpriteSpin.Data) {
   dragStart(e, data)
   drag(e, data)
 }
@@ -142,5 +141,3 @@ SpriteSpin.registerPlugin('move', {
   touchend: dragEnd,
   touchcancel: dragEnd
 })
-
-})()

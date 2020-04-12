@@ -8,7 +8,7 @@ describe('SpriteSpin.Plugins#input-move', () => {
 
   let data: SpriteSpin.Data
   beforeEach((done) => {
-    t.get$El().spritespin({
+    data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
       width: FRAME_WIDHT,
       height: FRAME_HEIGHT,
@@ -17,7 +17,6 @@ describe('SpriteSpin.Plugins#input-move', () => {
       animate: false,
       plugins: ['move', '360']
     })
-    data = t.get$El().data(SpriteSpin.namespace)
   })
   afterEach(() => {
     SpriteSpin.destroy(data)

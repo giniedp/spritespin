@@ -1,7 +1,5 @@
 import * as SpriteSpin from '../core'
-import * as Utils from '../utils'
-
-(() => {
+import { css, innerHeight, innerWidth } from '../utils'
 
 const NAME = 'panorama'
 
@@ -9,11 +7,11 @@ interface PanoramaState {
   scale: number
 }
 
-function getState(data) {
-  return SpriteSpin.getPluginState(data, NAME) as PanoramaState
+function getState(data: SpriteSpin.Data) {
+  return SpriteSpin.getPluginState<PanoramaState>(data, NAME)
 }
 
-function onLoad(e, data: SpriteSpin.Data) {
+function onLoad(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   const sprite = data.metrics[0]
   if (!sprite) {
@@ -21,15 +19,15 @@ function onLoad(e, data: SpriteSpin.Data) {
   }
 
   if (data.orientation === 'horizontal') {
-    state.scale = data.target.innerHeight() / sprite.sampledHeight
+    state.scale = innerHeight(data.target) / sprite.sampledHeight
     data.frames = sprite.sampledWidth
   } else {
-    state.scale = data.target.innerWidth() / sprite.sampledWidth
+    state.scale = innerWidth(data.target) / sprite.sampledWidth
     data.frames = sprite.sampledHeight
   }
   const width = Math.floor(sprite.sampledWidth * state.scale)
   const height = Math.floor(sprite.sampledHeight * state.scale)
-  data.stage.css({
+  css(data.stage, {
     'background-image'        : `url(${data.source[sprite.id]})`,
     'background-repeat'       : 'repeat-both',
     // set custom background size to enable responsive rendering
@@ -40,7 +38,7 @@ function onLoad(e, data: SpriteSpin.Data) {
   })
 }
 
-function onDraw(e, data: SpriteSpin.Data) {
+function onDraw(e: Event, data: SpriteSpin.Data) {
   const state = getState(data)
   const px = data.orientation === 'horizontal' ? 1 : 0
   const py = px ? 0 : 1
@@ -48,7 +46,7 @@ function onDraw(e, data: SpriteSpin.Data) {
   const offset = data.frame % data.frames
   const left = Math.round(px * offset * state.scale)
   const top = Math.round(py * offset * state.scale)
-  data.stage.css({ 'background-position' : `${left}px ${top}px` })
+  css(data.stage, { 'background-position' : `${left}px ${top}px` })
 }
 
 SpriteSpin.registerPlugin(NAME, {
@@ -56,5 +54,3 @@ SpriteSpin.registerPlugin(NAME, {
   onLoad: onLoad,
   onDraw: onDraw
 })
-
-})()
