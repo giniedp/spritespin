@@ -1,27 +1,26 @@
-import * as SpriteSpin from '../core'
-import { innerWidth, isVisible, offset } from '../utils'
+import { updateInput, Utils, Data, getInputState, updateFrame, registerPlugin } from 'spritespin'
 
 const NAME = 'click'
-function click(e: MouseEvent, data: SpriteSpin.Data) {
-  if (data.loading || !isVisible(data.stage)) {
+function click(e: MouseEvent, data: Data) {
+  if (data.loading || !Utils.isVisible(data.stage)) {
     return
   }
-  SpriteSpin.updateInput(e, data)
-  const input = SpriteSpin.getInputState(data)
+  updateInput(e, data)
+  const input = getInputState(data)
 
   let half: number, pos: number
-  const target = data.target, off = offset(target)
+  const target = data.target, off = Utils.offset(target)
   if (data.orientation === 'horizontal') {
-    half = innerWidth(target) / 2
+    half = Utils.innerWidth(target) / 2
     pos = input.currentX - off.left
   } else {
     half = target.clientHeight / 2
     pos = input.currentY - off.top
   }
-  SpriteSpin.updateFrame(data, data.frame + (pos > half ? 1 : -1))
+  updateFrame(data, data.frame + (pos > half ? 1 : -1))
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   mouseup: click,
   touchend: click

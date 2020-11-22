@@ -12,20 +12,24 @@
     "noImplicitThis": true,
     "inlineSourceMap": false,
     "inlineSources": true,
-    "target": "es5",
-    "outDir": "release/src",
+    "target": "es3",
+    "outDir": "release/es5",
     "rootDir": "./src",
     "sourceMap": true,
+    "importHelpers": false,
     "typeRoots": [
       "node_modules/@types"
     ],
     "types": [
       "jasmine",
-    ]
+    ],
+    "paths": {
+      "spritespin": ["./spritespin"]
+    }
   },
   "exclude": [
-    "src/**/*.test.ts",
     "node_modules",
-    "release"
+    "release",
+    "*.test.ts"
   ]
 }

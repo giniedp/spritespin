@@ -1,5 +1,5 @@
-import * as SpriteSpin from '../core'
-import { innerWidth, isVisible, offset } from '../utils'
+import { Data, getPluginState, is, updateInput, flag, applyAnimation, resetInput, stopAnimation, getInputState, registerPlugin, Utils } from 'spritespin'
+const { innerWidth, isVisible, offset } = Utils
 
 const NAME = 'hold'
 
@@ -9,49 +9,49 @@ interface HoldState {
   reverse: boolean
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as HoldState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as HoldState
 }
 
-function rememberOptions(data: SpriteSpin.Data) {
+function rememberOptions(data: Data) {
   const state = getState(data)
   state.frameTime = data.frameTime
   state.animate = data.animate
   state.reverse = data.reverse
 }
 
-function restoreOptions(data: SpriteSpin.Data) {
+function restoreOptions(data: Data) {
   const state = getState(data)
   data.frameTime = state.frameTime
   data.animate = state.animate
   data.reverse = state.reverse
 }
 
-function start(e: MouseEvent, data: SpriteSpin.Data) {
-  if (SpriteSpin.is(data, 'loading') || SpriteSpin.is(data, 'dragging') || !isVisible(data.stage)) {
+function start(e: MouseEvent, data: Data) {
+  if (is(data, 'loading') || is(data, 'dragging') || !isVisible(data.stage)) {
     return
   }
   rememberOptions(data)
-  SpriteSpin.updateInput(e, data)
-  SpriteSpin.flag(data, 'dragging', true)
+  updateInput(e, data)
+  flag(data, 'dragging', true)
   data.animate = true
-  SpriteSpin.applyAnimation(data)
+  applyAnimation(data)
 }
 
-function stop(e: Event, data: SpriteSpin.Data) {
-  SpriteSpin.flag(data, 'dragging', false)
-  SpriteSpin.resetInput(data)
-  SpriteSpin.stopAnimation(data)
+function stop(e: Event, data: Data) {
+  flag(data, 'dragging', false)
+  resetInput(data)
+  stopAnimation(data)
   restoreOptions(data)
-  SpriteSpin.applyAnimation(data)
+  applyAnimation(data)
 }
 
-function update(e: MouseEvent, data: SpriteSpin.Data) {
-  if (!SpriteSpin.is(data, 'dragging')) {
+function update(e: MouseEvent, data: Data) {
+  if (!is(data, 'dragging')) {
     return
   }
-  SpriteSpin.updateInput(e, data)
-  const input = SpriteSpin.getInputState(data)
+  updateInput(e, data)
+  const input = getInputState(data)
 
   let half, delta
   const target = data.target, off = offset(target)
@@ -72,12 +72,12 @@ function update(e: MouseEvent, data: SpriteSpin.Data) {
   }
 }
 
-function onFrame(e: Event, data: SpriteSpin.Data) {
+function onFrame(e: Event, data: Data) {
   data.animate = true
-  SpriteSpin.applyAnimation(data)
+  applyAnimation(data)
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
 
   mousedown: start,

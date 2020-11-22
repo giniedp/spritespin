@@ -3,7 +3,7 @@ import config from './rollup.base'
 export default Object.assign({}, config, {
   output: {
     name: 'SpriteSpin',
-    file: 'release/sprite-spin.umd.js',
+    file: 'release/spritespin.js',
     format: 'umd',
     sourcemap: true,
   }

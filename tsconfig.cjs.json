@@ -3,6 +3,5 @@
   "compilerOptions": {
     "outDir": "release/cjs",
     "module": "commonjs"
-  },
-  "exclude": []
+  }
 }

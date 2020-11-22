@@ -1,9 +1,9 @@
-import * as SpriteSpin from '../core'
-import { css, hide, innerHeight, innerWidth, show, findSpecs } from '../utils'
+import { Utils, Data, registerPlugin } from 'spritespin'
+const { css, hide, innerHeight, innerWidth, show, findSpecs } = Utils
 
 const NAME = '360'
 
-function onLoad(e: Event, data: SpriteSpin.Data) {
+function onLoad(e: Event, data: Data) {
   data.stage.querySelectorAll('.spritespin-frames').forEach((it) => it.remove())
   if (data.renderer === 'image' && Array.isArray(data.images)) {
     for (const image of data.images) {
@@ -13,7 +13,7 @@ function onLoad(e: Event, data: SpriteSpin.Data) {
   }
 }
 
-function onDraw(e: Event, data: SpriteSpin.Data) {
+function onDraw(e: Event, data: Data) {
   const specs = findSpecs(data.metrics, data.frames, data.frame, data.lane)
   const sheet = specs.sheet
   const sprite = specs.sprite
@@ -65,7 +65,7 @@ function onDraw(e: Event, data: SpriteSpin.Data) {
   })
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   onLoad,
   onDraw

@@ -1,7 +1,9 @@
-import { PreloadProgress, SheetSpec } from '../utils'
+import { PreloadProgress, SheetSpec } from './utils'
 
 /**
  * A callback function
+ *
+ * @public
  */
 export type SpriteSpinCallback = (this: HTMLElement, e: Event, data: Data) => void
 
@@ -41,8 +43,19 @@ export interface LifeCycleOptions {
   onComplete?: SpriteSpinCallback
 }
 
+/**
+ * @public
+ */
 export type SizeMode = 'original' | 'fit' | 'fill' | 'stretch'
+
+/**
+ * @public
+ */
 export type RenderMode = 'canvas' | 'image' | 'background'
+
+/**
+ * @public
+ */
 export type Orientation = 'horizontal' | 'vertical'
 
 /**
@@ -303,11 +316,15 @@ export interface Data extends Options {
 
 /**
  * A spritespin api function
+ *
+ * @public
  */
 export type ApiFunction<T extends Api = Api> = (this: T, ...args: any[]) => any
 
 /**
  * The spritespin api instance
+ *
+ * @public
  */
 export class Api {
   constructor(public data: Data) { }
@@ -315,6 +332,8 @@ export class Api {
 
 /**
  * An object with extension methods for spritespin api
+ *
+ * @public
  */
 export interface ApiExtension {
   [key: string]: ApiFunction

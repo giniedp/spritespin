@@ -1,4 +1,3 @@
-import { namespace } from '../core/constants'
 import { loop } from './requestAnimationFrame'
 
 export function noop() {
@@ -35,25 +34,6 @@ export function wrap(value: number, min: number, max: number, size: number) {
   while (value < min) { value += size }
   return value
 }
-
-// /**
-//  * Binds on the given target and event the given function.
-//  * The SpriteSpin namespace is attached to the event name
-//  */
-// export function bind(target: JQuery, event: string, func: (...args: any[]) => any) {
-//   if (func) {
-//     target.bind(event + '.' + namespace, (e) => {
-//       func.apply(target, [e, (target as any).spritespin('data')])
-//     })
-//   }
-// }
-
-// /**
-//  * Unbinds all SpriteSpin events from given target element
-//  */
-// export function unbind(target: JQuery): void {
-//   target.unbind('.' + namespace)
-// }
 
 export function pixelRatio(context: CanvasRenderingContext2D) {
   const devicePixelRatio = window.devicePixelRatio || 1
@@ -150,16 +130,16 @@ export function show(el: HTMLElement) {
 }
 
 export function fadeTo(el: HTMLElement, opacity: number, options?: { duration: number }) {
-  el.style.opacity = String(opacity)
-  return
-  // const duration = getOption(options, 'duration', 400)
-  // loop(function (this, t) {
-  //   const opacity = 1 - clamp(t / duration, 1, 0)
-  //   el.style.opacity = String(opacity)
-  //   if (opacity <= 0) {
-  //     this.kill()
-  //   }
-  // })
+  const startValue = Number(el.style.opacity || '1')
+  const endValue = clamp(opacity, 1, 0)
+  const duration = getOption(options, 'duration', 400)
+  loop(function (this, t) {
+    const value = clamp((t / duration), 1, 0) * (endValue - startValue) + startValue
+    el.style.opacity = String(value)
+    if (startValue <= endValue && value >= endValue || startValue >= endValue && value <= endValue) {
+      this.kill()
+    }
+  })
 }
 
 export function fadeOut(el: HTMLElement, options?: { duration: number }) {

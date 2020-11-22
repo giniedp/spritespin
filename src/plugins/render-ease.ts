@@ -1,5 +1,5 @@
-import * as SpriteSpin from '../core'
-import { getOption } from '../utils'
+import { Utils, Data, getPluginState, is, updateFrame, registerPlugin } from 'spritespin'
+const { getOption } = Utils
 
 const max = Math.max
 const min = Math.min
@@ -30,11 +30,11 @@ interface EaseState {
   frameStep: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as EaseState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as EaseState
 }
 
-function init(e: Event, data: SpriteSpin.Data) {
+function init(e: Event, data: Data) {
   const state = getState(data)
   state.maxSamples = max(getOption(data as any, 'easeMaxSamples', 5), 0)
   state.damping = max(min(getOption(data as any, 'easeDamping', 0.9), 0.999), 0)
@@ -44,14 +44,14 @@ function init(e: Event, data: SpriteSpin.Data) {
   state.steps = []
 }
 
-function update(e: Event, data: SpriteSpin.Data) {
-  if (SpriteSpin.is(data, 'dragging')) {
+function update(e: Event, data: Data) {
+  if (is(data, 'dragging')) {
     killLoop(data)
     sampleInput(data)
   }
 }
 
-function end(e: Event, data: SpriteSpin.Data) {
+function end(e: Event, data: Data) {
   const state = getState(data)
   const samples = state.samples
 
@@ -92,7 +92,7 @@ function end(e: Event, data: SpriteSpin.Data) {
   loop(data)
 }
 
-function sampleInput(data: SpriteSpin.Data) {
+function sampleInput(data: Data) {
   const state = getState(data)
   // add a new sample
   state.samples.push({
@@ -106,7 +106,7 @@ function sampleInput(data: SpriteSpin.Data) {
   }
 }
 
-function killLoop(data: SpriteSpin.Data) {
+function killLoop(data: Data) {
   const state = getState(data)
   if (state.handler != null) {
     window.clearTimeout(state.handler)
@@ -114,12 +114,12 @@ function killLoop(data: SpriteSpin.Data) {
   }
 }
 
-function loop(data: SpriteSpin.Data) {
+function loop(data: Data) {
   const state = getState(data)
   state.handler = window.setTimeout(() => { tick(data) }, state.updateTime)
 }
 
-function tick(data: SpriteSpin.Data) {
+function tick(data: Data) {
   const state = getState(data)
   state.lanes += state.laneStep
   state.frames += state.frameStep
@@ -128,9 +128,9 @@ function tick(data: SpriteSpin.Data) {
   const frame = Math.floor(state.frame + state.frames)
   const lane = Math.floor(state.lane + state.lanes)
 
-  SpriteSpin.updateFrame(data, frame, lane)
+  updateFrame(data, frame, lane)
 
-  if (SpriteSpin.is(data, 'dragging')) {
+  if (is(data, 'dragging')) {
     killLoop(data)
   } else if (Math.abs(state.frameStep) > 0.005 || Math.abs(state.laneStep) > 0.005) {
     loop(data)
@@ -139,7 +139,7 @@ function tick(data: SpriteSpin.Data) {
   }
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
 
   onLoad: init,

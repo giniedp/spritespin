@@ -1,14 +1,14 @@
-import { defaults, eventNames, eventsToPrevent, namespace } from './constants'
+import { Constants } from './constants'
 import { handleEvent, unbindEvents, bindEvent } from './events'
 import { findInstance, popInstance, pushInstance } from './instances'
 import { applyLayout } from './layout'
 import { Data, Options, Api } from './models'
 import { applyAnimation, stopAnimation } from './playback'
 import { applyPlugins } from './plugins'
-import { show, measure, findSpecs, toArray, preload } from '../utils'
+import { show, measure, findSpecs, toArray, preload } from './utils'
 
 function bindEvents(data: Data, target: EventTarget) {
-  for (const  eventName of eventNames) {
+  for (const  eventName of Constants.eventNames) {
     const internalName = target === document ? 'document' +  eventName : eventName
     bindEvent(data, target, eventName, (e: Event) => {
       handleEvent(data, internalName, e)
@@ -17,7 +17,7 @@ function bindEvents(data: Data, target: EventTarget) {
 }
 
 function bindPreventEvents(data: Data) {
-  for (const eName of eventsToPrevent) {
+  for (const eName of Constants.eventsToPrevent) {
     bindEvent(data, data.target, eName, (e: Event) => e.preventDefault())
   }
 }
@@ -47,7 +47,7 @@ export function applyEvents(data: Data) {
   bindPreventEvents(data)
   bindEvents(data, document)
   bindEvents(data, data.target)
-  bindEvent(data, data.target, `onLoad.${namespace}`, (e: Event, d: Data) => applyAnimation(d))
+  bindEvent(data, data.target, `onLoad.${Constants.namespace}`, (e: Event, d: Data) => applyAnimation(d))
 }
 
 function applyMetrics(data: Data) {
@@ -112,11 +112,13 @@ export function boot(data: Data) {
  */
 export function create(options: Options & { target: HTMLElement | string }): Data {
   const target = getElement(options.target)
-  const data: Data = {
-    ...JSON.parse(JSON.stringify(defaults)),
-    ...options,
-    target
-  } as any
+  const data: Data = JSON.parse(JSON.stringify(Constants.defaults))
+  for (const key in options) {
+    if (options.hasOwnProperty(key)) {
+      (data as any)[key] = (options as any)[key]
+    }
+  }
+  data.target = target
 
   // ensure source is set
   data.source = data.source || []

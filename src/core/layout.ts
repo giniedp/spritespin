@@ -1,5 +1,5 @@
 import { Data } from './models'
-import { css, hide, getComputedSize, getOuterSize, getInnerLayout, getInnerSize, pixelRatio } from '../utils'
+import { css, hide, getComputedSize, getOuterSize, getInnerLayout, getInnerSize, pixelRatio } from './utils'
 
 /**
  * Applies css attributes to layout the SpriteSpin containers.

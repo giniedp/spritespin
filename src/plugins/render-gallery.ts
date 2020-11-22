@@ -1,6 +1,6 @@
-import * as SpriteSpin from '../core'
-import { css, getOption, naturalSize, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, fadeTo } from '../utils'
+import { Utils, Data, getPluginState, getInputState, registerPlugin, is } from 'spritespin'
 
+const { css, getOption, naturalSize, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, fadeTo } = Utils
 const NAME = 'gallery'
 
 interface GalleryState {
@@ -14,11 +14,11 @@ interface GalleryState {
   ddX: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as GalleryState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as GalleryState
 }
 
-function load(e: Event, data: SpriteSpin.Data) {
+function load(e: Event, data: Data) {
   const state = getState(data)
 
   state.images = []
@@ -55,10 +55,10 @@ function load(e: Event, data: SpriteSpin.Data) {
   fadeTo(state.images[state.frame], 1, { duration: state.speed })
 }
 
-function draw(e: Event, data: SpriteSpin.Data) {
+function draw(e: Event, data: Data) {
   const state = getState(data)
-  const input = SpriteSpin.getInputState(data)
-  const isDragging = SpriteSpin.is(data, 'dragging')
+  const input = getInputState(data)
+  const isDragging = is(data, 'dragging')
   if (state.frame !== data.frame && !isDragging) {
     css(state.stage, { left : state.offsets[data.frame] })
 
@@ -73,7 +73,7 @@ function draw(e: Event, data: SpriteSpin.Data) {
   }
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   onLoad: load,
   onDraw: draw

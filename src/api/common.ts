@@ -1,8 +1,8 @@
-import * as SpriteSpin from '../core'
+import { Api, ApiExtension, extendApi, getPlaybackState, stopAnimation, applyAnimation, updateFrame } from 'spritespin'
 
-export type CommonApi = SpriteSpin.Api & CommonApiFunctions
+export type CommonApi = Api & CommonApiFunctions
 
-export interface CommonApiFunctions extends SpriteSpin.ApiExtension {
+export interface CommonApiFunctions extends ApiExtension {
   /**
    * Gets a value indicating whether the animation is currently running.
    */
@@ -57,9 +57,9 @@ export interface CommonApiFunctions extends SpriteSpin.ApiExtension {
   playTo: (frame: number, options?: { force?: boolean, nearest?: boolean}) => void
 }
 
-SpriteSpin.extendApi<CommonApiFunctions>({
+extendApi<CommonApiFunctions>({
   isPlaying: function(this: CommonApi) {
-    return SpriteSpin.getPlaybackState(this.data).handler != null
+    return getPlaybackState(this.data).handler != null
   },
   isLooping: function(this: CommonApi) {
     return this.data.loop
@@ -73,27 +73,27 @@ SpriteSpin.extendApi<CommonApiFunctions>({
   },
   stopAnimation: function(this: CommonApi) {
       this.data.animate = false
-      SpriteSpin.stopAnimation(this.data)
+      stopAnimation(this.data)
   },
   startAnimation: function(this: CommonApi) {
     this.data.animate = true
-    SpriteSpin.applyAnimation(this.data)
+    applyAnimation(this.data)
   },
   loop: function(this: CommonApi, value: boolean) {
     this.data.loop = value
-    SpriteSpin.applyAnimation(this.data)
+    applyAnimation(this.data)
     return this
   },
   currentFrame: function(this: CommonApi) {
     return this.data.frame
   },
   updateFrame: function(this: CommonApi, frame: number, lane?: number) {
-    SpriteSpin.updateFrame(this.data, frame, lane)
+    updateFrame(this.data, frame, lane)
     return this
   },
   skipFrames: function(this: CommonApi, step: number) {
     const data = this.data
-    SpriteSpin.updateFrame(data, data.frame + (data.reverse ? - step : + step))
+    updateFrame(data, data.frame + (data.reverse ? - step : + step))
     return this
   },
   nextFrame: function(this: CommonApi) {
@@ -120,7 +120,7 @@ SpriteSpin.extendApi<CommonApiFunctions>({
     data.animate = true
     data.loop = false
     data.stopFrame = frame
-    SpriteSpin.applyAnimation(data)
+    applyAnimation(data)
     return this
   }
 })

@@ -1,4 +1,4 @@
-import { clamp, wrap } from '../utils'
+import { clamp, wrap } from './utils'
 import { handleEvent } from './events'
 import { Data } from './models'
 import { getState } from './state'

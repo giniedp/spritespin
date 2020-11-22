@@ -1,6 +1,6 @@
-import * as SpriteSpin from '..'
+import * as SpriteSpin from 'spritespin'
 import * as t from '../lib.test'
-import { isVisible } from '../utils'
+const { isVisible } = SpriteSpin.Utils
 
 describe('SpriteSpin.Plugins#render-360', () => {
 

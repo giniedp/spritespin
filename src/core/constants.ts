@@ -3,13 +3,13 @@ import { Options } from './models'
 /**
  * The namespace that is used to bind functions to DOM events and store the data object
  */
-export const namespace = 'spritespin'
+const namespace = 'spritespin'
 
 /**
  * Event names that are recognized by SpriteSpin. A module can implement any of these and they will be bound
  * to the target element on which the plugin is called.
  */
-export const eventNames = [
+const eventNames = [
   'mousedown',
   'mousemove',
   'mouseup',
@@ -33,7 +33,7 @@ export const eventNames = [
 /**
  *
  */
-export const callbackNames = [
+const callbackNames = [
   'onInit',
   'onProgress',
   'onLoad',
@@ -47,7 +47,7 @@ export const callbackNames = [
 /**
  * Names of events for that the default behavior should be prevented.
  */
-export const eventsToPrevent = [
+const eventsToPrevent = [
   'dragstart'
 ]
 
@@ -55,7 +55,7 @@ export const eventsToPrevent = [
  * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
  * lifetime of a SpriteSpin instance. The data is stored inside the target DOM element on which the plugin is called.
  */
-export const defaults: Options = {
+const defaults: Options = {
   source            : undefined,    // Stitched source image or array of files
   width             : undefined,    // actual display width
   height            : undefined,    // actual display height
@@ -86,4 +86,12 @@ export const defaults: Options = {
   touchScrollTimer  : [200, 1500],  // Time range in ms when touch scroll will be disabled during interaction with SpriteSpin
   responsive        : undefined,
   plugins           : undefined
+}
+
+export const Constants = {
+  namespace,
+  eventNames,
+  callbackNames,
+  eventsToPrevent,
+  defaults
 }

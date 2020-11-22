@@ -1,4 +1,4 @@
-import { boot, Data, extendApi, getPluginState, SizeMode } from '../core'
+import { boot, Data, extendApi, getPluginState, SizeMode } from 'spritespin'
 
 export interface Options {
   source?: string | string[],

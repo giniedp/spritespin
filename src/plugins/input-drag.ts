@@ -1,5 +1,20 @@
-import * as SpriteSpin from '../core'
-import { isVisible } from '../utils'
+import {
+  Data,
+  getPluginState,
+  is,
+  getPlaybackState,
+  flag,
+  updateInput,
+  resetInput,
+  startAnimation,
+  getInputState,
+  updateFrame,
+  stopAnimation,
+  registerPlugin,
+  Utils
+} from 'spritespin'
+
+const { isVisible } = Utils
 
 const NAME = 'drag'
 
@@ -13,11 +28,11 @@ interface DragState {
   maxTime: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as DragState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as DragState
 }
 
-function getAxis(data: SpriteSpin.Data) {
+function getAxis(data: Data) {
   if (typeof data.orientation === 'number') {
     return data.orientation * Math.PI / 180
   }
@@ -27,7 +42,7 @@ function getAxis(data: SpriteSpin.Data) {
   return Math.PI / 2
 }
 
-function onInit(e: Event, data: SpriteSpin.Data) {
+function onInit(e: Event, data: Data) {
   const state = getState(data)
   const d = [200, 1500]
   const t = data.touchScrollTimer || d
@@ -35,9 +50,9 @@ function onInit(e: Event, data: SpriteSpin.Data) {
   state.maxTime = t[1] || d[1]
 }
 
-function dragStart(e: MouseEvent, data: SpriteSpin.Data) {
+function dragStart(e: MouseEvent, data: Data) {
   const state = getState(data)
-  if (data.loading || SpriteSpin.is(data, 'dragging') || (data as any).zoomPinFrame && !isVisible(data.stage)) {
+  if (data.loading || is(data, 'dragging') || (data as any).zoomPinFrame && !isVisible(data.stage)) {
     return
   }
 
@@ -65,30 +80,30 @@ function dragStart(e: MouseEvent, data: SpriteSpin.Data) {
   }
 
   state.startAt = now
-  state.wasPlaying = !!SpriteSpin.getPlaybackState(data).handler
+  state.wasPlaying = !!getPlaybackState(data).handler
 
   state.frame = data.frame || 0
   state.lane = data.lane || 0
-  SpriteSpin.flag(data, 'dragging', true)
-  SpriteSpin.updateInput(e, data)
+  flag(data, 'dragging', true)
+  updateInput(e, data)
 }
 
-function dragEnd(e: MouseEvent, data: SpriteSpin.Data) {
-  if (SpriteSpin.is(data, 'dragging')) {
+function dragEnd(e: MouseEvent, data: Data) {
+  if (is(data, 'dragging')) {
     getState(data).endAt = new Date().getTime()
-    SpriteSpin.flag(data, 'dragging', false)
-    SpriteSpin.resetInput(data)
+    flag(data, 'dragging', false)
+    resetInput(data)
     if (data.retainAnimate && getState(data).wasPlaying) {
-      SpriteSpin.startAnimation(data)
+      startAnimation(data)
     }
   }
 }
 
-function drag(e: MouseEvent, data: SpriteSpin.Data) {
+function drag(e: MouseEvent, data: Data) {
   const state = getState(data)
-  const input = SpriteSpin.getInputState(data)
-  if (!SpriteSpin.is(data, 'dragging')) { return }
-  SpriteSpin.updateInput(e, data)
+  const input = getInputState(data)
+  if (!is(data, 'dragging')) { return }
+  updateInput(e, data)
 
   const rad = getAxis(data)
   const sn = Math.sin(rad)
@@ -101,18 +116,16 @@ function drag(e: MouseEvent, data: SpriteSpin.Data) {
   state.lane += data.lanes * y
 
   // update spritespin
-  const oldFrame = data.frame
-  const oldLane = data.lane
-  SpriteSpin.updateFrame(data, Math.floor(state.frame), Math.floor(state.lane))
-  SpriteSpin.stopAnimation(data)
+  updateFrame(data, Math.floor(state.frame), Math.floor(state.lane))
+  stopAnimation(data)
 }
 
-function mousemove(e: MouseEvent, data: SpriteSpin.Data) {
+function mousemove(e: MouseEvent, data: Data) {
   dragStart(e, data)
   drag(e, data)
 }
 
-SpriteSpin.registerPlugin('drag', {
+registerPlugin('drag', {
   name: 'drag',
   onInit: onInit,
 
@@ -129,7 +142,7 @@ SpriteSpin.registerPlugin('drag', {
   touchcancel: dragEnd
 })
 
-SpriteSpin.registerPlugin('move', {
+registerPlugin('move', {
   name: 'move',
   onInit: onInit,
 

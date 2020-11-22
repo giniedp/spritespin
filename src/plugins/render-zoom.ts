@@ -1,5 +1,25 @@
-import * as SpriteSpin from '../core'
-import { css, hide, isVisible, getCursorPosition, findSpecs, fadeOut, fadeIn, clamp, getOption } from '../utils'
+import {
+  Data,
+  getPluginState,
+  flag,
+  updateFrame,
+  registerPlugin,
+  extendApi,
+  Api,
+  Utils
+} from 'spritespin'
+
+const {
+  css,
+  hide,
+  getOption,
+  isVisible,
+  getCursorPosition,
+  clamp,
+  findSpecs,
+  fadeOut,
+  fadeIn
+} = Utils
 
 const NAME = 'zoom'
 
@@ -19,11 +39,11 @@ interface ZoomState {
   pinFrame: boolean
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as ZoomState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as ZoomState
 }
 
-function onInit(e: Event, data: SpriteSpin.Data) {
+function onInit(e: Event, data: Data) {
   const state = getState(data)
   state.source = getOption(data as any, 'zoomSource', data.source)
   state.useWheel = getOption(data as any, 'zoomUseWheel', false)
@@ -45,7 +65,7 @@ function onInit(e: Event, data: SpriteSpin.Data) {
   hide(state.stage)
 }
 
-function onDestroy(e: Event, data: SpriteSpin.Data) {
+function onDestroy(e: Event, data: Data) {
   const state = getState(data)
   if (state.stage) {
     state.stage.remove()
@@ -53,7 +73,7 @@ function onDestroy(e: Event, data: SpriteSpin.Data) {
   }
 }
 
-function updateInput(e: MouseEvent, data: SpriteSpin.Data) {
+function updateInput(e: MouseEvent, data: Data) {
   const state = getState(data)
   if (!isVisible(state.stage)) {
     return
@@ -64,7 +84,7 @@ function updateInput(e: MouseEvent, data: SpriteSpin.Data) {
   if (state.pinFrame) {
     // hack into drag/move module and disable dragging
     // prevents frame change during zoom mode
-    SpriteSpin.flag(data, 'dragging', false)
+    flag(data, 'dragging', false)
   }
 
   // grab touch/cursor position
@@ -98,10 +118,10 @@ function updateInput(e: MouseEvent, data: SpriteSpin.Data) {
   state.currentX = clamp(state.currentX + dx, 0, 1)
   state.currentY = clamp(state.currentY + dy, 0, 1)
 
-  SpriteSpin.updateFrame(data, data.frame, data.lane)
+  updateFrame(data, data.frame, data.lane)
 }
 
-function onClick(e: MouseEvent, data: SpriteSpin.Data) {
+function onClick(e: MouseEvent, data: Data) {
   const state = getState(data)
   if (!state.useClick) {
     return
@@ -132,14 +152,14 @@ function onClick(e: MouseEvent, data: SpriteSpin.Data) {
   }
 }
 
-function onMove(e: MouseEvent, data: SpriteSpin.Data) {
+function onMove(e: MouseEvent, data: Data) {
   const state = getState(data)
   if (isVisible(state.stage)) {
     updateInput(e, data)
   }
 }
 
-function onDraw(e: Event, data: SpriteSpin.Data) {
+function onDraw(e: Event, data: Data) {
   const state = getState(data)
 
   // calculate the frame index
@@ -189,7 +209,7 @@ function onDraw(e: Event, data: SpriteSpin.Data) {
   }
 }
 
-function toggleZoom(data: SpriteSpin.Data) {
+function toggleZoom(data: Data) {
   const state = getState(data)
   if (!state.stage) {
     throw new Error('zoom module is not initialized or is not available.')
@@ -203,19 +223,19 @@ function toggleZoom(data: SpriteSpin.Data) {
   return false
 }
 
-function showZoom(data: SpriteSpin.Data) {
+function showZoom(data: Data) {
   const state = getState(data)
   fadeOut(state.stage)
   fadeIn(data.stage)
 }
 
-function hideZoom(data: SpriteSpin.Data) {
+function hideZoom(data: Data) {
   const state = getState(data)
   fadeIn(state.stage)
   fadeOut(data.stage)
 }
 
-function wheel(e: WheelEvent, data: SpriteSpin.Data) {
+function wheel(e: WheelEvent, data: Data) {
   const state = getState(data)
   if (!data.loading && state.useWheel) {
 
@@ -235,7 +255,7 @@ function wheel(e: WheelEvent, data: SpriteSpin.Data) {
   }
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
 
   mousedown: onClick,
@@ -249,6 +269,6 @@ SpriteSpin.registerPlugin(NAME, {
   onDraw: onDraw
 })
 
-SpriteSpin.extendApi({
-  toggleZoom: function(this: SpriteSpin.Api) { toggleZoom(this.data) }
+extendApi({
+  toggleZoom: function(this: Api) { toggleZoom(this.data) }
 })

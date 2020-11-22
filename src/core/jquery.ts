@@ -1,34 +1,16 @@
-// // import { $ } from '../utils'
-// import { createOrUpdate, destroy } from './boot'
-// import { namespace } from './constants'
-// import { Api } from './models'
+import { spritespin } from './boot'
 
-// function extension(option: string | any, value: any) {
-//   const $target = $(this)
-//   if (option === 'data') {
-//     return $target.data(namespace)
-//   }
-//   if (option === 'api') {
-//     const data = $target.data(namespace)
-//     data.api = data.api || new Api(data)
-//     return data.api
-//   }
-//   if (option === 'destroy') {
-//     return $target.each(() => {
-//       const data = $target.data(namespace)
-//       if (data) {
-//         destroy(data)
-//       }
-//     })
-//   }
-//   if (arguments.length === 2 && typeof option === 'string') {
-//     option = { [option]: value }
-//   }
-//   if (typeof option === 'object') {
-//     return createOrUpdate($.extend(true, { target: $target }, option)).target
-//   }
-
-//   throw new Error('Invalid call to spritespin')
-// }
-
-// $.fn[namespace] = extension
+if ('jQuery' in globalThis) {
+  const jq: any = (globalThis as any).jQuery
+  jq.fn.spritespin = function(this: any) {
+    const args = arguments
+    this.each(function(this: any) {
+      const params: any[] = []
+      for (let i = 0; i < args.length; i++) {
+        params[i] = args[i]
+      }
+      params.unshift(this[0])
+      spritespin.apply(this, params)
+    })
+  }
+}

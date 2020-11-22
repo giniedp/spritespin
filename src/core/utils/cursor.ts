@@ -1,9 +1,8 @@
-export interface TouchCoordinates {
-  clientX: number
-  clientY: number
-}
+export type InputEvent =
+  | { clientX: number; clientY: number; }
+  | { touches: { clientX: number; clientY: number; }[]; }
 
-export function getCursorPosition(event: TouchCoordinates | TouchEvent | MouseEvent) {
+export function getCursorPosition(event: InputEvent) {
   const touches = 'touches' in event ? event.touches : null
   let source = 'clientX' in event ? event : null
 

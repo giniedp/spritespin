@@ -1,6 +1,9 @@
 import { Data, SpriteSpinCallback } from './models'
 import { getState } from './state'
 
+/**
+ * @internal
+ */
 export function handleEvent(data: Data, eventName: string, e?: Event) {
   const shouldDispatch = !e
   if (shouldDispatch) {
@@ -44,6 +47,9 @@ function getEventsState(data: Data) {
   return state
 }
 
+/**
+ * @internal
+ */
 export function bindEvent(data: Data, target: EventTarget, name: string, fn: SpriteSpinCallback) {
   const handler = (e: Event) => fn.call(target, e, data)
   getEventsState(data).bindings.push({
@@ -55,6 +61,9 @@ export function bindEvent(data: Data, target: EventTarget, name: string, fn: Spr
   target.addEventListener(name, handler)
 }
 
+/**
+ * @internal
+ */
 export function unbindEvents(data: Data, target?: EventTarget, name?: string) {
   const state = getEventsState(data)
   state.bindings = state.bindings.filter((it) => {

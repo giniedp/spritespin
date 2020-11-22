@@ -1,5 +1,5 @@
-import * as SpriteSpin from '../core'
-import { getOption } from '../utils'
+import { Data, getPluginState, is, updateInput, flag, updateFrame, getInputState, resetInput, stopAnimation, registerPlugin, Utils } from 'spritespin'
+const { getOption } = Utils
 
 const NAME = 'swipe'
 
@@ -8,41 +8,41 @@ interface SwipeState {
   snap: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as SwipeState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as SwipeState
 }
 
-function init(e: Event, data: SpriteSpin.Data) {
+function init(e: Event, data: Data) {
   const state = getState(data)
   state.fling = getOption(data as any, 'swipeFling', 10)
   state.snap = getOption(data as any, 'swipeSnap', 0.50)
 }
 
-function start(e: MouseEvent, data: SpriteSpin.Data) {
-  if (!data.loading && !SpriteSpin.is(data, 'dragging')) {
-    SpriteSpin.updateInput(e, data)
-    SpriteSpin.flag(data, 'dragging', true)
+function start(e: MouseEvent, data: Data) {
+  if (!data.loading && !is(data, 'dragging')) {
+    updateInput(e, data)
+    flag(data, 'dragging', true)
   }
 }
 
-function update(e: MouseEvent, data: SpriteSpin.Data) {
-  if (!SpriteSpin.is(data, 'dragging')) {
+function update(e: MouseEvent, data: Data) {
+  if (!is(data, 'dragging')) {
     return
   }
-  SpriteSpin.updateInput(e, data)
+  updateInput(e, data)
   const frame = data.frame
   const lane = data.lane
-  SpriteSpin.updateFrame(data, frame, lane)
+  updateFrame(data, frame, lane)
 }
 
-function end(e: Event, data: SpriteSpin.Data) {
-  if (!SpriteSpin.is(data, 'dragging')) {
+function end(e: Event, data: Data) {
+  if (!is(data, 'dragging')) {
     return
   }
-  SpriteSpin.flag(data, 'dragging', false)
+  flag(data, 'dragging', false)
 
   const state = getState(data)
-  const input = SpriteSpin.getInputState(data)
+  const input = getInputState(data)
 
   let frame = data.frame
   const lane = data.lane
@@ -63,12 +63,12 @@ function end(e: Event, data: SpriteSpin.Data) {
     frame = data.frame + 1
   }
 
-  SpriteSpin.resetInput(data)
-  SpriteSpin.updateFrame(data, frame, lane)
-  SpriteSpin.stopAnimation(data)
+  resetInput(data)
+  updateFrame(data, frame, lane)
+  stopAnimation(data)
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   onLoad: init,
   mousedown: start,

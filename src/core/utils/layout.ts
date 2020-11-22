@@ -1,4 +1,4 @@
-import { SizeMode } from '../core/models'
+import { SizeMode } from '../models'
 import { innerHeight, innerWidth } from './utils'
 
 export interface Layoutable {

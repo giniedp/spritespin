@@ -20,6 +20,8 @@
     "object-literal-sort-keys": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-shorthand": false,
-    "no-reference": false
+    "no-reference": false,
+    "no-submodule-imports": [true, "spritespin"],
+    "no-implicit-dependencies": [false]
   }
 }

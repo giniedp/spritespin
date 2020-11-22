@@ -1,5 +1,5 @@
-import * as SpriteSpin from '../core'
-import { show, css, getOption, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, findSpecs } from '../utils'
+import { Utils, Data, getPluginState, getPlaybackState, registerPlugin } from 'spritespin'
+const { show, css, getOption, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, findSpecs } = Utils
 
 const NAME = 'blur'
 
@@ -23,11 +23,11 @@ interface BlurState {
   timeout: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState(data, NAME) as BlurState
+function getState(data: Data) {
+  return getPluginState(data, NAME) as BlurState
 }
 
-function init(e: Event, data: SpriteSpin.Data) {
+function init(e: Event, data: Data) {
   const state = getState(data)
 
   state.canvas = state.canvas || document.createElement('canvas')
@@ -51,7 +51,7 @@ function init(e: Event, data: SpriteSpin.Data) {
   data.target.appendChild(state.canvas)
 }
 
-function onFrame(e: Event, data: SpriteSpin.Data) {
+function onFrame(e: Event, data: Data) {
   const state = getState(data)
   trackFrame(data)
   if (state.timeout == null) {
@@ -59,9 +59,9 @@ function onFrame(e: Event, data: SpriteSpin.Data) {
   }
 }
 
-function trackFrame(data: SpriteSpin.Data) {
+function trackFrame(data: Data) {
   const state = getState(data)
-  const ani = SpriteSpin.getPlaybackState(data)
+  const ani = getPlaybackState(data)
 
   // distance between frames
   let d = Math.abs(data.frame - ani.lastFrame)
@@ -91,12 +91,12 @@ function removeOldFrames(frames: BlurStep[]) {
   }
 }
 
-function loop(data: SpriteSpin.Data) {
+function loop(data: Data) {
   const state = getState(data)
   state.timeout = window.setTimeout(() => { tick(data) }, state.frameTime)
 }
 
-function killLoop(data: SpriteSpin.Data) {
+function killLoop(data: Data) {
   const state = getState(data)
   window.clearTimeout(state.timeout)
   state.timeout = null
@@ -111,14 +111,14 @@ function applyCssBlur(canvas: HTMLElement, d: number) {
   })
 }
 
-function clearFrame(data: SpriteSpin.Data, state: BlurState) {
+function clearFrame(data: Data, state: BlurState) {
   show(state.canvas)
   const w = state.canvas.width / data.canvasRatio
   const h = state.canvas.height / data.canvasRatio
   // state.context.clearRect(0, 0, w, h)
 }
 
-function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
+function drawFrame(data: Data, state: BlurState, step: BlurStep) {
   if (step.alpha <= 0) { return }
 
   const specs = findSpecs(data.metrics, data.frames, step.frame, step.lane)
@@ -137,7 +137,7 @@ function drawFrame(data: SpriteSpin.Data, state: BlurState, step: BlurStep) {
   state.context.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
 }
 
-function tick(data: SpriteSpin.Data) {
+function tick(data: Data) {
   const state = getState(data)
   killLoop(data)
   if (!state.context) {
@@ -162,7 +162,7 @@ function tick(data: SpriteSpin.Data) {
   }
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
 
   onLoad: init,

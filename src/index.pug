@@ -24,620 +24,75 @@ head
 body(data-spy="scroll" data-target="#navbar" data-offset="56")
   .jumbotron.jumbotron-fluid.mb-0
     .container
-      h1.display-4 Tweak UI
-      p.lead a lightweight js library for building input controls with data binding.
-
-  nav#navbar.navbar.navbar-light.sticky-top.shadow-sm.bg-white
-    .container
-      span
-      ul.nav.nav-pills
-        li.nav-item.dropdown
-          a.nav-link.dropdown-toggle(data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false") Install
-          .dropdown-menu
-            a.dropdown-item(href="#install-npm") NPM
-            a.dropdown-item(href="#install-cdn") CDN
-        li.nav-item.dropdown
-          a.nav-link.dropdown-toggle(data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false") Controls
-          .dropdown-menu
-            a.dropdown-item(href="#control-button") Button
-            a.dropdown-item(href="#control-button-group") Button group
-            a.dropdown-item(href="#control-checkbox") Checkbox
-            a.dropdown-item(href="#control-color") Color
-            a.dropdown-item(href="#control-color-picker") Color picker
-            a.dropdown-item(href="#control-image") Image
-            a.dropdown-item(href="#control-number") Number
-            a.dropdown-item(href="#control-slider") Slider
-            a.dropdown-item(href="#control-text") Text
-            a.dropdown-item(href="#control-select") Select
-            a.dropdown-item(href="#control-vector") Vector
-            a.dropdown-item(href="#control-groups") Groups
-            a.dropdown-item(href="#control-tabs") Tabs
-        li.nav-item.dropdown
-          a.nav-link.dropdown-toggle(data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false") Concepts
-          .dropdown-menu
-            a.dropdown-item(href="#concept-layout") Layout & Labels
-            a.dropdown-item(href="#concept-input") Input Values
-            a.dropdown-item(href="#concept-mithril") Mithril
-        li.nav-item.dropdown
-          a.nav-link.dropdown-toggle(data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false") Customize
-          .dropdown-menu
-            a.dropdown-item(href="#custom-controls") Custom controls
-            a.dropdown-item(href="#custom-colors") Theme colors
+      h1.display-4 SpriteSpin
+      p.lead
+        | SpriteSpin is a jQuery plugin that turns image frames into animations. It requires an array of images or a stiched sprite sheet and plays them frame by frame like a flip book. The aim of this plugin is to provide a 360 degree view of any kind of product.
+      p.lead
+        | The plugin is built with extensibility in mind and allows web developers to customize the behavior and presentation of the animations
 
   .container
     h2#install-npm Installation (NPM)
     section
       p Install library from NPM
       pre.language-shell: code.
-        $ npm install tweak-ui
+        $ npm install spritespin
 
       p.mt-3 Import the library (here in typescript)
       pre.language-javascript: code.
-        import * as TweakUi from "tweak-ui"
+        import * as SpriteSpin from "spritespin"
 
-      p.mt-3 mount your ui on a DOM element
+      p.mt-3 initialize spritespin
       pre.language-javascript: code.
-        TweakUi.mount(el, [
-          // ... array of definitions
-        ])
+        SpriteSpin.spritespin('.my-element', {
+          // ... options`
+        })
 
     h2#install-cdn Installation (CDN)
     section
       p Reference the library and style sheet
       aside.language-html
-        script(src='https://unpkg.com/tweak-ui@x.x.x/dist/tweak-ui.umd.js')
-        link(href='https://unpkg.com/tweak-ui@x.x.x/dist/tweak-ui.css' rel='stylesheet')
+        script(src='./spritespin.js' type='text/javascript')
+        //- script(src='https://unpkg.com/spritespin@x.x.x/release/spritespin.js' type='text/javascript')
 
       p.mt-3 Add a container to your HTML
       aside.language-html
         .my-element
 
-      p.mt-3 mount your ui on a DOM element
+      p.mt-3 initialize spritespin
       pre.language-javascript: code.
-        TweakUi.mount(".my-element", [
-          // ... array of definitions
-        ])
-
+        SpriteSpin.spritespin('.my-element', {
+          // ... options`
+        })
     h2#sourcecode-git Github
     section
       p
         span get the source at
-        a(href="https://github.com/giniedp/tweak-ui", target="_blank")  github
+        a(href="https://github.com/giniedp/spritespin", target="_blank")  github
 
-    h2#controls Controls
-    section#control-button
-      h3 Button
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
+    h2#examples Examples
+    section#simple-example
+      h3 Basic Example
+      .card
+        .sprtespin-example
+        .card-body
           script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-button .gui", [{
-              type: "button",
-              text: "Button 1",
-              label: "Label",
-              onClick: (it) => console.log("clicked", it)
-            }, {
-              type: "button",
-              text: "Button 2",
-              label: "",      // renders empty label
-              onClick: (it) => console.log("clicked", it)
-            }, {
-              type: "button",
-              text: "Button 3",
-              label: false,    // omits the label
-              onClick: (it) => console.log("clicked", it)
-            }, {
-              type: "button",
-              text: "Button 4",
-              disabled: true,
-              onClick: (it) => console.log("clicked", it)
-            }])
+            SpriteSpin.spritespin("#simple-example .sprtespin-example", {
+              source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+              width: 480,
+              height: 327,
+              sense: -1,
+              plugins: [
+                // module that changes frame on drag
+                'drag',
+                // module that eases out an animation after mouse is released
+                'ease',
+                // module to display array or sprite of images
+                '360',
+                // module that render and fades additional frames to somulate blur
+                'blur'
+              ],
+            })
 
-    section#control-button-group
-      h3 Button group
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-button-group .gui", [{
-              type: "button-group",
-              label: "Label",
-              children: [{
-                text: "Btn 1",
-                onClick: (it) => console.log("clicked", it)
-              }, {
-                text: "Btn 2",
-                onClick: (it) => console.log("clicked", it)
-              }, {
-                text: "Btn 3",
-                onClick: (it) => console.log("clicked", it)
-              }]
-            }])
-
-    section#control-checkbox
-      h3#controls-checkbox Checkbox
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-checkbox .gui", [{
-              type: "checkbox",
-              label: "Check 1",
-              value: true,
-            }, {
-              type: "checkbox",
-              label: "Check 2",
-            }])
-
-    section#control-color
-      h3#controls-color Color
-      p.
-        The Color control has a <code>format</code> option which describes how the color value
-        should be parsed and encoded. It consists of 2 sections. The prefix specifies whether the color value is a
-      ul
-        li <code>#</code> hex string
-        li <code>0x</code> a number
-        li <code>[]</code> an array
-        li <code>{}</code> an object
-      p.
-        The suffix specifies the order of the color components. It may be any combinarion of
-        <code>r</code>, <code>g</code>, <code>b</code> and <code>a</code> Here are some examples
-      table.table.table-borderless.table-sm
-        thead
-          tr
-            th format
-            th value (r: 255, g: 128, b: 0, a: 1)
-            th description
-        tbody
-          tr
-            td <code>"#rgb"</code>
-            td <code>"#FF8000"</code>
-            td Hex string with red green and blue coded from left to right
-          tr
-            td <code>"#bgr"</code>
-            td <code>"#0080FF"</code>
-            td Hex string with red green and blue coded from right to left
-          tr
-            td <code>"0xrgb"</code>
-            td <code>16744448</code>
-            td number Hex string with red green and blue coded from right to left
-          tr
-            td <code>"[]rgb"</code>
-            td <code>[255, 128, 0]</code>
-            td number array with red green and blue coded from right to left
-          tr
-            td <code>"{}rgb"</code>
-            td <code>{ r: 255, g: 128, b: 0 }</code>
-            td object red green and blue components
-          tr
-            td <code>"[n]rgb"</code>
-            td <code>[1, 0.5, 0]</code>
-            td number array with all components normalized to range [0:1]
-          tr
-            td <code>"{n}rgb"</code>
-            td <code>{ r: 1, g: 0.5, b: 0 }</code>
-            td object red green and blue components normalized to range [0:1]
-
-      #control-color-hex.row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-color-hex .gui", [{
-              type:   "color", label: "hex rgb",
-              format: "#rgb",  value: "#00ff00",
-              onInput: (it, value) => console.log(value)
-            }])
-
-    section#control-color-picker
-      h3 Color picker
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-color-picker .gui", [{
-              type: "color-picker",
-              label: "hex rgb",
-              value: 0,
-              format: "0xrgb",
-              onInput: (it, value) => console.log(value)
-            }])
-
-    section#control-image
-      h3 Image
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-image .gui", [{
-              type: "image",
-              label: "Image",
-              src: "https://picsum.photos/300/300",
-            }])
-
-    section#control-number
-      h3 Number
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-number .gui", [{
-              type: "number",
-              label: "Number",
-              value: 10,
-              min: 1, max: 100, step: 0.5,
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-    section#control-slider
-      h3 Slider
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-slider .gui", [{
-              type: "slider",
-              label: "Slider",
-              value: 10,
-              min: 1, max: 100, step: 0.5,
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-    section#control-text
-      h3 Text
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-text .gui", [{
-              type: "text",
-              label: "Text",
-              value: "Hello World",
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-    section#control-select
-      h3 Select
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-select .gui", [{
-              type: "select",
-              label: "Select",
-              value: "foo",
-              options: ["foo", "bar", "baz"],
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-    section#control-vector
-      h3 Vector
-      p.mt-3 an object with x, y, z components
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-vector .gui", [{
-              type: "vector",
-              label: "Vector",
-              value: [3, 2, 1],
-              keys: [0, 1, 2],
-              min: 0, max: 10, step: 0.25,
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-      p.mt-3 an object with x, y, z components
-      .row
-        .col.gui.vec3.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-vector .vec3.gui", [{
-              type: "vector",
-              label: "Vector",
-              value: { x: 0, y: 1, z: 0 },
-              keys: ["x", "y", "z"],
-              min: -1, max: 1, step: 0.125,
-              onInput: (it, value) => console.log(it, value)
-            }])
-
-    section#control-group
-      h3 Groups
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-group .gui", [{
-              type: "group",
-              label: "My Group",
-              open: true,        // will be opened initially
-              children: [
-                { type: "text", label: "My Text" },
-                { type: "number", label: "My Number" },
-                {
-                  type: "group",
-                  label: "My Sub Group",
-                  open: false,   // will be closed initially (default)
-                  children: [
-                    { type: "text", label: "My Text" },
-                    { type: "number", label: "My Number" },
-                  ]
-                }
-              ]
-            }])
-
-    section#control-tabs
-      h3 Tabs
-      .row
-        .col.gui.flex-grow-0.order-last
-        .col
-          script(type="text/javascript").language-javascript.
-            TweakUi.mount("#control-tabs .gui", [{
-              type: "tabs",
-              active: 1,
-              children: [{
-                label: "Tab 1",
-                children: [
-                  { type: "text", label: "My Text" },
-                  { type: "number", label: "My Number" },
-                ]
-              }, {
-                label: "Tab 2",
-                children: [
-                  { type: "color-picker", label: "My Color" },
-                ]
-              }, {
-                label: "Tab 3",
-              }]
-            }])
-
-    h2 Complete example
-    section.example.complete.row
-      .col.flex-grow-0.order-last
-        .testbox
-        .gui
-      .col
-        script(type="text/javascript").language-javascript.
-          var testEl = document.querySelector(".example.complete .testbox")
-          TweakUi.mount(".example.complete .gui", [{
-            type: "tabs",
-            children: [{
-              label: "Content",
-              children: [{
-                type: "text",
-                label: "Text",
-                get value() { return testEl.textContent },
-                set value(v) { testEl.textContent = v }
-              }]
-            }, {
-              label: "Style",
-              children: [{
-                type: "color",
-                label: "Background",
-                format: "rgb()",
-                get value() { return testEl.style.backgroundColor },
-                set value(v) { testEl.style.backgroundColor = v },
-              }, {
-                type: "color",
-                label: "Color",
-                format: "rgb()",
-                get value() { return testEl.style.color },
-                set value(v) { testEl.style.color = v },
-              }]
-            }]
-          }])
-
-    h2#concepts Concepts
-    h3#concept-layout Layout & Labels
-    p.
-      The main container has a fixed width of <code>20rem</code> which is <code>320px</code> on this page.
-      All controlls are stacked vertically. The default stylesheet uses the <code>flex-box</code> layout model
-      which should render just fine on <a href="https://caniuse.com/#feat=flexbox" target="_blank"> all modern browsers </a>
-    p.
-      Almost all controls have a label to their left side. Hhowever this is only rendered if the <code>label</code> option
-      is actually set. If you want to alignt the controls vertically you have to set the <code>label</code> option
-      at least to an empty string.
-    section.example.labels.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        script(type="text/javascript").language-javascript.
-          TweakUi.mount(document.querySelector(".labels.example .gui"), [
-            { type: "text",                   value: "i dont have a label" },
-            { type: "text", label: "My text", value: "i do have a label" },
-            { type: "text", label: "",        value: "i have an empty label" }
-          ])
-
-    h3#concept-input Input values
-    p There are several ways how to provide and retreive input values.
-    p Use the <code>value</code> property to set the inital value and then listen for change
-    section.example.value-property.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        script(type="text/javascript").language-javascript.
-          TweakUi.mount(document.querySelector(".value-property.example .gui"), [{
-            type: "text",
-            label: "My text",
-            value: "i have a label",
-            onInput: (it, value) => { console.log(it, value) }
-          }])
-
-    p.mt-3 Use getters and setters (ECMAScript 5 and above)
-    section.example.value-accessor.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        script(type="text/javascript").language-javascript.
-          TweakUi.mount(document.querySelector(".value-accessor.example .gui"), [{
-            type: "text",
-            label: "Page Title",
-            get value() { return window.document.title },
-            set value(v) { window.document.title = v },
-            onInput: (it, value) => { console.log(it, value) }
-          }])
-
-    p.mt-3 Use a <code>target</code> object and provide a <code>property</code> name to get and set the value
-    section.example.value-target.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        script(type="text/javascript").language-javascript.
-          TweakUi.mount(document.querySelector(".value-target.example .gui"), [{
-            type: "text",
-            label: "Page Title",
-            target: window.document,
-            property: "title"
-          }])
-    h3#concept-mithril Mithril
-    p.
-      This library is based on <a href="https://mithril.js.org/">mithril</a>. All key concepts of mithril
-      also apply to this library. So if you are about to write your own controls for Tweak UI dont forget
-      to check mithrils documentation.
-
-    h2#customize Customize
-    h3#custom-controls Custom controls
-    p.
-      Register your custom controls by using the <code>registerComponent</code> function.
-      The argument must be a unique name and a component class or component factory.
-      Consult the documentation of <a href="https://mithril.js.org/components.html" target="_blank">mithriljs</a>
-      for how the components work. Take a look at the source code for how Tweak Ui components are
-      implemented.
-
-    section.example.custom.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        script(type="text/javascript").language-javascript.
-          TweakUi.registerComponent("embed", (node) => {
-            return {
-              view: () => {
-                return TweakUi.renderControl(node, (data) => {
-                  return TweakUi.h('embed', {
-                    src: data.src,
-                    width: data.width,
-                    height: data.height
-                  })
-                })
-              }
-            }
-          })
-
-          TweakUi.mount(document.querySelector(".custom.example .gui"), [{
-            type: "embed",
-            label: "Youtube",
-            width: 220,
-            src: [
-              "https://www.youtube.com/embed/QH2-TGUlwu4",
-              "?rel=0&amp;autoplay=0&mute=1"
-            ].join("")
-          }])
-    h3#custom-colors Change Theme colors
-    p.
-      Tweak ui comes with a default theme and the alternatives <code>.tweakui-dark</code> and <code>.tweakui-light</code>.
-      Add one of these classes to the root element to change the look.
-    section.example.theme-default.row
-      .col.gui.flex-grow-0.order-last.tweakui-default
-      .col
-        span this is default
-        script(type="text/javascript").
-          TweakUi.mount(document.querySelector(".theme-default.example .gui"), [{
-            type: "button",
-            text: "Button",
-            label: ""
-          }, {
-            type: "number",
-            label: "Number",
-            value: 0
-          }, {
-            type: "text",
-            label: "Text",
-            value: "Hello World"
-          }, {
-            type: "color",
-            label: "Color",
-            value: "#ff00ff"
-          }])
-    section.example.theme-dark.row
-      .col.gui.flex-grow-0.order-last.tweakui-dark
-      .col
-        code .tweakui-dark
-        script(type="text/javascript").
-          TweakUi.mount(document.querySelector(".theme-dark.example .gui"), [{
-            type: "button",
-            text: "Button",
-            label: ""
-          }, {
-            type: "number",
-            label: "Number",
-            value: 0
-          }, {
-            type: "text",
-            label: "Text",
-            value: "Hello World"
-          }, {
-            type: "color",
-            label: "Color",
-            value: "#ff00ff"
-          }])
-    section.example.theme-light.row
-      .col.gui.flex-grow-0.order-last.tweakui-light
-      .col
-        code .tweakui-light
-        script(type="text/javascript").
-          TweakUi.mount(document.querySelector(".theme-light.example .gui"), [{
-            type: "button",
-            text: "Button",
-            label: ""
-          }, {
-            type: "number",
-            label: "Number",
-            value: 0
-          }, {
-            type: "text",
-            label: "Text",
-            value: "Hello World"
-          }, {
-            type: "color",
-            label: "Color",
-            value: "#ff00ff"
-          }])
-
-    p.
-      Another quick and easy way is to change the CSS variables for the root element.
-      However <a href="https://caniuse.com/#feat=css-variables" target="_blank">not all browsers</a> support that.
-      Read more about CSS variables
-      <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties">here </a>,
-      <a target="_blank" href="https://www.w3schools.com/css/css3_variables.asp">here </a> or
-      <a target="_blank" href="https://medium.freecodecamp.org/learn-css-variables-in-5-minutes-80cf63b4025d">here </a>
-
-    section.example.theme.row
-      .col.gui.flex-grow-0.order-last
-      .col
-        style.language-css.
-          .example.theme .gui {
-            --tweakui-color-primary: #263238;
-            --tweakui-color-primary-dark: #000a12;
-            --tweakui-color-primary-light: #4f5b62;
-            --tweakui-color-secondary: #37474f;
-            --tweakui-color-secondary-dark: #102027;
-            --tweakui-color-secondary-light: #62727b;
-            --tweakui-color-on-primary: #fff;
-            --tweakui-color-on-secondary: #fff;
-            --tweakui-color-accent: #f9AA33;
-          }
-
-        script(type="text/javascript").
-          TweakUi.mount(document.querySelector(".theme.example .gui"), [{
-            type: "button",
-            text: "Button",
-            label: ""
-          }, {
-            type: "number",
-            label: "Number",
-            value: 0
-          }, {
-            type: "text",
-            label: "Text",
-            value: "Hello World"
-          }, {
-            type: "color",
-            label: "Color",
-            value: "#ff00ff"
-          }])
     script(type='text/javascript').
       (function() {
         function formatText(text) {
@@ -666,13 +121,3 @@ body(data-spy="scroll" data-target="#navbar" data-offset="56")
         })
       }())
 
-    h3#comments Comments
-    section#disqus_thread
-    script(type='text/javascript').
-      var disqus_shortname = 'tweak-ui';
-      var disqus_url = 'https://tweak-ui.ginie.eu';
-      (function(){
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('body')[0]).appendChild(dsq);
-      })();

@@ -1,6 +1,5 @@
-import * as SpriteSpin from '..'
+import * as SpriteSpin from 'spritespin'
 import * as t from '../lib.test'
-import { isVisible } from '../utils'
 
 describe('SpriteSpin.Plugins#render-zoom', () => {
 
@@ -43,17 +42,17 @@ describe('SpriteSpin.Plugins#render-zoom', () => {
     })
 
     it ('hides zoom-stage initially', () => {
-      expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
+      expect(SpriteSpin.Utils.isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
     })
   })
 
   describe('double tap', () => {
     it ('toggles zoom-stage', (done) => {
-      expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
+      expect(SpriteSpin.Utils.isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
       doubleTap(0, 0, () => {
-        expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(true)
+        expect(SpriteSpin.Utils.isVisible(data.target.querySelector('.zoom-stage'))).toBe(true)
         doubleTap(0, 0, () => {
-          expect(isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
+          expect(SpriteSpin.Utils.isVisible(data.target.querySelector('.zoom-stage'))).toBe(false)
           done()
         })
       })

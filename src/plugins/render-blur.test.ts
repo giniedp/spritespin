@@ -1,4 +1,4 @@
-import * as SpriteSpin from '..'
+import * as SpriteSpin from 'spritespin'
 import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#render-blur', () => {

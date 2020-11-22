@@ -1,5 +1,5 @@
-import * as SpriteSpin from '../core'
-import { fadeOut, hide, fadeIn } from '../utils'
+import * as SpriteSpin from 'spritespin'
+const { fadeOut, hide, fadeIn } = SpriteSpin.Utils
 
 interface State {
   stage: HTMLElement

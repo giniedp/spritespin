@@ -1,5 +1,6 @@
-import * as SpriteSpin from '../core'
-import { css, innerHeight, innerWidth } from '../utils'
+import { Data, getPluginState, registerPlugin, Utils } from 'spritespin'
+
+const { innerHeight, innerWidth, css } = Utils
 
 const NAME = 'panorama'
 
@@ -7,11 +8,11 @@ interface PanoramaState {
   scale: number
 }
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState<PanoramaState>(data, NAME)
+function getState(data: Data) {
+  return getPluginState<PanoramaState>(data, NAME)
 }
 
-function onLoad(e: Event, data: SpriteSpin.Data) {
+function onLoad(e: Event, data: Data) {
   const state = getState(data)
   const sprite = data.metrics[0]
   if (!sprite) {
@@ -38,7 +39,7 @@ function onLoad(e: Event, data: SpriteSpin.Data) {
   })
 }
 
-function onDraw(e: Event, data: SpriteSpin.Data) {
+function onDraw(e: Event, data: Data) {
   const state = getState(data)
   const px = data.orientation === 'horizontal' ? 1 : 0
   const py = px ? 0 : 1
@@ -49,7 +50,7 @@ function onDraw(e: Event, data: SpriteSpin.Data) {
   css(data.stage, { 'background-position' : `${left}px ${top}px` })
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   onLoad: onLoad,
   onDraw: onDraw

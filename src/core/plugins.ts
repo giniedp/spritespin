@@ -1,4 +1,4 @@
-import { error, warn } from '../utils'
+import { error, warn } from './utils'
 import { SpriteSpinCallback, LifeCycleOptions, Data } from './models'
 
 /**
