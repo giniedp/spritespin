@@ -1,4 +1,4 @@
-import { Data, getPluginState, is, updateInput, flag, updateFrame, getInputState, resetInput, stopAnimation, registerPlugin, Utils } from 'spritespin'
+import { Data, getPluginState, is, updateInput, flag, updateFrame, getInputState, resetInput, stopAnimation, registerPlugin, Utils } from '../core'
 const { getOption } = Utils
 
 const NAME = 'swipe'

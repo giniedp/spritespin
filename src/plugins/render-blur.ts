@@ -1,4 +1,4 @@
-import { Utils, Data, getPluginState, getPlaybackState, registerPlugin } from 'spritespin'
+import { Utils, Data, getPluginState, getPlaybackState, registerPlugin } from '../core'
 const { show, css, getOption, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, findSpecs } = Utils
 
 const NAME = 'blur'

@@ -12,7 +12,7 @@ import {
   stopAnimation,
   registerPlugin,
   Utils
-} from 'spritespin'
+} from '../core'
 
 const { isVisible } = Utils
 

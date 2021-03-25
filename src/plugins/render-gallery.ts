@@ -1,4 +1,4 @@
-import { Utils, Data, getPluginState, getInputState, registerPlugin, is } from 'spritespin'
+import { Utils, Data, getPluginState, getInputState, registerPlugin, is } from '../core'
 
 const { css, getOption, naturalSize, getInnerSize, getComputedSize, getOuterSize, getInnerLayout, fadeTo } = Utils
 const NAME = 'gallery'

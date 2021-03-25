@@ -1,4 +1,4 @@
-import { Data, getPluginState, registerPlugin, Utils } from 'spritespin'
+import { Data, getPluginState, registerPlugin, Utils } from '../core'
 
 const { innerHeight, innerWidth, css } = Utils
 

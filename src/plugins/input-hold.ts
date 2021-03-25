@@ -1,4 +1,4 @@
-import { Data, getPluginState, is, updateInput, flag, applyAnimation, resetInput, stopAnimation, getInputState, registerPlugin, Utils } from 'spritespin'
+import { Data, getPluginState, is, updateInput, flag, applyAnimation, resetInput, stopAnimation, getInputState, registerPlugin, Utils } from '../core'
 const { innerWidth, isVisible, offset } = Utils
 
 const NAME = 'hold'

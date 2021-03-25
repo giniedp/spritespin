@@ -1,4 +1,4 @@
-import * as t from '../lib.test'
+import * as t from '../../lib.test'
 import * as Utils from '../utils'
 
 describe('SpriteSpin.Utils', () => {

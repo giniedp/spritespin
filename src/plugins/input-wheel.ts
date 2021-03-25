@@ -1,4 +1,4 @@
-import { Utils, Data, updateFrame, registerPlugin } from 'spritespin'
+import { Utils, Data, updateFrame, registerPlugin } from '../core'
 
 const { isVisible } = Utils
 

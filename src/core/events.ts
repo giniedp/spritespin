@@ -4,7 +4,7 @@ import { getState } from './state'
 /**
  * @internal
  */
-export function handleEvent(data: Data, eventName: string, e?: Event) {
+export function dispatchEvent(data: Data, eventName: string, e?: Event) {
   const shouldDispatch = !e
   if (shouldDispatch) {
     e = document.createEvent('Event')

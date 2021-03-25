@@ -8,7 +8,6 @@ module.exports = (config) => {
   config.set({
     plugins: [
       'karma-jasmine',
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-safari-launcher',
@@ -26,7 +25,6 @@ module.exports = (config) => {
       IS_TRAVIS ? 'Firefox' : 'ChromeHeadless'
     ],
     files: [
-      // 'node_modules/jquery/dist/jquery.js',
       'src/**/*.ts',
     ],
     preprocessors: {
@@ -38,21 +36,7 @@ module.exports = (config) => {
     ],
 
     karmaTypescriptConfig: {
-      bundlerOptions: {
-        entrypoints: /\.test\.ts$/,
-        sourceMap: true,
-        validateSyntax: false,
-      },
-      exclude: ['node_modules', 'release'],
-      // compilerOptions: tsconfig.compilerOptions,
       tsconfig: 'tsconfig.test.json',
-      // Pass options to remap-istanbul.
-      // remapOptions: {
-      //   // a regex for excluding files from remapping
-      //   // exclude: '',
-      //   // a function for handling error messages
-      //   warn: (msg) => console.log(msg)
-      // },
       converageOptions: {
         instrumentation: IS_COVERAGE,
         exclude: /\.(d|spec|test)\.ts/i,

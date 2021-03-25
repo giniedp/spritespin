@@ -72,26 +72,60 @@ body(data-spy="scroll" data-target="#navbar" data-offset="56")
     h2#examples Examples
     section#simple-example
       h3 Basic Example
-      .card
-        .sprtespin-example
-        .card-body
-          script(type="text/javascript").language-javascript.
-            SpriteSpin.spritespin("#simple-example .sprtespin-example", {
-              source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
-              width: 480,
-              height: 327,
-              sense: -1,
-              plugins: [
-                // module that changes frame on drag
-                'drag',
-                // module that eases out an animation after mouse is released
-                'ease',
-                // module to display array or sprite of images
-                '360',
-                // module that render and fades additional frames to somulate blur
-                'blur'
-              ],
-            })
+      .sprtespin-example
+      div
+        script(type="text/javascript").language-javascript.
+          SpriteSpin.spritespin("#simple-example .sprtespin-example", {
+            source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', {
+              frame: [1,34], digits: 3
+            }),
+            width: 480,
+            height: 327,
+            sense: -1,
+            plugins: [
+              // module that changes frame on drag
+              'drag',
+              // module that eases out an animation after mouse is released
+              'ease',
+              // module to display array or sprite of images
+              '360',
+              // module that render and fades additional frames to somulate blur
+              'blur'
+            ],
+          })
+
+    section
+      h3 3D Example
+      .sprtespin-example-3d
+      div
+        script(type="text/javascript").language-javascript.
+          SpriteSpin.spritespin('.sprtespin-example-3d', {
+            source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/3d/sample-{lane}-{frame}.jpg', {
+              lane: [0, 11],
+              frame: [0, 23],
+              digits: 2,
+            }),
+            // width and height of the display
+            width: 400,
+            height: 225,
+            // the number of lanes (vertical angles)
+            lanes: 12,
+            // the number of frames per lane (per vertical angle)
+            frames: 24,
+            // interaction sensitivity (and direction) modifier for horizontal movement
+            sense: 1,
+            // interaction sensitivity (and direction) modifier for vertical movement
+            senseLane: -2,
+
+            // the initial lane number
+            lane: 6,
+            // the initial frame number (within the lane)
+            frame: 0,
+            // disable autostart of the animation
+            animate: false,
+
+            plugins: ['progress', '360', 'drag'],
+          })
 
     script(type='text/javascript').
       (function() {

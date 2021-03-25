@@ -1,4 +1,4 @@
-import { updateInput, Utils, Data, getInputState, updateFrame, registerPlugin } from 'spritespin'
+import { updateInput, Utils, Data, getInputState, updateFrame, registerPlugin } from '../core'
 
 const NAME = 'click'
 function click(e: MouseEvent, data: Data) {

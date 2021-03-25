@@ -7,7 +7,7 @@ import {
   extendApi,
   Api,
   Utils
-} from 'spritespin'
+} from '../core'
 
 const {
   css,
@@ -210,6 +210,7 @@ function onDraw(e: Event, data: Data) {
 }
 
 function toggleZoom(data: Data) {
+  console.log('toggle zoom')
   const state = getState(data)
   if (!state.stage) {
     throw new Error('zoom module is not initialized or is not available.')
@@ -224,12 +225,14 @@ function toggleZoom(data: Data) {
 }
 
 function showZoom(data: Data) {
+  console.log('showZoom')
   const state = getState(data)
   fadeOut(state.stage)
   fadeIn(data.stage)
 }
 
 function hideZoom(data: Data) {
+  console.log('hideZoom')
   const state = getState(data)
   fadeIn(state.stage)
   fadeOut(data.stage)

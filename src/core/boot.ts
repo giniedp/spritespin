@@ -1,5 +1,5 @@
 import { Constants } from './constants'
-import { handleEvent, unbindEvents, bindEvent } from './events'
+import { dispatchEvent, unbindEvents, bindEvent } from './events'
 import { findInstance, popInstance, pushInstance } from './instances'
 import { applyLayout } from './layout'
 import { Data, Options, Api } from './models'
@@ -11,7 +11,7 @@ function bindEvents(data: Data, target: EventTarget) {
   for (const  eventName of Constants.eventNames) {
     const internalName = target === document ? 'document' +  eventName : eventName
     bindEvent(data, target, eventName, (e: Event) => {
-      handleEvent(data, internalName, e)
+      dispatchEvent(data, internalName, e)
     })
   }
 }
@@ -79,14 +79,14 @@ export function boot(data: Data) {
   data.source = toArray(data.source)
   data.loading = true
   data.target.classList.add('loading')
-  handleEvent(data, 'onInit')
+  dispatchEvent(data, 'onInit')
   preload({
     source: data.source,
     crossOrigin: data.crossOrigin,
     preloadCount: data.preloadCount,
     progress: (progress) => {
       data.progress = progress
-      handleEvent(data, 'onProgress')
+      dispatchEvent(data, 'onProgress')
     },
     complete: (images) => {
       data.images = images
@@ -97,10 +97,10 @@ export function boot(data: Data) {
       applyLayout(data)
       show(data.stage)
       data.target.classList.remove('loading')
-      handleEvent(data, 'onLoad')
-      handleEvent(data, 'onFrame')
-      handleEvent(data, 'onDraw')
-      handleEvent(data, 'onComplete')
+      dispatchEvent(data, 'onLoad')
+      dispatchEvent(data, 'onFrame')
+      dispatchEvent(data, 'onDraw')
+      dispatchEvent(data, 'onComplete')
     }
   })
 }
@@ -204,7 +204,7 @@ export function createOrUpdate(options: Options & { target: HTMLElement | string
 export function destroy(data: Data) {
   popInstance(data)
   stopAnimation(data)
-  handleEvent(data, 'onDestroy')
+  dispatchEvent(data, 'onDestroy')
   unbindEvents(data)
   data.target.innerHTML = ''
   data.target.setAttribute('style', null)

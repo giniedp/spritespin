@@ -12,7 +12,7 @@ export const warn: (message?: any, ...optionalParams: any[]) => void = console &
 export const error: (message?: any, ...optionalParams: any[]) => void = console && console.error || noop
 
 export function getOption<T, K extends keyof T>(data: T, name: K, fallback: T[K]) {
-  return name in data ? data[name] : fallback
+  return data && (name in data) ? data[name] : fallback
 }
 
 export function toArray<T>(value: T | T[]): T[] {
@@ -108,6 +108,17 @@ export function css(el: HTMLElement, style: { [key: string]: string | number }) 
       el.style.setProperty(key, String(value))
     }
   }
+}
+
+export function createElement(name: string, options: { id?: string, class?: string }) {
+  const el = document.createElement(name)
+  if (options.id) {
+    el.setAttribute('id', options.id)
+  }
+  if (options.class) {
+    el.setAttribute('class', options.class)
+  }
+  return el
 }
 
 export function isVisible(el: HTMLElement) {

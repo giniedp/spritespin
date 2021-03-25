@@ -1,5 +1,5 @@
-import * as SpriteSpin from 'spritespin'
-const { fadeOut, hide, fadeIn } = SpriteSpin.Utils
+import { Data, getPluginState, registerPlugin, Utils } from '../core'
+const { fadeOut, hide, fadeIn, createElement } = Utils
 
 interface State {
   stage: HTMLElement
@@ -8,27 +8,21 @@ interface State {
 }
 
 const NAME = 'progress'
-const template = `
-<div class='spritespin-progress'>
-  <div class='spritespin-progress-label'></div>
-  <div class='spritespin-progress-bar'></div>
-</div>
-`
 
-function getState(data: SpriteSpin.Data) {
-  return SpriteSpin.getPluginState<State>(data, NAME)
+function getState(data: Data) {
+  return getPluginState<State>(data, NAME)
 }
 
-function onInit(e: Event, data: SpriteSpin.Data) {
+function onInit(e: Event, data: Data) {
   const state = getState(data)
   if (!state.stage) {
-    state.stage = document.createElement('div')
-    state.stage.outerHTML = template
-    state.label = state.stage.querySelector('.spritespin-progress-label')
-    state.progress = state.stage.querySelector('.spritespin-progress-bar')
+    state.stage = createElement('div', { class: 'spritespin-progress' })
+    state.label = createElement('div', { class: 'spritespin-progress-label' })
+    state.progress = createElement('div', { class: 'spritespin-progress-bar' })
+    state.stage.appendChild(state.label)
+    state.stage.appendChild(state.progress)
     data.target.appendChild(state.stage)
   }
-
   state.label.textContent = '0%'
   state.label.style.textAlign = 'center'
   state.progress.style.width = '0%'
@@ -36,21 +30,21 @@ function onInit(e: Event, data: SpriteSpin.Data) {
   hide(state.stage)
   fadeIn(state.stage)
 }
-function onProgress(e: Event, data: SpriteSpin.Data) {
+function onProgress(e: Event, data: Data) {
   const state = getState(data)
   state.label.textContent = `${data.progress.percent}%`
   state.progress.style.width = `${data.progress.percent}%`
 }
 
-function onLoad(e: Event, data: SpriteSpin.Data) {
+function onLoad(e: Event, data: Data) {
   fadeOut(getState(data).stage)
 }
 
-function onDestroy(e: Event, data: SpriteSpin.Data) {
+function onDestroy(e: Event, data: Data) {
   getState(data).stage.remove()
 }
 
-SpriteSpin.registerPlugin(NAME, {
+registerPlugin(NAME, {
   name: NAME,
   onInit: onInit,
   onProgress: onProgress,

@@ -1,4 +1,4 @@
-import { Utils, Data, registerPlugin } from 'spritespin'
+import { Utils, Data, registerPlugin } from '../core'
 const { css, hide, innerHeight, innerWidth, show, findSpecs } = Utils
 
 const NAME = '360'

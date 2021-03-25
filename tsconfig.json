@@ -7,25 +7,25 @@
     "declarationMap": true,
     "module": "es2015",
     "moduleResolution": "node",
+    "outDir": "release/es5",
     "noEmitHelpers": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "inlineSourceMap": false,
     "inlineSources": true,
-    "target": "es3",
-    "outDir": "release/es5",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "es5",
     "rootDir": "./src",
     "sourceMap": true,
-    "importHelpers": false,
+    "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "types": [
       "jasmine",
-    ],
-    "paths": {
-      "spritespin": ["./spritespin"]
-    }
+    ]
   },
   "exclude": [
     "node_modules",

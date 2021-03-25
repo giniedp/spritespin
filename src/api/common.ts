@@ -1,4 +1,4 @@
-import { Api, ApiExtension, extendApi, getPlaybackState, stopAnimation, applyAnimation, updateFrame } from 'spritespin'
+import { Api, ApiExtension, extendApi, getPlaybackState, stopAnimation, applyAnimation, updateFrame } from '../core'
 
 export type CommonApi = Api & CommonApiFunctions
 
@@ -54,55 +54,55 @@ export interface CommonApiFunctions extends ApiExtension {
    *   force [boolean] starts the animation, even if current frame is the target frame
    *   nearest [boolean] animates to the direction with minimum distance to the target frame
    */
-  playTo: (frame: number, options?: { force?: boolean, nearest?: boolean}) => void
+  playTo: (frame: number, options?: { force?: boolean; nearest?: boolean }) => void
 }
 
 extendApi<CommonApiFunctions>({
-  isPlaying: function(this: CommonApi) {
+  isPlaying: function (this: CommonApi) {
     return getPlaybackState(this.data).handler != null
   },
-  isLooping: function(this: CommonApi) {
+  isLooping: function (this: CommonApi) {
     return this.data.loop
   },
-  toggleAnimation: function(this: CommonApi) {
+  toggleAnimation: function (this: CommonApi) {
     if (this.isPlaying()) {
       this.stopAnimation()
     } else {
       this.startAnimation()
     }
   },
-  stopAnimation: function(this: CommonApi) {
-      this.data.animate = false
-      stopAnimation(this.data)
+  stopAnimation: function (this: CommonApi) {
+    this.data.animate = false
+    stopAnimation(this.data)
   },
-  startAnimation: function(this: CommonApi) {
+  startAnimation: function (this: CommonApi) {
     this.data.animate = true
     applyAnimation(this.data)
   },
-  loop: function(this: CommonApi, value: boolean) {
+  loop: function (this: CommonApi, value: boolean) {
     this.data.loop = value
     applyAnimation(this.data)
     return this
   },
-  currentFrame: function(this: CommonApi) {
+  currentFrame: function (this: CommonApi) {
     return this.data.frame
   },
-  updateFrame: function(this: CommonApi, frame: number, lane?: number) {
+  updateFrame: function (this: CommonApi, frame: number, lane?: number) {
     updateFrame(this.data, frame, lane)
     return this
   },
-  skipFrames: function(this: CommonApi, step: number) {
+  skipFrames: function (this: CommonApi, step: number) {
     const data = this.data
-    updateFrame(data, data.frame + (data.reverse ? - step : + step))
+    updateFrame(data, data.frame + (data.reverse ? -step : +step))
     return this
   },
-  nextFrame: function(this: CommonApi) {
+  nextFrame: function (this: CommonApi) {
     return this.skipFrames(1)
   },
-  prevFrame: function(this: CommonApi) {
+  prevFrame: function (this: CommonApi) {
     return this.skipFrames(-1)
   },
-  playTo: function(this: CommonApi, frame, options) {
+  playTo: function (this: CommonApi, frame: number, options) {
     const data = this.data
     options = options || {}
     if (!options.force && data.frame === frame) {
@@ -122,5 +122,5 @@ extendApi<CommonApiFunctions>({
     data.stopFrame = frame
     applyAnimation(data)
     return this
-  }
+  },
 })

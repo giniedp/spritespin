@@ -1,4 +1,4 @@
-import { Utils, Data, getPluginState, is, updateFrame, registerPlugin } from 'spritespin'
+import { Utils, Data, getPluginState, is, updateFrame, registerPlugin } from '../core'
 const { getOption } = Utils
 
 const max = Math.max
