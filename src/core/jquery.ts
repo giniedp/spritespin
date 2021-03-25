@@ -1,7 +1,7 @@
 import { spritespin } from './boot'
 
-if ('jQuery' in globalThis) {
-  const jq: any = (globalThis as any).jQuery
+if ('jQuery' in window) {
+  const jq: any = (window as any).jQuery
   jq.fn.spritespin = function(this: any) {
     const args = arguments
     this.each(function(this: any) {
