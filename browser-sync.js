@@ -16,5 +16,9 @@ module.exports = {
     port: 3001,
   },
   port: 3000,
-  server: './release',
+  server: './dist',
+  watch: true,
+  open: false,
+  notify: false,
+  reloadDelay: 2000
 }

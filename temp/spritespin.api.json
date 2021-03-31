@@ -211,7 +211,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!applyAnimation:function(1)",
-          "docComment": "/**\n * Starts animation playback if needed.\n *\n * @remarks\n *\n * Starts animation playback if `animate` property is `true` and the animation is not yet running.\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Starts animation playback if needed.\n *\n * @remarks\n *\n * Starts animation playback if `animate` property is `true` and the animation is not yet running.\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -990,7 +990,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!flag:function(1)",
-          "docComment": "/**\n * Sets a flag value. See {@link is}.\n *\n * @param data - The SpriteSpin instance data\n *\n * @param key - The name of the flag\n *\n * @param value - The value to set\n *\n * @public\n */\n",
+          "docComment": "/**\n * Sets a flag value. See {@link is}.\n *\n * @param data - The SpriteSpin instance state\n *\n * @param key - The name of the flag\n *\n * @param value - The value to set\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1064,7 +1064,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!getInputState:function(1)",
-          "docComment": "/**\n * Gets the current input state\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Gets the current input state\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1109,7 +1109,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!getPlaybackState:function(1)",
-          "docComment": "/**\n * Gets the playback state\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Gets the playback state\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1154,7 +1154,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!getPluginState:function(1)",
-          "docComment": "/**\n * Gets a plugin state object by name.\n *\n * @remarks\n *\n * Plugins should use this method to get or create a state object where they can store any instance variables.\n *\n * @param data - The SpriteSpin instance data\n *\n * @param name - The name of the plugin\n *\n * @public\n */\n",
+          "docComment": "/**\n * Gets a plugin state object by name.\n *\n * @remarks\n *\n * Plugins should use this method to get or create a state object where they can store any instance variables.\n *\n * @param data - The SpriteSpin instance state\n *\n * @param name - The name of the plugin\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1682,7 +1682,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!is:function(1)",
-          "docComment": "/**\n * Checks whether a flag is set. See {@link flag}.\n *\n * @param data - The SpriteSpin instance data\n *\n * @param key - The name of the flag\n *\n * @public\n */\n",
+          "docComment": "/**\n * Checks whether a flag is set. See {@link flag}.\n *\n * @param data - The SpriteSpin instance state\n *\n * @param key - The name of the flag\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5315,7 +5315,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!startAnimation:function(1)",
-          "docComment": "/**\n * Starts the animation playback\n *\n * @remarks\n *\n * Starts the animation playback and also sets the `animate` property to `true`\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Starts the animation playback\n *\n * @remarks\n *\n * Starts the animation playback and also sets the `animate` property to `true`\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5359,7 +5359,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!stopAnimation:function(1)",
-          "docComment": "/**\n * Stops the running animation.\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Stops the running animation.\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5403,7 +5403,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!updateFrame:function(1)",
-          "docComment": "/**\n * Updates the frame or lane number of the SpriteSpin data.\n *\n * @param data - The SpriteSpin instance data\n *\n * @param frame - The frame number to set\n *\n * @param lane - The lane number to set\n *\n * @public\n */\n",
+          "docComment": "/**\n * Updates the frame or lane number of the SpriteSpin data.\n *\n * @param data - The SpriteSpin instance state\n *\n * @param frame - The frame number to set\n *\n * @param lane - The lane number to set\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5477,7 +5477,7 @@
         {
           "kind": "Function",
           "canonicalReference": "spritespin!updateInput:function(1)",
-          "docComment": "/**\n * Updates the input state using a mouse or touch event.\n *\n * @param e - The input event\n *\n * @param data - The SpriteSpin instance data\n *\n * @public\n */\n",
+          "docComment": "/**\n * Updates the input state using a mouse or touch event.\n *\n * @param e - The input event\n *\n * @param data - The SpriteSpin instance state\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

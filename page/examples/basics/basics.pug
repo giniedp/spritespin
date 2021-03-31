@@ -1,0 +1,16 @@
+---
+title: SpriteSpin
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.spritespin({
+        target: '#spritespin-example',
+        source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        width: 480,
+        height: 327,
+        sense: -1
+      })

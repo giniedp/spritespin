@@ -1,0 +1,36 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "outDir": "../dist/release/es5",
+    "noEmitHelpers": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "inlineSourceMap": false,
+    "inlineSources": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "es5",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
+    "lib": ["DOM", "ES5"],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "release",
+    "*.test.ts"
+  ]
+}

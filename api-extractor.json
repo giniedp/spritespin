@@ -2,10 +2,10 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
 
-  "mainEntryPointFilePath": "<projectFolder>/release/src/index.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/dist/release/spritespin.d.ts",
   "projectFolder": "./",
   "compiler": {
-    "tsconfigFilePath": "<projectFolder>/tsconfig.json"
+    "tsconfigFilePath": "<projectFolder>/lib/tsconfig.json"
   },
   "apiReport": {
     "enabled": false,

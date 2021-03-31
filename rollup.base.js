@@ -7,17 +7,19 @@ import sourcemaps from 'rollup-plugin-sourcemaps'
 import pkg from './package.json'
 
 export default {
-  input: 'src/spritespin.ts',
+  input: 'lib/src/spritespin.ts',
   watch: {
-    include: 'src/**'
+    include: 'lib/**',
   },
   plugins: [
     resolve(),
     sourcemaps(),
-    typescript(),
+    typescript({
+      tsconfig: 'lib/tsconfig.json',
+    }),
     replace({
       preventAssignment: true,
       VERSION_STRING: JSON.stringify(pkg.version),
     }),
-  ]
+  ],
 }

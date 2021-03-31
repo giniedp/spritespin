@@ -25,7 +25,7 @@ module.exports = (config) => {
       IS_TRAVIS ? 'Firefox' : 'ChromeHeadless'
     ],
     files: [
-      'src/**/*.ts',
+      'lib/**/*.ts',
     ],
     preprocessors: {
       '**/*.ts': ['karma-typescript'],
@@ -36,7 +36,7 @@ module.exports = (config) => {
     ],
 
     karmaTypescriptConfig: {
-      tsconfig: 'tsconfig.test.json',
+      tsconfig: 'lib/tsconfig.test.json',
       converageOptions: {
         instrumentation: IS_COVERAGE,
         exclude: /\.(d|spec|test)\.ts/i,
@@ -44,11 +44,11 @@ module.exports = (config) => {
       reports: {
         'text-summary': '',
         html: {
-          directory: 'coverage',
+          directory: 'dist/coverage',
           subdirectory: 'html',
         },
         lcovonly: {
-          directory: 'coverage',
+          directory: 'dist/coverage',
           subdirectory: 'lcov',
         },
       },

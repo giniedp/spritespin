@@ -14,7 +14,7 @@ export default Object.assign({}, config, {
   // external: ['mithril'],
   output: {
     name: 'SpriteSpin',
-    file: 'release/spritespin.module.js',
+    file: 'dist/release/spritespin.module.js',
     format: 'es',
     sourcemap: true,
   },

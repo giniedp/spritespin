@@ -1,0 +1,16 @@
+doctype html
+html(lang="en")
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0")
+    //- link(rel="icon" type="image/svg+xml" href="/assets/logo/gglib.svg" sizes="any")
+    link(rel="stylesheet" href="/index.css")
+    block head
+
+body.layout-frame
+  nav.navbar.navbar-expand.navbar-dark.bg-dark.justify-content-center.text-center
+    ul.navbar-nav.container.flex-row
+      li.flex-fill: a.nav-link(href="/") SpriteSpin
+      li.flex-fill: a.nav-link(href="/how-to") How To
+      li.flex-fill: a.nav-link(href="/examples") Examples
+  block content
+  block script

@@ -1,0 +1,47 @@
+---
+title: SpriteSpin
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.spritespin('#spritespin-example', {
+        source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/3d/sample-{lane}-{frame}.jpg', {
+          lane: [0,11],
+          frame: [0,23],
+          digits: 2
+        }),
+        // width and height of the display
+        width: 400,
+        height: 225,
+        // the number of lanes (vertical angles)
+        lanes: 12,
+        // the number of frames per lane (per vertical angle)
+        frames: 24,
+        // interaction sensitivity (and direction) modifier for horizontal movement
+        sense: 1,
+        // interaction sensitivity (and direction) modifier for vertical movement
+        senseLane: -2,
+
+        // the initial lane number
+        lane: 6,
+        // the initial frame number (within the lane)
+        frame: 0,
+        // disable autostart of the animation
+        animate: false,
+
+        plugins: [
+          // module that changes frame on drag
+          'drag',
+          // module that eases out an animation after mouse is released
+          'inertia',
+          // module to display array or sprite of images
+          '360',
+          // module that render and fades additional frames to somulate blur
+          'blur'
+        ],
+        // blurCss: true,     // if true this will add a css blur filter
+        // blurFadeTime: 100, // time in ms for trailing images to fade out
+      })

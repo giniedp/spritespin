@@ -1,0 +1,13 @@
+extends /_layouts/_page
+block content
+  .layout-row
+    .layout-content.example-sidebar.bg-dark
+      ul.list-group.list-group-flush
+        each child, i in childrenOf(meta.file, ['.pug'])
+          li.list-group-item.bg-dark
+            a.example-link(href=child.urlPath)= child.slug || child.urlPath
+    .example-content.layout-column.bg-dark.text-light
+      iframe.layout-column.example-embed
+block script
+  script(src="./index.js")
+

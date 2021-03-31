@@ -1,0 +1,22 @@
+---
+title: SpriteSpin
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.spritespin('#spritespin-example', {
+        source: 'http://spritespin.ginie.eu/images/panorama.jpg',
+        // always use 'fill' for panorama
+        fillMode: 'fill',
+        // The height in pixels is optional but it avoids layout shift after image load
+        // May be controlled with CSS
+        height: 300,
+        plugins: [
+          'drag',
+          'inertia',
+          'panorama'
+        ]
+      })
