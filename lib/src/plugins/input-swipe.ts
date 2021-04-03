@@ -1,5 +1,5 @@
-import { InstanceState, updateInput, updateFrame, getInputState, resetInput, stopAnimation, registerPlugin, Utils, getPluginOptions } from '../core'
-const { getOption } = Utils
+import { InstanceState, updateInput, updateFrame, getInputState, resetInput, stopAnimation, registerPlugin, getPluginOptions } from '../core'
+import { getOption } from '../utils'
 
 const NAME = 'swipe'
 

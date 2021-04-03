@@ -21,11 +21,11 @@ export interface MetalsmithFileMeta extends MetalsmithFile {
   slug?: string
   title?: string
   linkTitle?: string
-  weight?: string
+  weight?: string | number
   urlPath?: string
   file?: string
   fileExt?: string
-  // children?: MetalsmithFileMeta[]
+  children?: MetalsmithFileMeta[]
   template?: string
   content?: string
 }
@@ -51,6 +51,7 @@ export function augmentFile(filePath: string, file: MetalsmithFile, smith: Metal
   if (meta.template) {
     meta.template = path.join(path.dirname(filePath), meta.template)
   }
+  meta.weight = Number(meta.weight) || meta.weight || path.basename(filePath)
 }
 
 export default () => {

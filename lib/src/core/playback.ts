@@ -1,4 +1,4 @@
-import { clamp, wrap } from './utils'
+import { clamp, loop, Loop, wrap } from '../utils'
 import { InstanceState } from './models'
 import { getState } from './state'
 
@@ -18,16 +18,39 @@ export function getPlaybackState(instance: InstanceState): PlaybackState {
  * @public
  */
 export interface PlaybackState {
+  /**
+   * The time between frames
+   */
   frameTime: number
+  /**
+   * The time when the last update occured
+   */
+  lastTime: number
+  /**
+   * The frame number at last frame
+   */
   lastFrame: number
+  /**
+   * The lane number at last frame
+   */
   lastLane: number
-  handler: number
+  /**
+   * The animation looper
+   */
+  looper: Loop
 }
 
-function updateLane(instance: InstanceState, lane: number) {
+function setLane(instance: InstanceState, lane: number) {
   instance.lane = instance.wrapLane
     ? wrap(lane, 0, instance.lanes - 1, instance.lanes)
     : clamp(lane, 0, instance.lanes - 1)
+}
+
+function setFrame(data: InstanceState, frame: number) {
+  data.frame = Number(frame)
+  data.frame = data.wrap
+    ? wrap(data.frame, 0, data.frames - 1, data.frames)
+    : clamp(data.frame, 0, data.frames - 1)
 }
 
 function updateAnimationFrame(data: InstanceState) {
@@ -40,18 +63,13 @@ function updateAnimationFrame(data: InstanceState) {
   }
 }
 
-function updateInputFrame(data: InstanceState, frame: number) {
-  data.frame = Number(frame)
-  data.frame = data.wrap
-    ? wrap(data.frame, 0, data.frames - 1, data.frames)
-    : clamp(data.frame, 0, data.frames - 1)
-}
-
-function updateAnimation(data: InstanceState) {
+function updateAnimation(data: InstanceState, time: number) {
   const state = getPlaybackState(data)
-  if (!state.handler) {
+  state.lastTime = state.lastTime || 0
+  if ((time - state.lastTime) < state.frameTime) {
     return
   }
+  state.lastTime = time
   aroundFrame(data, () => {
     updateAnimationFrame(data)
   })
@@ -80,27 +98,12 @@ function aroundFrame(data: InstanceState, fn: Function) {
 export function updateFrame(data: InstanceState, frame?: number, lane?: number) {
   aroundFrame(data, () => {
     if (frame != null) {
-      updateInputFrame(data, frame)
+      setFrame(data, frame)
     }
     if (lane != null) {
-      updateLane(data, lane)
+      setLane(data, lane)
     }
   })
-}
-
-/**
- * Stops the running animation.
- *
- * @public
- * @param data - The SpriteSpin instance state
- */
-export function stopAnimation(data: InstanceState) {
-  data.animate = false
-  const state = getPlaybackState(data)
-  if (state.handler != null) {
-    window.clearInterval(state.handler)
-    state.handler = null
-  }
 }
 
 /**
@@ -112,15 +115,29 @@ export function stopAnimation(data: InstanceState) {
  * @public
  * @param data - The SpriteSpin instance state
  */
-export function applyAnimation(data: InstanceState) {
+export function usePlayback(data: InstanceState) {
   const state = getPlaybackState(data)
-  if (state.handler && (!data.animate || state.frameTime !== data.frameTime)) {
-    stopAnimation(data)
+  state.frameTime = data.frameTime
+  if (!data.animate) {
+    state.looper?.kill()
+  } else if (state.looper) {
+    state.looper()
+  } else {
+    state.looper = loop((time) => {
+      updateAnimation(data, time)
+    })
   }
-  if (data.animate && !state.handler) {
-    state.frameTime = data.frameTime
-    state.handler = window.setInterval(() => updateAnimation(data), state.frameTime)
-  }
+}
+
+/**
+ * Stops the running animation.
+ *
+ * @public
+ * @param data - The SpriteSpin instance state
+ */
+ export function stopAnimation(data: InstanceState) {
+  data.animate = false
+  usePlayback(data)
 }
 
 /**
@@ -134,5 +151,5 @@ export function applyAnimation(data: InstanceState) {
  */
 export function startAnimation(state: InstanceState) {
   state.animate = true
-  applyAnimation(state)
+  usePlayback(state)
 }

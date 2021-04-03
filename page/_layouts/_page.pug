@@ -1,8 +1,17 @@
+mixin example(embed)
+  - var beforehtml = pug_html;
+  - block();
+  - var content = pug_html.replace(beforehtml, '');
+  - pug_html = beforehtml;
+  if embed
+    != content
+  pre: code.language-html
+    = content
+
 doctype html
 html(lang="en")
   head
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0")
-    //- link(rel="icon" type="image/svg+xml" href="/assets/logo/gglib.svg" sizes="any")
     link(rel="stylesheet" href="/index.css")
     block head
 
@@ -14,3 +23,5 @@ body.layout-frame
       li.flex-fill: a.nav-link(href="/examples") Examples
   block content
   block script
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" async)
+  link(href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-okaidia.min.css" rel="stylesheet")

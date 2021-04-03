@@ -1,13 +1,22 @@
 extends /_layouts/_page
+mixin tree(list)
+  ul.list-group.list-group-flush
+    each child, i in list
+      - var hasChildren = child.children && child.children.length
+      li.list-group-item.bg-dark(class={ "list-group-item-header": hasChildren})
+        a.example-link(href=child.urlPath)= child.title || child.slug || child.urlPath
+        if hasChildren
+          +tree(child.children)
 block content
-  .layout-row
+  .layout-row.example-container.sidebar-off
     .layout-content.example-sidebar.bg-dark
-      ul.list-group.list-group-flush
-        each child, i in childrenOf(meta.file, ['.pug'])
-          li.list-group-item.bg-dark
-            a.example-link(href=child.urlPath)= child.slug || child.urlPath
+      +tree(children(meta.file, { deep: true, ext: ['.pug']}))
     .example-content.layout-column.bg-dark.text-light
+      .example-toolbar.d-flex.flex-row
+        a.example-button-menu
+        a.example-button-prev
+        .example-title.flex-fill
+        a.example-button-next
       iframe.layout-column.example-embed
 block script
   script(src="./index.js")
-

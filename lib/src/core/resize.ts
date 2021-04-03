@@ -1,16 +1,16 @@
 import { InstanceState } from './models'
 import { getState } from './state'
-import { addEventListener } from './utils'
+import { addEventListener, Destructor, destructor, DestructorFn } from '../utils'
 
 type ResizeState = {
-  dispose: Array<Function>
+  destructor: Destructor
 }
 
 function getResizeState(instance: InstanceState) {
   return getState<ResizeState>(instance, 'resize')
 }
 
-function onResize(state: InstanceState, fn: () => void): Function {
+function onResize(state: InstanceState, fn: () => void): DestructorFn {
   let timeout: any
   const resize = () => {
     clearTimeout(timeout)
@@ -31,16 +31,16 @@ function onResize(state: InstanceState, fn: () => void): Function {
   return addEventListener(window, 'resize', resize)
 }
 
-export function applyResize(state: InstanceState) {
+export function useResize(state: InstanceState) {
   const data = getResizeState(state)
-  data.dispose = data.dispose || [
+  data.destructor = data.destructor || destructor([
     state.instance.addListener('onDestroy', () => {
-      data.dispose.forEach((fn) => fn())
+      data.destructor()
+      data.destructor = null
     }),
     onResize(state, () => {
-      console.log('resize')
       state.instance.init()
       state.instance.tick()
-    }),
-  ]
+    })
+  ])
 }

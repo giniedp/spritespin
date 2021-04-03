@@ -1,0 +1,99 @@
+
+.example-sidebar {
+  max-width: 20rem;
+  width: 20rem;
+  z-index: 3;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  .list-group-item {
+    padding: 0;
+    a {
+      display: block;
+      padding: 0.25rem 1rem;
+      color: $gray-600;
+      text-decoration: none;
+    }
+    a.active {
+      color: $light;
+    }
+  }
+  .list-group-item-header {
+    margin-top: 1rem;
+    > a {
+      text-transform: uppercase;
+    }
+  }
+  .list-group .list-group > .list-group-item {
+    margin-left: 1rem;
+  }
+}
+
+.example-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  height: 3rem;
+  > a {
+    display: block;
+    width: 3rem;
+    height: 3rem;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    line-height: 1;
+  }
+  .example-title {
+    flex: 1;
+    text-align: center;
+    line-height: 3rem;
+  }
+  .example-button-menu {
+    display: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='16' viewBox='0 0 12 16'%3E%3Cpath fill-rule='evenodd' fill='white' d='M11.41 9H.59C0 9 0 8.59 0 8c0-.59 0-1 .59-1H11.4c.59 0 .59.41.59 1 0 .59 0 1-.59 1h.01zm0-4H.59C0 5 0 4.59 0 4c0-.59 0-1 .59-1H11.4c.59 0 .59.41.59 1 0 .59 0 1-.59 1h.01zM.59 11H11.4c.59 0 .59.41.59 1 0 .59 0 1-.59 1H.59C0 13 0 12.59 0 12c0-.59 0-1 .59-1z'/%3E%3C/svg%3E");
+  }
+  .example-button-prev {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16' viewBox='0 0 8 16'%3E%3Cpath fill-rule='evenodd' fill='white' d='M5.5 3L7 4.5 3.25 8 7 11.5 5.5 13l-5-5 5-5z'/%3E%3C/svg%3E");
+  }
+  .example-button-next {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16' viewBox='0 0 8 16'%3E%3Cpath fill-rule='evenodd' fill='white' d='M7.5 8l-5 5L1 11.5 4.75 8 1 4.5 2.5 3l5 5z'/%3E%3C/svg%3E");
+  }
+}
+
+@media (max-width: 64rem) {
+  .example-container {
+    position: relative;
+  }
+  .example-sidebar {
+    position: absolute;
+    top: 3rem;
+    left: 0;
+    bottom: 0;
+    transform: translateX(0px);
+    transition: transform 0.25s, opacity 0.25s;
+    opacity: 1;
+  }
+  .sidebar-off {
+    .example-sidebar {
+      transform: translateX(-20rem);
+      opacity: 0;
+    }
+  }
+  .example-toolbar .example-button-menu {
+    display: block;
+  }
+}
+
+#example-page {
+  padding: 1rem;
+  background-color: #222;
+
+  pre.example-code {
+    background: $dark !important;
+    margin: 1rem 0 !important;
+  }
+
+  .example-embed {
+    border: none;
+    margin: 0;
+  }
+}

@@ -1,0 +1,55 @@
+.layout-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-row {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-content {
+  display: block;
+  overflow: auto;
+}
+
+.navbar {
+  padding: 0;
+  height: 3.5rem;
+  a.nav-link {
+    height: 3.5rem;
+    line-height: 3.5rem;;
+    display: block;
+    padding: 0;
+    color: $light !important;
+  }
+}
+
+pre[class*=language-] {
+  background: none !important;
+  margin: auto !important;
+}
+
+.spritespin-instance,
+#spritespin-example,
+#spritespin-preview {
+  border-radius: 3px;
+  margin-bottom: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #FFF
+}

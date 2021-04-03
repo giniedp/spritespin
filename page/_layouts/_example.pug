@@ -4,20 +4,16 @@ mixin example
   - var content = pug_html.replace(beforehtml, '');
   - pug_html = beforehtml;
   != content
-  pre: code.language-html= content
+  pre.example-code: code.language-html= content
 
 doctype html
 html(lang="en")
   head
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0")
-    //- link(rel="icon" type="image/svg+xml" href="/assets/logo/gglib.svg" sizes="any")
     link(rel="stylesheet" href="/index.css")
     block head
-body#example-page
+body#example-page.text-light.container-md
   block content
   block script
   link(href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-okaidia.min.css" rel="stylesheet")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js")
-
-
-

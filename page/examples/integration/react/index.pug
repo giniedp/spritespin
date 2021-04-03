@@ -1,0 +1,136 @@
+---
+title: React
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(src="https://unpkg.com/react@16/umd/react.development.js")
+    script(src="https://unpkg.com/react-dom@16/umd/react-dom.development.js")
+    script(type='text/javascript').
+      class SpriteSpinComponent extends React.Component {
+
+        constructor(props) {
+          super(props);
+          this.$el = null;
+        }
+
+        componentDidMount() {
+          this.instance = SpriteSpin.create({
+            ...this.props.options,
+            target: this.$el
+          });
+        }
+
+        componentDidUpdate() {
+          this.instance.update(this.props.options);
+        }
+
+        componentWillUnmount() {
+          this.instance.destroy()
+          this.instance = null
+        }
+
+        render() {
+          return React.createElement('div', {
+            ref: (el) => this.$el = el
+          });
+        }
+      }
+
+      class ParentComponent extends React.Component {
+        constructor(props) {
+          super(props);
+          // options that will be passed to spritespin
+          this.options = {
+            source: 'http://spritespin.ginie.eu/images/bike6x6_big.jpg',
+            width: 480,
+            height: 327,
+            frames: 34,
+            framesX: 6,
+            sense: -1
+          }
+          // the instance of the spritespin component
+          this.ssc = null
+          // state whether to render spritespin or not
+          this.state = {
+            show: true,
+          };
+        }
+
+        onCreateDestroyClicked() {
+          this.setState((state) => {
+            return { show: !state.show, options: state.options };
+          });
+        }
+
+        onPrevClicked() {
+          if (this.ssc) {
+            this.ssc.instance.stopAnimation();
+            this.ssc.instance.prevFrame();
+          }
+        }
+
+        onNextClicked() {
+          if (this.ssc) {
+            this.ssc.instance.stopAnimation();
+            this.ssc.instance.nextFrame();
+          }
+        }
+
+        onToggleClicked() {
+          if (this.ssc) {
+            this.ssc.instance.toggleAnimation();
+          }
+        }
+
+        onFullscreenClicked() {
+          if (this.ssc) {
+            this.ssc.instance.requestFullscreen();
+          }
+        }
+
+        render() {
+          return React.createElement('div', {},
+            React.createElement('div', { className: "btn-group" },
+              React.createElement('button', {
+                className: "btn btn-primary",
+                onClick: this.onCreateDestroyClicked.bind(this)
+              }, "CREATE | DESTROY"),
+
+              React.createElement('button', {
+                className: "btn btn-primary",
+                onClick: this.onPrevClicked.bind(this)
+              }, "PREV"),
+
+              React.createElement('button', {
+                className: "btn btn-primary",
+                onClick: this.onNextClicked.bind(this)
+              }, "NEXT"),
+
+              React.createElement('button', {
+                className: "btn btn-primary",
+                onClick: this.onToggleClicked.bind(this)
+              }, "TOGGLE"),
+
+              React.createElement('button', {
+                className: "btn btn-primary",
+                onClick: this.onFullscreenClicked.bind(this)
+              }, "FULLSCREEN"),
+            ),
+
+            this.state.show ? React.createElement(SpriteSpinComponent, {
+              options: this.options,
+              ref: (ssc) => {
+                this.ssc = ssc;
+              }
+            }) : null,
+          )
+        }
+      }
+
+      ReactDOM.render(
+        React.createElement(ParentComponent, {}),
+        document.querySelector('#spritespin-example')
+      );

@@ -1,5 +1,5 @@
-import { InstanceState, updateInput, applyAnimation, resetInput, stopAnimation, getInputState, registerPlugin, Utils } from '../core'
-const { innerWidth, isVisible, offset } = Utils
+import { InstanceState, updateInput, usePlayback, resetInput, stopAnimation, getInputState, registerPlugin } from '../core'
+import { innerWidth, offset } from '../utils'
 
 const NAME = 'hold'
 
@@ -36,7 +36,7 @@ registerPlugin(NAME, (data: InstanceState) => {
     updateInput(e, data)
     data.isDragging = true
     data.animate = true
-    applyAnimation(data)
+    usePlayback(data)
   }
 
   function stop() {
@@ -44,11 +44,11 @@ registerPlugin(NAME, (data: InstanceState) => {
     resetInput(data)
     stopAnimation(data)
     restoreOptions()
-    applyAnimation(data)
+    usePlayback(data)
   }
 
   function update(e: MouseEvent) {
-    if (!data.isDragging) {
+    if (!data.isDragging || data.isLoading || data.isHalted) {
       return
     }
     updateInput(e, data)
@@ -75,7 +75,7 @@ registerPlugin(NAME, (data: InstanceState) => {
 
   function onFrame() {
     data.animate = true
-    applyAnimation(data)
+    usePlayback(data)
   }
 
   return {

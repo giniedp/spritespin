@@ -1,11 +1,11 @@
-import { Utils, InstanceState, registerPlugin } from '../core'
-const { css, hide, show, findSpecs } = Utils
+import { InstanceState, registerPlugin } from '../core'
+import { css, hide, show, findSpecs, innerWidth, innerHeight } from '../utils'
 
 const NAME = '360'
 
 registerPlugin(NAME, (state: InstanceState) => {
 
-  function onLoad(e: Event) {
+  function onLoad() {
     state.stage.querySelectorAll('.spritespin-frames').forEach((it) => it.remove())
     if (state.renderMode === 'image' && Array.isArray(state.images)) {
       for (const image of state.images) {
@@ -15,7 +15,7 @@ registerPlugin(NAME, (state: InstanceState) => {
     }
   }
 
-  function onDraw(e: Event) {
+  function onDraw() {
     const specs = findSpecs(state.metrics, state.frames, state.frame, state.lane)
     const sheet = specs.sheet
     const sprite = specs.sprite
@@ -33,8 +33,8 @@ registerPlugin(NAME, (state: InstanceState) => {
       return
     }
 
-    const scaleX = state.stage.offsetWidth / sprite.sampledWidth
-    const scaleY = state.stage.offsetHeight / sprite.sampledHeight
+    const scaleX = innerWidth(state.stage) / sprite.sampledWidth
+    const scaleY = innerHeight(state.stage) / sprite.sampledHeight
     const top = Math.floor(-sprite.sampledY * scaleY)
     const left = Math.floor(-sprite.sampledX * scaleX)
     const width = Math.floor(sheet.sampledWidth * scaleX)

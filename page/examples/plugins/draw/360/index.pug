@@ -1,0 +1,59 @@
+---
+title: 360
+---
+extends /_layouts/_example
+block content
+  :markdown-it
+    ## `360` Plugin
+    This is the base rendering plugin of SpriteSpin. It is usually active by default together with the `drag` plugin.
+
+    Whenever plugins are declared explicitely, no default plugins are instantiated. Here only the `360` plugin is
+    declared, so `drag` plugin is not presend and no interaction is activated.
+
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example',
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', {
+          frame: [1,34], digits: 3.
+        }),
+        plugins: ['360']
+      })
+
+
+  :markdown-it
+    ### 3D Spin
+
+  +example
+    #spritespin-example-3
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example-3',
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/3d/sample-{lane}-{frame}.jpg', {
+          lane: [0,11],
+          frame: [0,23],
+          digits: 2
+        }),
+        // the number of lanes (vertical angles)
+        lanes: 12,
+        // the number of frames per lane (per vertical angle)
+        frames: 24,
+        // interaction sensitivity (and direction) modifier for horizontal movement
+        sense: 1,
+        // interaction sensitivity (and direction) modifier for vertical movement
+        senseLane: -2,
+
+        // the initial lane number
+        lane: 6,
+        // the initial frame number (within the lane)
+        frame: 0,
+        // disable autostart of the animation
+        animate: false,
+
+        plugins: [
+          '360',
+          'drag',
+        ],
+      })

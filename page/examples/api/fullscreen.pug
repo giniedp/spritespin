@@ -8,13 +8,13 @@ block content
     button.btn.btn-primary(onclick="enterFullscreen()") ENTER FULLSCREEN
     script(type='text/javascript' src='/release/spritespin.js')
     script(type='text/javascript').
-      SpriteSpin.spritespin({
+      SpriteSpin.create({
         target: '#spritespin-example',
-        source: SpriteSpin.sourceArray('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
         width: 480,
         height: 327,
         sense: -1
       })
       function enterFullscreen() {
-        SpriteSpin.spritespin('#spritespin-example').requestFullscreen()
+        SpriteSpin.find('#spritespin-example').requestFullscreen()
       }

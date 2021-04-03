@@ -1,29 +1,42 @@
 import { __assign } from 'tslib'
-import { Constants } from './constants'
 import { Events } from './events'
-import { findInstance, popInstance, pushInstance } from './instances'
-import { applyLayout } from './layout'
+import { useLayout } from './layout'
 import { InstanceExtension, InstanceState, Options, PluginInstance, PluginLifecycle, PluginMethod } from './models'
-import { stopAnimation } from './playback'
-import { applyPlugins } from './plugins'
-import { applyStage } from './stage'
-import { applyResize } from './resize'
-import { findSpecs, measure, preload, toArray, warn } from './utils'
+import { usePlayback, stopAnimation } from './playback'
+import { usePlugins } from './plugins'
+import { useStage } from './stage'
+import { useResize } from './resize'
+import { destructor, findSpecs, measure, preload, toArray, warn } from '../utils'
+import { defaults, eventNames, lifecycleNames, namespace } from './constants'
+
+const instances: Array<Instance> = []
+
+function pushInstance(instance: Instance) {
+  if (instances.indexOf(instance) < 0) {
+    instances.push(instance)
+  }
+}
+
+function popInstance(instance: Instance) {
+  const index = instances.indexOf(instance)
+  if (index >= 0) {
+    instances.splice(index, 1)
+  }
+}
 
 /**
- * Adds methods to the SpriteSpin prototype
+ * Gets an instance for the given HTML Element
  *
- * @public
+ * @param target - The HTML Element or a selector or an object with target
  */
-export function extend<T extends InstanceExtension>(extension: T) {
-  const prototype: any = Instance.prototype
-  for (const key of Object.keys(extension)) {
-    if (key in prototype) {
-      throw new Error('Instance method is already defined: ' + key)
-    } else {
-      prototype[key] = extension[key]
+export function find(target: HTMLElement | string | Pick<Options, 'target'>): Instance | null {
+  const el = elementOf(target)
+  for (const instance of instances) {
+    if (instance.target === el) {
+      return instance
     }
   }
+  return null
 }
 
 /**
@@ -32,12 +45,8 @@ export function extend<T extends InstanceExtension>(extension: T) {
  * @public
  */
 export function createOrUpdate(options: Options): Instance {
-  const instance = findInstance(getElement(options.target))
-  if (instance) {
-    instance.update(options)
-    return instance
-  }
-  return new Instance(options).load()
+  const instance = find(options)
+  return instance ? instance.update(options) : new Instance(options).load()
 }
 
 /**
@@ -46,7 +55,7 @@ export function createOrUpdate(options: Options): Instance {
  * @public
  */
 export function create(options: Options): Instance {
-  const instance = findInstance(getElement(options.target))
+  const instance = find(options)
   if (instance) {
     throw new Error('Instance on element already exists')
   }
@@ -57,16 +66,13 @@ export function create(options: Options): Instance {
  * Updates an existing instance with given options
  *
  * @public
- * @param options
- * @returns
  */
-export function update(options: Options): Instance {
-  const instance = findInstance(getElement(options.target))
+ export function update(options: Options): Instance {
+  const instance = find(options)
   if (!instance) {
     throw new Error('Instance not found')
   }
-  instance.update(options)
-  return instance
+  return instance.update(options)
 }
 
 /**
@@ -79,14 +85,26 @@ export function update(options: Options): Instance {
  *
  * @public
  */
-export function destroy(target: HTMLElement | string | Pick<Options, 'target'> ) {
-  if (typeof target !== 'string' && !(target instanceof Element)) {
-    target = target.target
-  }
-  const el = getElement(target)
-  const instance = findInstance(el)
+export function destroy(target: HTMLElement | string | Pick<Options, 'target'>) {
+  const instance = find(target)
   if (instance) {
     instance.destroy()
+  }
+}
+
+/**
+ * Adds methods to the SpriteSpin prototype
+ *
+ * @public
+ */
+ export function extend<T extends InstanceExtension>(extension: T) {
+  const prototype: any = Instance.prototype
+  for (const key of Object.keys(extension)) {
+    if (key in prototype) {
+      throw new Error('Instance method is already defined: ' + key)
+    } else {
+      prototype[key] = extension[key]
+    }
   }
 }
 
@@ -109,12 +127,12 @@ export class Instance {
    * @param options - the configuration options
    */
   public constructor(options: Options) {
-    this.target = getElement(options.target)
+    this.target = elementOf(options.target)
     if (!this.target) {
       throw new Error('Element not given or not found')
     }
     this.state = {
-      ...JSON.parse(JSON.stringify(Constants.defaults)),
+      ...JSON.parse(JSON.stringify(defaults)),
       ...options,
       source: toArray(options.source),
       target: this.target,
@@ -135,7 +153,8 @@ export class Instance {
       target: this.target,
       stage: this.state.stage,
       images: this.state.images,
-      instance: this as Instance
+      instance: this as Instance,
+      opaque: this.state.opaque
     } as InstanceState)
     this.load()
     return this
@@ -228,7 +247,7 @@ export class Instance {
     let e: Event
     try {
       e = document.createEvent('Event')
-      e.initEvent(`${event}.${Constants.namespace}`, true, true)
+      e.initEvent(`${event}.${namespace}`, true, true)
     } catch(e) {
       warn(e)
     }
@@ -246,10 +265,10 @@ function onInit(instance: Instance) {
 
   state.target.classList.add('loading')
   state.source = toArray(state.source)
-  applyResize(state)
-  applyStage(state)
-  applyLayout(state)
-  applyPlugins(state, {
+  useResize(state)
+  useStage(state)
+  useLayout(state)
+  usePlugins(state, {
     onCreated: (plugin) => onPluginCreated(instance, plugin),
     onRemoved: (plugin) => onPluginRemoved(instance, plugin)
   })
@@ -259,8 +278,9 @@ function onLoad(instance: Instance) {
   const state = instance.state
   state.frames = state.frames || state.images.length
   state.target.classList.remove('loading')
-  applyMetrics(state)
-  applyLayout(state)
+  useMetrics(state)
+  useLayout(state)
+  usePlayback(state)
 }
 
 function onDestroy(instance: Instance) {
@@ -273,44 +293,43 @@ function onDestroy(instance: Instance) {
 }
 
 function onPluginCreated(instance: Instance, plugin: PluginInstance) {
-  const unlisten: Function[] = []
+  const destroy = destructor()
   const onDestroy = plugin.onDestroy
   plugin.onDestroy = (e, instance) => {
-    for (const fn of unlisten) {
-      fn()
-    }
+    destroy()
     onDestroy?.call(plugin, e, instance)
   }
-  Constants.lifecycleNames.forEach((key) => {
-    if (!plugin[key]) { return }
-    unlisten.push(instance.addListener(key, (e, state) => {
+  for (const key of lifecycleNames) {
+    if (typeof plugin[key] !== 'function') { continue }
+    destroy.add(instance.addListener(key, (e, state) => {
       plugin[key].call(plugin, e, state)
     }))
-  })
-  Constants.eventNames.forEach((key) => {
-    if (!plugin[key]) { return }
-    const target = instance.target
+  }
+  for (const key of eventNames) {
+    if (typeof plugin[key] !== 'function') { continue }
     const listener = (e: any) => plugin[key].call(plugin, e, instance.state)
-    target.addEventListener(key, listener, { passive: false })
-    unlisten.push(() => target.removeEventListener(key, listener))
-  })
+    destroy.addEventListener(instance.target, key, listener, { passive: false })
+  }
 }
 
 function onPluginRemoved(instance: Instance, plugin: PluginInstance) {
   plugin.onDestroy?.(null, instance.state)
 }
 
-function getElement(target: HTMLElement | string): HTMLElement {
+function elementOf(target: HTMLElement | string | Pick<Options, 'target'>): HTMLElement {
   if (target instanceof Element) {
     return target
   }
   if (typeof target === 'string') {
     return document.querySelector<HTMLElement>(target)
   }
+  if (typeof target === 'object') {
+    return elementOf(target.target)
+  }
   return null
 }
 
-function applyMetrics(state: InstanceState) {
+function useMetrics(state: InstanceState) {
   state.metrics = measure(state.images, {
     frames: state.frames,
     framesX: state.framesX,

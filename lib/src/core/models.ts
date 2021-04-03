@@ -1,5 +1,5 @@
 import type { Instance } from './instance'
-import { PreloadProgress, SheetSpec } from './utils'
+import { PreloadProgress, SheetSpec } from '../utils'
 
 /**
  * A spritespin instance method
@@ -150,7 +150,7 @@ export interface Options extends PluginLifecycle {
   /**
    * Image URL or array of urls to be used.
    */
-  source: string | string[]
+  source?: string | string[]
 
   /**
    * The display width in pixels.

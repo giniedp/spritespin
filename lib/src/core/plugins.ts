@@ -1,6 +1,6 @@
 import type { PluginClass, PluginFactory, InstanceState, PluginType, PluginInstance } from './models'
 import { getState } from './state'
-import { error, findIndex } from './utils'
+import { error, findIndex } from '../utils'
 
 const registry: Record<string, PluginType> = {}
 
@@ -83,7 +83,7 @@ export function getPluginOptions(state: InstanceState, name: string) {
  * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
  * @internal
  */
-export function applyPlugins(
+export function usePlugins(
   state: InstanceState,
   actions: {
     onCreated: (p: PluginInstance) => void

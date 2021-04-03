@@ -1,0 +1,91 @@
+---
+title: Vue
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript' src='https://unpkg.com/vue@2.5.16/dist/vue.js')
+    script(type='text/javascript').
+      Vue.component('spritespin', {
+        props: ['options'],
+        template: '<div></div>',
+        data: function () {
+          return {
+            instance: null,
+          }
+        },
+        mounted: function() {
+          this.instance = SpriteSpin.create({
+            ...this.options,
+            target: this.$el
+          })
+          // watch changes and update spritespin
+          this.$watch('options', (newVal, oldVal) => {
+            this.instance.update(newVal)
+          })
+        },
+        updated: function() {
+          // this.instance.update(this.options)
+        },
+        beforeDestroy: function() {
+          this.instance.destroy()
+          this.instance = null
+        },
+      })
+
+      new Vue({
+        el: '#spritespin-example',
+        template: `
+          <div>
+            <div class="btn-group">
+              <button class="btn btn-primary" v-on:click="toggleShow">CREATE DESTROY</button>
+              <button class="btn btn-primary" v-on:click="next">NEXT</button>
+              <button class="btn btn-primary" v-on:click="prev">PREV</button>
+              <button class="btn btn-primary" v-on:click="togglePlayback">TOGGLE</button>
+              <button class="btn btn-primary" v-on:click="toggleFullscreen">FULLSCREEN</button>
+            </div>
+            <spritespin v-bind:options="options" v-if="show" ref="spritespin"/>
+          </div>
+        `,
+        data: {
+          show: true,
+          options: {
+            source: 'http://spritespin.ginie.eu/images/bike6x6_big.jpg',
+            width: 480,
+            height: 327,
+            frames: 34,
+            framesX: 6,
+            sense: -1
+          },
+        },
+        methods: {
+          toggleShow: function() {
+            this.show = !this.show
+          },
+          prev: function() {
+            if (this.$refs.spritespin) {
+              this.$refs.spritespin.instance.stopAnimation()
+              this.$refs.spritespin.instance.prevFrame()
+            }
+          },
+          next: function() {
+            if (this.$refs.spritespin) {
+              this.$refs.spritespin.instance.stopAnimation()
+              this.$refs.spritespin.instance.nextFrame()
+            }
+          },
+          togglePlayback: function() {
+            if (this.$refs.spritespin) {
+              this.$refs.spritespin.instance.toggleAnimation()
+            }
+          },
+          toggleFullscreen: function() {
+            console.log(this.$refs)
+            if (this.$refs.spritespin) {
+              this.$refs.spritespin.instance.requestFullscreen()
+            }
+          },
+        }
+      })

@@ -1,6 +1,5 @@
-import { pixelRatio } from 'core/utils'
-import { Utils, InstanceState, getPluginState, getPlaybackState, registerPlugin } from '../core'
-const { show, css, getOption, findSpecs } = Utils
+import { InstanceState, getPluginState, getPlaybackState, registerPlugin, getPluginOptions } from '../core'
+import { pixelRatio, show, css, getOption, findSpecs, innerWidth, innerHeight } from '../utils'
 
 const NAME = 'blur'
 
@@ -16,10 +15,10 @@ interface BlurState {
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   steps: BlurStep[]
+  cssBlur: boolean
   fadeTime: number
   frameTime: number
   trackTime: number
-  cssBlur: boolean
 
   timeout: number
 }
@@ -30,12 +29,12 @@ function getState(data: InstanceState) {
 
 function init(e: Event, data: InstanceState) {
   const state = getState(data)
-
+  const options = getPluginOptions(data, NAME) || {}
   state.steps = state.steps || []
-  state.fadeTime = Math.max(getOption(data as any, 'blurFadeTime', 200), 1)
-  state.frameTime = Math.max(getOption(data as any, 'blurFrameTime', data.frameTime), 16)
+  state.cssBlur = !!getOption(options, 'cssBlur', false)
+  state.fadeTime = Math.max(getOption(options, 'fadeTime', 200), 1)
+  state.frameTime = Math.max(getOption(options, 'frameTime', data.frameTime), 16)
   state.trackTime = null
-  state.cssBlur = !!getOption(data as any, 'blurCss', false)
 
   if (!state.canvas || !state.canvas.parentElement) {
     state.canvas = state.canvas || document.createElement('canvas')
@@ -47,13 +46,15 @@ function init(e: Event, data: InstanceState) {
       left: 0,
       right: 0,
       bottom: 0,
+      width: '100%',
+      height: '100%',
     })
     data.stage.appendChild(state.canvas)
   }
 
   const canvasRatio = pixelRatio(state.context)
-  state.canvas.width = data.width * canvasRatio
-  state.canvas.height = data.height * canvasRatio
+  state.canvas.width = innerWidth(data.stage) * canvasRatio
+  state.canvas.height = innerHeight(data.stage) * canvasRatio
   show(state.canvas)
   state.context.scale(canvasRatio, canvasRatio)
 
@@ -123,7 +124,7 @@ function clearFrame(data: InstanceState, state: BlurState) {
   show(state.canvas)
   const w = state.canvas.width / data.canvasRatio
   const h = state.canvas.height / data.canvasRatio
-  // state.context.clearRect(0, 0, w, h)
+  state.context.clearRect(0, 0, w, h)
 }
 
 function drawFrame(data: InstanceState, state: BlurState, step: BlurStep) {
@@ -134,7 +135,6 @@ function drawFrame(data: InstanceState, state: BlurState, step: BlurStep) {
   const sprite = specs.sprite
   if (!sheet || !sprite) { return }
 
-  const src = data.source[sheet.id]
   const image = data.images[sheet.id]
   if (image.complete === false) { return }
   show(state.canvas)

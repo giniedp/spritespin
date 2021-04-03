@@ -1,4 +1,4 @@
-import { getCursorPosition, innerHeight, innerWidth } from './utils'
+import { getCursorPosition, innerHeight, innerWidth } from '../utils'
 import { InstanceState } from './models'
 import { getState } from './state'
 

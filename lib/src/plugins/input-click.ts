@@ -1,19 +1,19 @@
-import { updateInput, Utils, InstanceState, getInputState, updateFrame, registerPlugin } from '../core'
+import { updateInput, InstanceState, getInputState, updateFrame, registerPlugin } from '../core'
+import { offset, innerWidth } from '../utils'
 
 const NAME = 'click'
-
 registerPlugin(NAME, (state: InstanceState) => {
   const onclick = (e: MouseEvent) => {
-    if (state.isLoading) {
+    if (state.isLoading || state.isHalted) {
       return
     }
     updateInput(e, state)
     const input = getInputState(state)
 
     let half: number, pos: number
-    const target = state.target, off = Utils.offset(target)
+    const target = state.target, off = offset(target)
     if (state.orientation === 'horizontal') {
-      half = Utils.innerWidth(target) / 2
+      half = innerWidth(target) / 2
       pos = input.currentX - off.left
     } else {
       half = target.clientHeight / 2

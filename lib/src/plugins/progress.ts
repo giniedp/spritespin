@@ -1,6 +1,5 @@
-import { css, hide, show } from 'core/utils'
-import { InstanceState, registerPlugin, Utils } from '../core'
-const { createElement } = Utils
+import { InstanceState, registerPlugin } from '../core'
+import { css, hide, show, createElement } from '../utils'
 
 const NAME = 'progress'
 

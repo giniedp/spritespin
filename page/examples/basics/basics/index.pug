@@ -1,0 +1,62 @@
+---
+title: Basics
+---
+extends /_layouts/_example
+block content
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example',
+        source: [
+          'http://spritespin.ginie.eu/images/rad_zoom_001.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_002.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_003.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_004.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_005.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_006.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_007.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_008.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_009.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_010.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_011.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_012.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_013.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_014.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_015.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_016.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_017.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_018.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_019.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_020.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_021.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_022.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_023.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_024.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_025.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_026.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_027.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_028.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_029.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_030.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_031.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_032.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_033.jpg',
+          'http://spritespin.ginie.eu/images/rad_zoom_034.jpg',
+        ],
+        width: 480,
+        height: 327,
+        sense: -1
+      })
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example',
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', { frame: [1,34], digits: 3 }),
+        width: 480,
+        height: 327,
+        sense: -1
+      })

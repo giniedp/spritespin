@@ -1,5 +1,5 @@
-import { Utils, InstanceState, updateFrame, registerPlugin, getPluginOptions } from '../core'
-const { getOption } = Utils
+import { InstanceState, updateFrame, registerPlugin, getPluginOptions } from '../core'
+import { getOption } from '../utils'
 
 const max = Math.max
 const min = Math.min

@@ -1,5 +1,5 @@
 import { InstanceState } from './models'
-import { css } from './utils'
+import { css, innerWidth, innerHeight } from '../utils'
 
 function solveContain(width: number, height: number, maxWidth: number, maxHeight: number) {
   const aspect = (width / height) || 1
@@ -42,9 +42,9 @@ function solveScaleDown(width: number, height: number, maxWidth: number, maxHeig
 /**
  * Applies css attributes to layout the SpriteSpin containers.
  *
- * @internal
+ * @public
  */
-export function applyLayout(state: InstanceState) {
+export function useLayout(state: InstanceState) {
   state.target.setAttribute('unselectable', 'on')
   css(state.target, {
     '-ms-user-select': 'none',
@@ -63,8 +63,8 @@ export function applyLayout(state: InstanceState) {
 
   let width = state.frameWidth || state.width
   let height = state.frameHeight || state.height
-  let targetWidth = state.target.offsetWidth || width
-  let targetHeight = state.target.offsetHeight || height
+  let targetWidth = innerWidth(state.target) || width
+  let targetHeight = innerHeight(state.target) || height
   switch (state.fillMode) {
     case 'contain':
       [width, height] = solveContain(width, height, targetWidth, targetHeight)
@@ -87,8 +87,8 @@ export function applyLayout(state: InstanceState) {
     height: height,
     position: 'relative'
   })
-  targetWidth = state.target.offsetWidth || width
-  targetHeight = state.target.offsetHeight || height
+  targetWidth = innerWidth(state.target) || width
+  targetHeight = innerHeight(state.target) || height
   css(state.stage, {
     left: (targetWidth - width) / 2,
     top: (targetHeight - height) / 2

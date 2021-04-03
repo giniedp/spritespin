@@ -4,33 +4,32 @@ import {
   getPluginState,
   updateFrame,
   registerPlugin,
-  Utils,
   getPluginOptions,
 } from '../core'
-
-const {
+import {
   css,
   hide,
   getOption,
-  isVisible,
   getCursorPosition,
   clamp,
   findSpecs,
   fadeOut,
-  fadeIn
-} = Utils
+  fadeIn,
+  innerWidth,
+  innerHeight
+} from '../utils'
 
 const NAME = 'zoom'
-
 interface ZoomOptions {
   source: string[]
-  useWheel: boolean | number
-  useClick: boolean
+  wheel: boolean | number
+  click: boolean
+  clickTime: number
   pinFrame: boolean
-  doubleClickTime: number
 }
 
 interface ZoomState {
+  active: boolean
   source: string[]
   stage: HTMLElement
 
@@ -52,14 +51,12 @@ function getState(data: InstanceState) {
 
 function onInit(e: Event, data: InstanceState) {
   const state = getState(data)
-  const options = getPluginOptions(data, NAME) as ZoomOptions
-  if (options) {
-    state.source = getOption(options, 'source', data.source)
-    state.useWheel = getOption(options, 'useWheel', false)
-    state.useClick = getOption(options, 'useClick', true)
-    state.pinFrame = getOption(options, 'pinFrame', true)
-    state.doubleClickTime = getOption(options, 'doubleClickTime', 500)
-  }
+  const options = (getPluginOptions(data, NAME) || {}) as ZoomOptions
+  state.source = getOption(options, 'source', data.source)
+  state.useWheel = getOption(options, 'wheel', false)
+  state.useClick = getOption(options, 'click', true)
+  state.pinFrame = getOption(options, 'pinFrame', true)
+  state.doubleClickTime = getOption(options, 'clickTime', 500)
   state.stage = state.stage || document.createElement('div')
   state.stage.classList.add('zoom-stage')
   css(state.stage, {
@@ -76,48 +73,41 @@ function onInit(e: Event, data: InstanceState) {
 }
 
 function onDestroy(e: Event, state: InstanceState) {
-  const data = getState(state)
-  if (data.stage) {
-    data.stage.remove()
-    delete data.stage
+  const zoom = getState(state)
+  if (zoom.stage) {
+    zoom.stage.remove()
+    delete zoom.stage
   }
 }
 
 function updateInput(e: MouseEvent, data: InstanceState) {
-  const state = getState(data)
-  if (!isVisible(state.stage)) {
-    data.isHalted = false
+  const zoom = getState(data)
+  if (!zoom.active) {
     return
   }
 
   e.preventDefault()
 
-  if (state.pinFrame) {
-    // hack into drag/move module and disable dragging
-    // prevents frame change during zoom mode
-    data.isHalted = true
-  }
-
   // grab touch/cursor position
   const cursor = getCursorPosition(e)
   // normalize cursor position into [0:1] range
-  const x = cursor.x / data.width
-  const y = cursor.y / data.height
+  const x = cursor.x / innerWidth(zoom.stage)
+  const y = cursor.y / innerHeight(zoom.stage)
 
-  if (state.oldX == null) {
-    state.oldX = x
-    state.oldY = y
+  if (zoom.oldX == null) {
+    zoom.oldX = x
+    zoom.oldY = y
   }
-  if (state.currentX == null) {
-    state.currentX = x
-    state.currentY = y
+  if (zoom.currentX == null) {
+    zoom.currentX = x
+    zoom.currentY = y
   }
 
   // calculate move delta since last frame and remember current position
-  let dx = x - state.oldX
-  let dy = y - state.oldY
-  state.oldX = x
-  state.oldY = y
+  let dx = x - zoom.oldX
+  let dy = y - zoom.oldY
+  zoom.oldX = x
+  zoom.oldY = y
 
   // invert drag direction for touch events to enable 'natural' scrolling
   if (e.type.match(/touch/)) {
@@ -126,15 +116,15 @@ function updateInput(e: MouseEvent, data: InstanceState) {
   }
 
   // accumulate display coordinates
-  state.currentX = clamp(state.currentX + dx, 0, 1)
-  state.currentY = clamp(state.currentY + dy, 0, 1)
+  zoom.currentX = clamp(zoom.currentX + dx, 0, 1)
+  zoom.currentY = clamp(zoom.currentY + dy, 0, 1)
 
   updateFrame(data, data.frame, data.lane)
 }
 
 function onClick(e: MouseEvent, data: InstanceState) {
-  const state = getState(data)
-  if (!state.useClick) {
+  const zoom = getState(data)
+  if (!zoom.useClick) {
     return
   }
 
@@ -142,50 +132,50 @@ function onClick(e: MouseEvent, data: InstanceState) {
   // simulate double click
 
   const clickTime = new Date().getTime()
-  if (!state.clickTime) {
+  if (!zoom.clickTime) {
     // on first click
-    state.clickTime = clickTime
+    zoom.clickTime = clickTime
     return
   }
 
   // on second click
-  const timeDelta = clickTime - state.clickTime
-  if (timeDelta > state.doubleClickTime) {
+  const timeDelta = clickTime - zoom.clickTime
+  if (timeDelta > zoom.doubleClickTime) {
     // took too long, back to first click
-    state.clickTime = clickTime
+    zoom.clickTime = clickTime
     return
   }
 
   // on valid double click
-  state.clickTime = undefined
+  zoom.clickTime = undefined
   if (toggleZoom(data)) {
     updateInput(e, data)
   }
 }
 
 function onMove(e: MouseEvent, data: InstanceState) {
-  const state = getState(data)
-  if (isVisible(state.stage)) {
+  const zoom = getState(data)
+  if (zoom.active) {
     updateInput(e, data)
   }
 }
 
 function onDraw(e: Event, data: InstanceState) {
-  const state = getState(data)
+  const zoom = getState(data)
 
   // calculate the frame index
   const index = data.lane * data.frames + data.frame
   // get the zoom image. Use original frames as fallback. This won't work for sprite sheets
-  const source = state.source[index]
+  const source = zoom.source[index]
   const spec = findSpecs(data.metrics, data.frames, data.frame, data.lane)
 
   // get display position
-  let x = state.currentX
-  let y = state.currentY
+  let x = zoom.currentX
+  let y = zoom.currentY
   // fallback to centered position
   if (x == null) {
-    x = state.currentX = 0.5
-    y = state.currentY = 0.5
+    x = zoom.currentX = 0.5
+    y = zoom.currentY = 0.5
   }
 
   if (source) {
@@ -194,7 +184,7 @@ function onDraw(e: Event, data: InstanceState) {
     y = Math.floor(y * 100)
 
     // update background image and position
-    css(state.stage, {
+    css(zoom.stage, {
       'background-repeat'   : 'no-repeat',
       'background-image'    : `url('${source}')`,
       'background-position' : `${x}% ${y}%`
@@ -207,62 +197,66 @@ function onDraw(e: Event, data: InstanceState) {
     const top = -Math.floor(sprite.sampledY + y * (sprite.sampledHeight - data.height))
     const width = sheet.sampledWidth
     const height = sheet.sampledHeight
-    css(state.stage, {
+    css(zoom.stage, {
       'background-image'    : `url('${src}')`,
       'background-position' : `${left}px ${top}px`,
       'background-repeat'   : 'no-repeat',
-      // set custom background size to enable responsive rendering
-      '-webkit-background-size' : `${width}px ${height}px`, /* Safari 3-4 Chrome 1-3 */
-      '-moz-background-size'    : `${width}px ${height}px`, /* Firefox 3.6 */
-      '-o-background-size'      : `${width}px ${height}px`, /* Opera 9.5 */
-      'background-size'         : `${width}px ${height}px`  /* Chrome, Firefox 4+, IE 9+, Opera, Safari 5+ */
+      '-webkit-background-size' : `${width}px ${height}px`,
+      '-moz-background-size'    : `${width}px ${height}px`,
+      '-o-background-size'      : `${width}px ${height}px`,
+      'background-size'         : `${width}px ${height}px`
     })
   }
 }
 
 function toggleZoom(data: InstanceState) {
-  const state = getState(data)
-  if (!state.stage) {
+  const zoom = getState(data)
+  if (!zoom.stage) {
     throw new Error('zoom module is not initialized or is not available.')
   }
-  if (!isVisible(state.stage)) {
+  zoom.active = !zoom.active
+  if (zoom.active) {
     showZoom(data)
   } else {
     hideZoom(data)
-    return true
   }
-  return false
+  return zoom.active
 }
 
 function showZoom(state: InstanceState) {
   const zoom = getState(state)
+  zoom.active = true
   fadeOut(zoom.stage)
+  state.isHalted = !!zoom.pinFrame
   fadeIn(state.stage)
 }
 
 function hideZoom(state: InstanceState) {
   const zoom = getState(state)
+  zoom.active = false
   fadeIn(zoom.stage)
+  state.isHalted = false
   fadeOut(state.stage)
 }
 
 function wheel(e: WheelEvent, state: InstanceState) {
   const zoom = getState(state)
-  if (!state.isLoading && zoom.useWheel) {
+  if (state.isLoading || !zoom.useWheel) {
+    return
+  }
+  console.log(e.deltaY)
+  let signY = e.deltaY === 0 ? 0 : e.deltaY > 0 ? 1 : -1
+  if (typeof zoom.useWheel === 'number') {
+    signY *= zoom.useWheel
+  }
 
-    let signY = e.deltaY === 0 ? 0 : e.deltaY > 0 ? 1 : -1
-    if (typeof zoom.useWheel === 'number') {
-      signY *= zoom.useWheel
-    }
-
-    if (!isVisible(zoom.stage) && signY > 0) {
-      e.preventDefault()
-      showZoom(state)
-    }
-    if (isVisible(zoom.stage) && signY < 0) {
-      e.preventDefault()
-      hideZoom(state)
-    }
+  if (!zoom.active && signY > 0) {
+    // e.preventDefault()
+    showZoom(state)
+  }
+  if (zoom.active && signY < 0) {
+    // e.preventDefault()
+    hideZoom(state)
   }
 }
 

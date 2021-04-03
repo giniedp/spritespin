@@ -1,0 +1,25 @@
+---
+title: Panorama
+---
+extends /_layouts/_example
+block content
+  :markdown-it
+    ## `panorama` Plugin
+    This plugin does only work with one image which is renderes as `background-image` and repeated horizontally.
+
+    Make sure to set the `fillMode` to `fill` as it works best with this plugin.
+
+    This plugin has no additional options.
+
+  +example
+    #spritespin-example
+    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example',
+        source: 'http://spritespin.ginie.eu/images/panorama.jpg',
+        fillMode: 'fill',
+        plugins: [
+          'panorama',
+        ]
+      })

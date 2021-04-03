@@ -54,12 +54,12 @@ function compile(config: MetalsmithPugOptions, file: string, files: Record<strin
   const locals = (typeof config.locals === 'function' ? config.locals(file, data, smith) : config.locals) || {}
   return template({
     meta: data,
-    childrenOf: (file: string, ext?: string[]) => childrenOf(file, files, ext),
+    children: (file: string, opt: { deep: boolean, ext: string[] }) => childrenOf(file, files, opt),
     ...locals,
   })
 }
 
-function childrenOf(file: string, files: Record<string, MetalsmithFileMeta>, ext?: string[]) {
+function childrenOf(file: string, files: Record<string, MetalsmithFileMeta>, { deep, ext }: { deep?: boolean, ext?: string[] } = {}) {
   const dirname = path.dirname(file)
   let result = Object.keys(files)
     .filter((it) => it.startsWith(dirname))
@@ -67,6 +67,12 @@ function childrenOf(file: string, files: Record<string, MetalsmithFileMeta>, ext
     .map((it) => files[it])
   if (ext) {
     result = result.filter((it) => ext.includes(it.fileExt))
+  }
+  result.sort((a, b) => a.weight < b.weight ? -1 : a.weight > b.weight ? 1 : 0)
+  if (deep) {
+    result.forEach((f) => {
+      f.children = childrenOf(f.file, files, { deep, ext })
+    })
   }
   return result
 }

@@ -1,5 +1,5 @@
 import type { InstanceState } from "./models"
-import { pixelRatio } from "./utils"
+import { pixelRatio } from "../utils"
 
 /**
  * Prepares the render stage and canvas
@@ -7,7 +7,7 @@ import { pixelRatio } from "./utils"
  * @public
  * @param state - The SpriteSpin instance state
  */
-export function applyStage(state: InstanceState) {
+export function useStage(state: InstanceState) {
   if (!state.stage) {
     state.stage = grabStage(state.target)
     state.images = grabImages(state.stage)

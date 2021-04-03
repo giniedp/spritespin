@@ -1,7 +1,6 @@
-import { findInstance } from './instances'
 import { InstanceState, Options } from './models'
-import { createOrUpdate, Instance } from './instance'
-import { getElement } from './utils/utils'
+import { find, createOrUpdate, Instance } from './instance'
+import { getElement } from '../utils/utils'
 /**
  * Gets an existing spritespin instance for the given element (or selector)
  * @param options
@@ -41,7 +40,7 @@ export function spritespin() {
     if ((typeof arguments[0] !== 'string') && !(arguments[0] instanceof Element)) {
       return createOrUpdate(arguments[0])
     }
-    return findInstance(getElement(arguments[0] as HTMLElement))
+    return find(getElement(arguments[0] as HTMLElement))
   }
 
   const target: HTMLElement = getElement(arguments[0])
@@ -56,7 +55,7 @@ export function spritespin() {
       target
     })
   }
-  const instance = findInstance(target)
+  const instance = find(target)
   if (!instance) {
     throw new Error('Instance not found')
   }

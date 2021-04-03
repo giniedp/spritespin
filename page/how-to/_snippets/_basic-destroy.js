@@ -1,0 +1,1 @@
+SpriteSpin.destroy("#my-spritespin");
