@@ -3,32 +3,49 @@ import { find, createOrUpdate, Instance } from './instance'
 import { getElement } from '../utils/utils'
 /**
  * Gets an existing spritespin instance for the given element (or selector)
- * @param options
+ *
+ * @public
+ * @param target - The target element
  */
 export function spritespin(target: HTMLElement | string): Instance
 /**
  * Creates or updates a spritespin instance
- * @param options
+ *
+ * @public
+ * @param options - The create or update options
  */
 export function spritespin(options: Options): Instance
 /**
  * Creates or updates a spritespin instance
- * @param options
+ *
+ * @public
+ * @param target - The target element
+ * @param options - The create or update options
  */
 export function spritespin(target: HTMLElement | string, option: Partial<Options>): Instance
 /**
  * Destroys a spritespin instance
- * @param options
+ *
+ * @public
+ * @param target - The target element
+ * @param options - The action to execute
  */
 export function spritespin(target: HTMLElement | string, option: 'destroy'): void
 /**
  * Gets a value of an existing spritespin instance
- * @param options
+ *
+ * @public
+ * @param target - The target element
+ * @param key - The option key
  */
 export function spritespin<K extends keyof InstanceState>(target: HTMLElement | string, key: K): InstanceState[K]
 /**
  * Updates a value on an existing spritespin instance
- * @param options
+ *
+ * @public
+ * @param target - The target element
+ * @param key - The option key
+ * @param value - The value to set
  */
 export function spritespin<K extends keyof InstanceState>(target: HTMLElement | string, key: K, value: InstanceState[K]): Instance
 export function spritespin() {

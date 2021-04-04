@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0")
+    link(rel="stylesheet" href="/index.css")
+    block head
+
+body.layout-frame#docs-page
+  nav.navbar.navbar-expand.navbar-dark.bg-dark.justify-content-center.text-center
+    ul.navbar-nav.container.flex-row
+      li.flex-fill: a.nav-link(href="/") SpriteSpin
+      li.flex-fill: a.nav-link(href="/how-to") How To
+      li.flex-fill: a.nav-link(href="/examples") Examples
+  .container
+    != meta.content
+  block content
+  block script
+  link(href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet")

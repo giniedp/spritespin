@@ -67,7 +67,8 @@ export function getPluginState<T extends object = any>(state: InstanceState, plu
 /**
  * Gets the user options given for the plugin
  *
- * @param state - The SpriteSPin instance state
+ * @public
+ * @param state - The SpriteSpin instance state
  * @param name - The plugin name
  * @returns
  */
@@ -80,8 +81,22 @@ export function getPluginOptions(state: InstanceState, name: string) {
 }
 
 /**
+ * Gets an instance of an active plugin by name
+ *
+ * @param state - The SpriteSpin instance state
+ * @param name - The plugin name
+ * @returns
+ */
+export function getPluginInstance(state: InstanceState, name: string): PluginInstance | null {
+  for (let i = 0; i < state.activePlugins.length; i++) {
+    if (state.activePlugins[i].name === name)  {
+      return state.activePlugins[i]
+    }
+  }
+}
+/**
  * Replaces module names on given SpriteSpin data and replaces them with actual implementations.
- * @internal
+ * @public
  */
 export function usePlugins(
   state: InstanceState,

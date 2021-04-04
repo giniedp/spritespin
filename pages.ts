@@ -1,14 +1,17 @@
 import Metalsmith from 'metalsmith'
 
-import msMarkdown from 'metalsmith-markdown'
-import permalinks from 'metalsmith-permalinks'
+// import msMarkdown from 'metalsmith-markdown'
 import msSass from 'metalsmith-sass'
 import filter from 'metalsmith-filter'
 import msMetadata from './tools/metalsmith-metadata'
 import msPug from './tools/metalsmith-pug'
 import msTypescript from './tools/metalsmith-typescript'
 import msBrowserSync from './tools/metalsmith-browsersync'
+import msMarkdown from './tools/metalsmith-markdown'
 import msWatch from './tools/metalsmith-watch'
+import msRelayout from './tools/metalsmith-relayout'
+
+require('jstransformer')(require('jstransformer-markdown-it'))
 
 Metalsmith(__dirname)
   .metadata({
@@ -25,16 +28,18 @@ Metalsmith(__dirname)
   .use(msSass({
     includePaths: ['node_modules'],
   }))
+  .use(msMarkdown({
+    html: true,
+    linkify: true,
+  }))
+  .use(msRelayout({
+    match: '**/docs/*',
+    template: '_layouts/_docs.pug'
+  }))
   .use(msPug({
 
   }))
   .use(msTypescript({ keepOriginal: true }))
-  .use(msMarkdown())
-  .use(
-    permalinks({
-      relative: false,
-    }),
-  )
   .use(msBrowserSync({ name: 'spritespin', config: require(`${__dirname}/browser-sync`) }))
   .use(msWatch({ pattern: './page/**/*' }))
   .build((err) => {

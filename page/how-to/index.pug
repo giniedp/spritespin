@@ -2,29 +2,217 @@ extends /_layouts/_page
 mixin snippet(lang)
   .mb-3.bg-dark: pre.container: code(class="language-"+lang)
     block
+mixin option(key, type, def)
+  dt
+    code= key
+    if type
+      |
+      |
+      code.text-secondary= type
+    if def
+      | (default is
+      |
+      code=def
+      | )
+  dd
+    block
 block content
   .container
     h1.text-center.fw-bold.display-2.my-4.py-4 How To
-    hr
+    h2 Basics
+  .container
+    p Define an html element where a SpriteSpin instance should live
+  +snippet('html')
+    = "<div id='my-spritespin'></div>"
+  .container
     p Reference the SpriteSpin script from CDN in your html
   +snippet('html')
     = "<script src='https://unpkg.com/spritespin@x.x.x/release/spritespin.js' type='text/javascript'></script>"
-
   .container
-    p Define an html element where SpriteSpin should live
+    p Or import it in javascript/typescript
   +snippet('html')
-    = "<div id='my-spritespin'></div>"
-
-  .container: p Initialize the plugin
+    = "import * as SpriteSpin from 'spritespin'"
+  .container
+    p Create an instance
   +snippet('js')
     include ./_snippets/_basic-create.js
-
-  .container: p To update an existing instance
+  .container
+    p To update an existing instance
   +snippet('js')
     include ./_snippets/_basic-update.js
-
-  .container: p To destroy an existing instance
+  .container
+    p To destroy an existing instance
   +snippet('js')
     include ./_snippets/_basic-destroy.js
+
   .container
     h2 Options
+    dl
+      dt.mt-3 BASIC OPTIONS
+      +option("target", "string | HTMLImageElement")
+        | The target element (or selector) which should hold the spritespin instance.
+      +option("source", "string | string[]")
+        | The image URL or an array or URLs to load.
+
+      dt.mt-3 PRELOAD OPTIONS
+      +option("preloadCount", "number")
+        | Number of images to preload. If nothing is set, all images are preloaded.
+        | If a value is given, the life cycle will be triggered after the given number of frames
+        | has been loaded.
+      +option("crossOrigin", "string")
+        | Allows to download images from foreign origins
+        |
+        a(href="https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image" target="_blank") see
+
+      dt.mt-3 DISPLAY OPTIONS
+      +option("detectSubsampling", "boolean", "true")
+        | If true, tries to detect whether the images are down sampled by the browser.
+      +option("width", "number")
+        | The intended display width in pixels.
+      +option("height", "number")
+        | The intended display height in pixels.
+      +option("frames", "number")
+        | Number of frames for a full 360 rotation.
+      +option("framesX", "number")
+        | Number of frames in one row of a single sprite sheet.
+      +option("framesY", "number")
+        | Number of frames in one column of a single sprite sheet.
+      +option("lanes", "number")
+        | Number of 360 sequences. Each lane must have equal number of frames (see: frames)
+      +option("fillMode", "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'")
+        | Specifies how the content of spritespin should be resized to fit its target container.
+        | Is expected to behave the same as
+        a(href="https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit" target="_blank")  object-fit
+        |  CSS Promperty
+      +option("renderMode", "'canvas' | 'image' | 'background'")
+        | A hint for the rendering plugins which technique they should use to render tehe content.
+
+      dt.mt-3 PLAYBACK OPTIONS
+      +option("lane", "number")
+        | The initial sequence number to play.
+      +option("frame", "number")
+        | The initial frame number to play.
+      +option("frameTime", "number")
+        | Time in ms between updates. e.g. 40 is exactly 25 FPS
+      +option("animate", "boolean")
+        | If true, the playback starts automatically
+      +option("retainAnimate", "boolean")
+        | If true, remembers the playback state before user interaction and restores it after that user interaction.
+      +option("reverse", "boolean")
+        | If true, playback is reversed
+      +option("loop", "boolean")
+        | If true, playback is looped
+      +option("stopFrame", "number")
+        | The frame number where playback should automatically stop.
+
+      dt.mt-3 INTERACTION OPTIONS
+      +option("wrap", "boolean")
+        | If true, allows the user to drag the animation beyond the last frame and wrap over to the beginning.
+      +option("wrapLane", "boolean")
+        | If true, allows the user to drag the animation beyond the last sequence and wrap over to the beginning.
+      +option("sense", "number")
+        | Sensitivity factor for user interaction. Use -1 to reverse animation during interaction
+      +option("senseLane", "number")
+        | Sensitivity factor for user interaction
+      +option("plugins", "Array<string | { name: string; options: any }>")
+        | Array of plugin names to load. If an entry is an Object with  name and options, the options are
+        | designated for the plugin with given name
+
+      dt.mt-3 LIFECYCLE OPTIONS
+      +option("onInit")
+        | Occurs when the plugin has been initialized, but before loading the source files.
+      +option("onProgress")
+        | Occurs during the preload phase when preload progress is changed
+      +option("onLoad")
+        | Occurs when all source files have been loaded and spritespin is ready to update and draw.
+      +option("onFrameChanged")
+        | Occurs when the frame number has changed.
+      +option("onFrame")
+        | Occurs when the frame number has been updated (e.g. during animation)
+      +option("onDraw")
+        | Occurs when all update is complete and frame can be drawn
+      +option("onComplete")
+        | Occurs when spritespin has been loaded and the first draw operation did complete
+      +option("onDestroy")
+        | Occurs when plugin should be removed from spritespin
+
+  .container
+    h2 Writing Plugins
+    :markdown-it
+      Plugins must have a name and may be implemented as a `class`, a closure `function` or as an `Object`. They must be registered in SpriteSpin ecosystem in order to be used
+
+    p This is a class type plugin
+  +snippet('javascript')
+    include ./_snippets/_plugin-class.js
+  .container: p This is a closure type plugin
+  +snippet('javascript')
+    include ./_snippets/_plugin-closure.js
+  .container: p This is a plain object plugin
+  +snippet('javascript')
+    include ./_snippets/_plugin-object.js
+  .container
+    p The plugin can be invoked by passing the plugin name to the spritespin options
+  +snippet('javascript')
+    include ./_snippets/_plugin-invoke.js
+  .container
+    p Alternatively the plugin can be invoked with a set of options like this
+  +snippet('javascript')
+    include ./_snippets/_plugin-invoke-options.js
+  .container
+    p To access options for a specific plugin use
+  +snippet('javascript')="let options = SpriteSpin.getPluginOptions('my-plugin')"
+  .container
+    :markdown-it
+      To attach the plugin to the SpriteSpin lifecycle it may implement any method of the lifecycle interface.
+      - `onInit`
+      - `onProgress`
+      - `onLoad`
+      - `onFrameChanged`
+      - `onFrame`
+      - `onDraw`
+      - `onComplete`
+      - `onDestroy`
+
+      The following plugin properties will be automatically bound as event handlers on the `target` element and
+      removed when the plugin is destroyed
+      - `resize`
+      - `blur`
+      - `focus`
+      - `click`
+      - `dblclick`
+      - `keydown`
+      - `keypress`
+      - `keyup`
+      - `mousedown`
+      - `mouseenter`
+      - `mouseleave`
+      - `mousemove`
+      - `mouseout`
+      - `mouseover`
+      - `mouseup`
+      - `touchcancel`
+      - `touchend`
+      - `touchmove`
+      - `touchstart`
+      - `wheel`
+      - `mousewheel`
+
+      All other event types must be handled manually by the plugin.
+
+  .container
+    h2 Lifecycle Events
+    :markdown-it
+      To add hooks to the SpriteSpin lifecycle without registering a plugin, it is possible to listen for the following event types on the `target` element
+
+      - `onInit.spritespin`
+      - `onProgress.spritespin`
+      - `onLoad.spritespin`
+      - `onFrameChanged.spritespin`
+      - `onFrame.spritespin`
+      - `onDraw.spritespin`
+      - `onComplete.spritespin`
+      - `onDestroy.spritespin`
+
+      These event handlers must be manualle added and remove. SpriteSpin does not remove these avent handlers on destroy.
+
+

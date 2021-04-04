@@ -2,7 +2,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
 
-  "mainEntryPointFilePath": "<projectFolder>/dist/release/spritespin.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/dist/release/core/index.d.ts",
   "projectFolder": "./",
   "compiler": {
     "tsconfigFilePath": "<projectFolder>/lib/tsconfig.json"
@@ -24,7 +24,8 @@
   },
 
   "tsdocMetadata": {
-    "enabled": false
+    "enabled": true,
+    "tsdocMetadataFilePath": "<projectFolder>/temp/<unscopedPackageName>.tsdoc.json"
   },
 
   "messages": {

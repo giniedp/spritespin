@@ -1,5 +1,9 @@
 import { noop } from "./utils"
 
+/**
+ *
+ * @public
+ */
 export interface PreloadOptions {
   source: string | string[]
   crossOrigin?: string
@@ -9,6 +13,10 @@ export interface PreloadOptions {
   complete?: (images: HTMLImageElement[]) => void
 }
 
+/**
+ *
+ * @public
+ */
 export interface PreloadProgress {
   // The image index that currently has been loaded
   index: number
@@ -20,6 +28,11 @@ export interface PreloadProgress {
   percent: number
 }
 
+/**
+ *
+ * @public
+ * @param opts
+ */
 export function preload(opts: PreloadOptions) {
   const src = typeof opts.source === 'string' ? [opts.source] : opts.source
 

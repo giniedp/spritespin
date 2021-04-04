@@ -3,7 +3,7 @@ import type { InstanceState } from './models'
 /**
  * Gets an opaque state object by key
  *
- * @internal
+ * @public
  * @param state - The SpriteSpin instance or instance state object
  * @param key - The name of the state object
  */

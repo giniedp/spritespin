@@ -38,12 +38,12 @@ function watch(pattern: string | string[], smith: Metalsmith) {
     }
   })
   function changed(file: string) {
-    clearTimeout(time)
     if (path.basename(file).startsWith('_')) {
       mode = 'build'
     }
     const read = smith.readFile.bind(smith) as any
     read(file, (err: Error, ret: any) => {
+      clearTimeout(time)
       if (err) {
         log.error(err)
       } else {
@@ -73,7 +73,7 @@ function watch(pattern: string | string[], smith: Metalsmith) {
         if (err) {
           log.error(err)
         }
-        log.info('end')
+        log.info('run end')
       })
     })
   }
@@ -83,7 +83,7 @@ function watch(pattern: string | string[], smith: Metalsmith) {
       if (err) {
         log.error(err)
       }
-      log.info('end')
+      log.info('build end')
     })
   }
   return watcher

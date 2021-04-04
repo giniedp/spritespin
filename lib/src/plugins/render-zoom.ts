@@ -16,7 +16,9 @@ import {
   fadeOut,
   fadeIn,
   innerWidth,
-  innerHeight
+  innerHeight,
+  Destructor,
+  destructor
 } from '../utils'
 
 const NAME = 'zoom'
@@ -43,6 +45,7 @@ interface ZoomState {
   useWheel: boolean | number
   useClick: boolean
   pinFrame: boolean
+  destructor: Destructor
 }
 
 function getState(data: InstanceState) {
@@ -59,6 +62,7 @@ function onInit(e: Event, data: InstanceState) {
   state.doubleClickTime = getOption(options, 'clickTime', 500)
   state.stage = state.stage || document.createElement('div')
   state.stage.classList.add('zoom-stage')
+  state.destructor = state.destructor || destructor()
   css(state.stage, {
     width    : '100%',
     height   : '100%',
@@ -69,11 +73,16 @@ function onInit(e: Event, data: InstanceState) {
     position : 'absolute'
   })
   data.target.appendChild(state.stage)
-  hide(state.stage)
+  if (!state.active) {
+    hide(state.stage)
+  }
 }
 
 function onDestroy(e: Event, state: InstanceState) {
   const zoom = getState(state)
+  if (zoom.active) {
+    hideZoom(state)
+  }
   if (zoom.stage) {
     zoom.stage.remove()
     delete zoom.stage
@@ -86,13 +95,19 @@ function updateInput(e: MouseEvent, data: InstanceState) {
     return
   }
 
+  const w = innerWidth(zoom.stage)
+  const h = innerHeight(zoom.stage)
+  if (!w || !h) {
+    return
+  }
+
   e.preventDefault()
 
   // grab touch/cursor position
   const cursor = getCursorPosition(e)
   // normalize cursor position into [0:1] range
-  const x = cursor.x / innerWidth(zoom.stage)
-  const y = cursor.y / innerHeight(zoom.stage)
+  const x = cursor.x / w
+  const y = cursor.y / h
 
   if (zoom.oldX == null) {
     zoom.oldX = x
@@ -229,6 +244,7 @@ function showZoom(state: InstanceState) {
   fadeOut(zoom.stage)
   state.isHalted = !!zoom.pinFrame
   fadeIn(state.stage)
+  zoom.destructor.addEventListener(document, 'mousemove', (e: MouseEvent) => onMove(e, state))
 }
 
 function hideZoom(state: InstanceState) {
@@ -237,6 +253,7 @@ function hideZoom(state: InstanceState) {
   fadeIn(zoom.stage)
   state.isHalted = false
   fadeOut(state.stage)
+  zoom.destructor()
 }
 
 function wheel(e: WheelEvent, state: InstanceState) {
@@ -244,7 +261,6 @@ function wheel(e: WheelEvent, state: InstanceState) {
   if (state.isLoading || !zoom.useWheel) {
     return
   }
-  console.log(e.deltaY)
   let signY = e.deltaY === 0 ? 0 : e.deltaY > 0 ? 1 : -1
   if (typeof zoom.useWheel === 'number') {
     signY *= zoom.useWheel

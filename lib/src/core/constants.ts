@@ -2,12 +2,16 @@ import type { PluginEvents, Options, PluginLifecycle } from './models'
 
 /**
  * The namespace that is used to bind functions to DOM events and store the data object
+ *
+ * @public
  */
 export const namespace = 'spritespin'
 
 /**
  * Event names that are recognized by SpriteSpin. A module can implement any of these and they will be bound
  * to the target element on which the plugin is called.
+ *
+ * @public
  */
 export const eventNames: Array<keyof PluginEvents> = [
   'resize',
@@ -35,6 +39,7 @@ export const eventNames: Array<keyof PluginEvents> = [
 
 /**
  *
+ * @public
  */
 export const lifecycleNames: Array<keyof PluginLifecycle> = [
   'onInit',
@@ -50,6 +55,8 @@ export const lifecycleNames: Array<keyof PluginLifecycle> = [
 /**
  * Default set of SpriteSpin options. This also represents the majority of data attributes that are used during the
  * lifetime of a SpriteSpin instance. The data is stored inside the target DOM element on which the plugin is called.
+ *
+ * @public
  */
 export const defaults: Options = {
   source: undefined,
@@ -78,6 +85,5 @@ export const defaults: Options = {
   detectSubsampling: true,
   preloadCount: undefined,
 
-  touchScrollTimer: [200, 1500],
   plugins: ['360', 'drag'],
 }

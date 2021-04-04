@@ -20,7 +20,7 @@ export type InstanceExtension = Record<string, InstanceMethod>
  *
  * @public
  */
-export type PluginMethod = (e: Event, instance: InstanceState) => void
+export type PluginMethod = (e: Event, state: InstanceState) => void
 
 /**
  * The plugin lifecycle interface
@@ -53,7 +53,7 @@ export interface PluginLifecycle {
    */
   onDraw?: PluginMethod
   /**
-   * Occurs when spritespin has been loaded and the first draw operation is complete
+   * Occurs when spritespin has been loaded and the first draw operation did complete
    */
   onComplete?: PluginMethod
   /**
@@ -103,6 +103,10 @@ export interface PluginInstance extends PluginLifecycle, PluginEvents {
   name?: string
 }
 
+/**
+ *
+ * @public
+ */
 export type PluginType = PluginInstance | PluginClass | PluginFactory
 
 /**
@@ -143,17 +147,17 @@ export type Orientation = 'horizontal' | 'vertical'
  */
 export interface Options extends PluginLifecycle {
   /**
-   * The target element which should hold the spritespin instance. This is usually already specified by the jQuery selector but can be overridden here.
+   * The target element (or selector) which should hold the spritespin instance.
    */
   target?: HTMLElement | string
 
   /**
-   * Image URL or array of urls to be used.
+   * The image URL or an array or URLs to load.
    */
   source?: string | string[]
 
   /**
-   * The display width in pixels.
+   * The intended display width in pixels.
    *
    * @remarks
    * Width and height should match the aspect ratio of the frames.
@@ -161,7 +165,7 @@ export interface Options extends PluginLifecycle {
   width?: number
 
   /**
-   * The display height in pixels.
+   * The intended display height in pixels.
    *
    * @remarks
    * Width and height should match the aspect ratio of the frames.
@@ -187,13 +191,15 @@ export interface Options extends PluginLifecycle {
   framesY?: number
 
   /**
-   * Number of sequences.
+   * Number of 360 sequences.
    */
   lanes?: number
 
   /**
-   * Specifies how the frames are sized and scaled if it does not match the given
-   * width and height dimensions.
+   * Specifies how the content of spritespin should be resized to fit its target container.
+   *
+   * @remarks
+   * The logic mimics the behavior of the object-fit CSS Promperty: see
    */
   fillMode?: FillMode
 
@@ -269,11 +275,6 @@ export interface Options extends PluginLifecycle {
    * Number of images to preload. If nothing is set, all images are preloaded.
    */
   preloadCount?: number
-
-  /**
-   * Time range in ms when touch scroll will be disabled during interaction with SpriteSpin
-   */
-  touchScrollTimer?: [number, number]
 
   /**
    * Array of plugins to load

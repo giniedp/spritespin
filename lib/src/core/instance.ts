@@ -3,7 +3,7 @@ import { Events } from './events'
 import { useLayout } from './layout'
 import { InstanceExtension, InstanceState, Options, PluginInstance, PluginLifecycle, PluginMethod } from './models'
 import { usePlayback, stopAnimation } from './playback'
-import { usePlugins } from './plugins'
+import { getPluginInstance, getPluginState, usePlugins } from './plugins'
 import { useStage } from './stage'
 import { useResize } from './resize'
 import { destructor, findSpecs, measure, preload, toArray, warn } from '../utils'
@@ -27,6 +27,7 @@ function popInstance(instance: Instance) {
 /**
  * Gets an instance for the given HTML Element
  *
+ * @public
  * @param target - The HTML Element or a selector or an object with target
  */
 export function find(target: HTMLElement | string | Pick<Options, 'target'>): Instance | null {
@@ -108,6 +109,10 @@ export function destroy(target: HTMLElement | string | Pick<Options, 'target'>) 
   }
 }
 
+/**
+ *
+ * @public
+ */
 export class Instance {
   /**
    * The element this instance is bound to
@@ -230,7 +235,7 @@ export class Instance {
   /**
    * Removes a previously added event listener
    *
-   * @param cb
+   * @param cb - the handler to remove
    * @returns
    */
   public removeListener(cb: PluginMethod): this {
@@ -255,6 +260,15 @@ export class Instance {
     if (e) {
       this.target.dispatchEvent(e)
     }
+  }
+
+  /**
+   * Gets the instance of an active plugin by name
+   *
+   * @param name - The name of the plugin
+   */
+  public getPlugin(name: string) {
+    return getPluginInstance(this.state, name)
   }
 }
 
