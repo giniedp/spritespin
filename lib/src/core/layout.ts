@@ -53,7 +53,9 @@ export function useLayout(state: InstanceState) {
     '-webkit-user-select': 'none',
     'user-select': 'none',
     overflow : 'hidden',
-    position: 'relative'
+    position: 'relative',
+    width: state.width || null,
+    height: state.height || null,
   })
 
   css(state.stage, {
