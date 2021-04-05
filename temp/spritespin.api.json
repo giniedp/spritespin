@@ -2516,6 +2516,32 @@
             },
             {
               "kind": "PropertySignature",
+              "canonicalReference": "spritespin!Options#frameHeight:member",
+              "docComment": "/**\n * The height of a single frame\n *\n * @remarks\n *\n * This will be automatically detected. This value can be used to avoid layout shifts before/after image preload\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "frameHeight?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "frameHeight",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
               "canonicalReference": "spritespin!Options#frames:member",
               "docComment": "/**\n * Number of frames for a full 360 rotation.\n *\n * @remarks\n *\n * If multiple lanes are used, each lane must have this amount of frames.\n */\n",
               "excerptTokens": [
@@ -2620,8 +2646,34 @@
             },
             {
               "kind": "PropertySignature",
+              "canonicalReference": "spritespin!Options#frameWidth:member",
+              "docComment": "/**\n * The width of a single frame\n *\n * @remarks\n *\n * This will be automatically detected. This value can be used to avoid layout shifts before/after image preload\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "frameWidth?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "frameWidth",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
               "canonicalReference": "spritespin!Options#height:member",
-              "docComment": "/**\n * The intended display height in pixels.\n *\n * @remarks\n *\n * Width and height should match the aspect ratio of the frames.\n */\n",
+              "docComment": "/**\n * The fixed display height in pixels.\n *\n * @remarks\n *\n * This is used to set a fixed height of the spritespin container. Setting this will loose the responsive layout capability. Concider using the `frameHeight` Property\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -3027,7 +3079,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "spritespin!Options#width:member",
-              "docComment": "/**\n * The intended display width in pixels.\n *\n * @remarks\n *\n * Width and height should match the aspect ratio of the frames.\n */\n",
+              "docComment": "/**\n * The fixed display width in pixels.\n *\n * @remarks\n *\n * This is used to set a fixed width of the spritespin container. Setting this will loose the responsive layout capability. Concider using the `frameWidth` Property\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

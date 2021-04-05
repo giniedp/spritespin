@@ -2,7 +2,7 @@
   "name": "spritespin",
   "description": "Javascript library for creating flipbook animations",
   "private": true,
-  "version": "5.0.0-beta.0",
+  "version": "5.0.0-beta.1",
   "author": "Alexander Graefenstein",
   "license": "MIT",
   "keywords": [
