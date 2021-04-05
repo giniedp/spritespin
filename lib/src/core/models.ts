@@ -157,20 +157,42 @@ export interface Options extends PluginLifecycle {
   source?: string | string[]
 
   /**
-   * The intended display width in pixels.
+   * The fixed display width in pixels.
    *
    * @remarks
-   * Width and height should match the aspect ratio of the frames.
+   * This is used to set a fixed width of the spritespin container.
+   * Setting this will loose the responsive layout capability.
+   * Concider using the `frameWidth` Property
    */
   width?: number
 
   /**
-   * The intended display height in pixels.
+   * The fixed display height in pixels.
    *
    * @remarks
-   * Width and height should match the aspect ratio of the frames.
+   * This is used to set a fixed height of the spritespin container.
+   * Setting this will loose the responsive layout capability.
+   * Concider using the `frameHeight` Property
    */
   height?: number
+
+  /**
+   * The width of a single frame
+   *
+   * @remarks
+   * This will be automatically detected. This value can be used
+   * to avoid layout shifts before/after image preload
+   */
+  frameWidth?: number
+
+   /**
+    * The height of a single frame
+    *
+    * @remarks
+    * This will be automatically detected. This value can be used
+    * to avoid layout shifts before/after image preload
+    */
+  frameHeight?: number
 
   /**
    * Number of frames for a full 360 rotation.
