@@ -9,12 +9,10 @@ registerPlugin(NAME, (state: InstanceState) => {
     if (!sprite) {
       return
     }
-    if (state.frames <= 1) {
-      if (state.orientation === 'horizontal') {
-        state.frames = sprite.sampledWidth
-      } else {
-        state.frames = sprite.sampledHeight
-      }
+    if (state.orientation === 'horizontal') {
+      state.frames = sprite.sampledWidth
+    } else {
+      state.frames = sprite.sampledHeight
     }
 
     let scale = 1

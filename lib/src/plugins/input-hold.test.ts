@@ -3,20 +3,22 @@ import * as t from '../lib.test'
 
 describe('SpriteSpin.Plugins#input-hold', () => {
 
-  const FRAME_WIDHT = 10
-  const FRAME_HEIGHT = 10
+  let FRAME_WIDHT: number
+  let FRAME_HEIGHT: number
 
   let data: SpriteSpin.InstanceState
   beforeEach((done) => {
     data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
-      width: FRAME_WIDHT,
-      height: FRAME_HEIGHT,
       frames: 25,
       onLoad: done,
       animate: false,
       plugins: ['hold', '360']
     }).state
+  })
+  beforeEach(() => {
+    FRAME_WIDHT = data.target.offsetWidth
+    FRAME_HEIGHT = data.target.offsetHeight
   })
   afterEach(() => {
     SpriteSpin.destroy(data)
@@ -31,7 +33,7 @@ describe('SpriteSpin.Plugins#input-hold', () => {
   describe('mouse interaction', () => {
 
     it ('sets "dragging" flag on mousedown', () => {
-      expect(data.isDragging).toBe(false)
+      expect(data.isDragging).toBeFalsy()
       t.mouseDown(t.getEl(), 0, 0)
       expect(data.isDragging).toBe(true)
     })
@@ -49,7 +51,7 @@ describe('SpriteSpin.Plugins#input-hold', () => {
       expect(data.isDragging).toBe(false)
     })
 
-    xit ('removes "dragging" flag on mouseleave', () => {
+    it ('removes "dragging" flag on mouseleave', () => {
       data.isDragging = true
       expect(data.isDragging).toBe(true)
       t.mouseLeave(t.getEl(), 0, 0)
@@ -57,9 +59,9 @@ describe('SpriteSpin.Plugins#input-hold', () => {
     })
 
     it ('ignores move event if not dragging', () => {
-      expect(data.isDragging).toBe(false)
+      expect(data.isDragging).toBeFalsy()
       t.mouseMove(t.getEl(), 0, 0)
-      expect(data.isDragging).toBe(false)
+      expect(data.isDragging).toBeFalsy()
     })
 
     it ('update frameTime on horizontal move', () => {
@@ -68,7 +70,7 @@ describe('SpriteSpin.Plugins#input-hold', () => {
       t.mouseMove(t.getEl(), 0, 0)
       expect(data.frameTime).toBe(20)
       t.mouseMove(t.getEl(), FRAME_WIDHT / 2, 0)
-      expect(data.frameTime).toBe(100)
+      expect(Math.round(data.frameTime)).toBe(100)
       t.mouseMove(t.getEl(), FRAME_WIDHT, 0)
       expect(data.frameTime).toBe(20)
     })

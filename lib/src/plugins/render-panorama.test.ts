@@ -8,8 +8,6 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
     data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE40x30,
       frames: 1,
-      width: 10,
-      height: 10,
       animate: false,
       onComplete: done,
       plugins: ['panorama']
@@ -62,9 +60,8 @@ describe('SpriteSpin.Plugins#render-panorama', () => {
     beforeEach((done) => {
       SpriteSpin.spritespin(data.target, {
         orientation: 'vertical',
-        width: 40,
-        height: 10,
-        onComplete: done
+        onComplete: done,
+        fillMode: 'fill',
       })
     })
 

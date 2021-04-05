@@ -1,5 +1,14 @@
 import type { PluginEvents, Options, PluginLifecycle } from './models'
 
+declare const VERSION_STRING: string
+
+/**
+ * The version string
+ *
+ * @public
+ */
+export const VERSION = typeof VERSION_STRING === 'string' ? VERSION_STRING : null
+
 /**
  * The namespace that is used to bind functions to DOM events and store the data object
  *

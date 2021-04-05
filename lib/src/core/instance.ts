@@ -46,8 +46,12 @@ export function find(target: HTMLElement | string | Pick<Options, 'target'>): In
  * @public
  */
 export function createOrUpdate(options: Options): Instance {
-  const instance = find(options)
-  return instance ? instance.update(options) : new Instance(options).load()
+  let instance = find(options)
+  if (!instance) {
+    instance = new Instance(options)
+    return instance.load()
+  }
+  return instance.update(options)
 }
 
 /**
@@ -259,6 +263,9 @@ export class Instance {
     this.events.trigger(event, e, this.state)
     if (e) {
       this.target.dispatchEvent(e)
+    }
+    if (event in this.state) {
+      this.state[event].call(this, e, this.state)
     }
   }
 

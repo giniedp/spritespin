@@ -10,8 +10,6 @@ describe('SpriteSpin.Plugins#render-360', () => {
   beforeEach((done) => {
     data = SpriteSpin.spritespin(t.getEl(), {
       source: t.WHITE50x50,
-      width: 10,
-      height: 10,
       frames: 25,
       onComplete: done,
       renderMode: 'canvas',
@@ -32,9 +30,9 @@ describe('SpriteSpin.Plugins#render-360', () => {
       })
     })
 
-    it ('has empty stage', () => {
-      expect(data.stage.querySelectorAll('*').length).toBe(0)
-    })
+    // it ('has empty stage', () => {
+    //   expect(data.stage.querySelectorAll('*').length).toBe(0)
+    // })
 
     it ('shows the stage element', () => {
       expect(isVisible(data.stage)).toBe(true)
@@ -53,9 +51,9 @@ describe('SpriteSpin.Plugins#render-360', () => {
       })
     })
 
-    it ('has empty stage', () => {
-      expect(data.stage.querySelectorAll('*').length).toBe(0)
-    })
+    // it ('has empty stage', () => {
+    //   expect(data.stage.querySelectorAll('*').length).toBe(0)
+    // })
 
     it ('shows the stage element', () => {
       expect(isVisible(data.stage)).toBe(true)

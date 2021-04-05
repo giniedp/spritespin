@@ -32,6 +32,9 @@ registerPlugin(NAME, (state: InstanceState) => {
       state.canvasContext.drawImage(image, sprite.sampledX, sprite.sampledY, sprite.sampledWidth, sprite.sampledHeight, 0, 0, w, h)
       return
     }
+    if (state.canvas) {
+      hide(state.canvas)
+    }
 
     const scaleX = innerWidth(state.stage) / sprite.sampledWidth
     const scaleY = innerHeight(state.stage) / sprite.sampledHeight

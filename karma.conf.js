@@ -25,8 +25,14 @@ module.exports = (config) => {
       IS_TRAVIS ? 'Firefox' : 'ChromeHeadless'
     ],
     files: [
-      'lib/**/*.ts',
+      {
+        pattern: 'lib/src/**/*.ts',
+        watched: true,
+        served: true,
+        included: true,
+      },
     ],
+    exclude: [],
     preprocessors: {
       '**/*.ts': ['karma-typescript'],
     },
@@ -34,12 +40,25 @@ module.exports = (config) => {
       'mocha',
       'karma-typescript',
     ],
-
+    mochaReporter: {
+      output: 'minimal',
+    },
     karmaTypescriptConfig: {
+      bundlerOptions: {
+        entrypoints: /(\.test\.ts)$/,
+        sourceMap: true,
+        validateSyntax: false,
+      },
       tsconfig: 'lib/tsconfig.test.json',
       converageOptions: {
         instrumentation: IS_COVERAGE,
         exclude: /\.(d|spec|test)\.ts/i,
+        instrumenterOptions: {
+          // a regex for excluding files from remapping
+          // exclude: '',
+          // a function for handling error messages
+          warn: (msg) => console.log(msg),
+        },
       },
       reports: {
         'text-summary': '',

@@ -1,5 +1,5 @@
 import { InstanceState, updateInput, usePlayback, resetInput, stopAnimation, getInputState, registerPlugin } from '../core'
-import { innerWidth, offset } from '../utils'
+import { innerHeight, innerWidth, offset } from '../utils'
 
 const NAME = 'hold'
 
@@ -60,7 +60,7 @@ registerPlugin(NAME, (data: InstanceState) => {
       half = innerWidth(target) / 2
       delta = (input.currentX - off.left - half) / half
     } else {
-      half = (data.height / 2)
+      half = innerHeight(target) / 2
       delta = (input.currentY - off.top - half) / half
     }
     data.reverse = delta < 0

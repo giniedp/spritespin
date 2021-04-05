@@ -5376,6 +5376,27 @@
             }
           ],
           "name": "useStage"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "spritespin!VERSION:var",
+          "docComment": "/**\n * The version string\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VERSION: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "VERSION",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
         }
       ]
     }

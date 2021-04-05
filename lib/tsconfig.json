@@ -27,10 +27,5 @@
     "types": [
       "jasmine",
     ]
-  },
-  "exclude": [
-    "node_modules",
-    "release",
-    "*.test.ts"
-  ]
+  }
 }

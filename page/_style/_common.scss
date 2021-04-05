@@ -1,3 +1,28 @@
+
+* {
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 0.5rem
+}
+
+*::-webkit-scrollbar-track {
+  background-color: $dark;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-width: 1px;
+  border-style: solid;
+  transition: background-color 0.2s ease-in-out;
+  background-color: $secondary;
+  border-color: $dark;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: $secondary;
+}
+
 .layout-frame {
   position: absolute;
   top: 0;

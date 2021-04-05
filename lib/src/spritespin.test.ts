@@ -1,7 +1,7 @@
 import * as SpriteSpin from 'spritespin'
 import * as t from './lib.test'
 
-fdescribe('SpriteSpin', () => {
+describe('SpriteSpin', () => {
 
   const WIDTH = 50
   const HEIGHT = 50
@@ -42,15 +42,16 @@ fdescribe('SpriteSpin', () => {
     it ('returns state.plugin.NAME', () => {
       const result = SpriteSpin.getPluginState(data, 'lorem ipsum')
       expect(result).toBeDefined()
-      expect(result).toBe((data.opaque as any).plugin['lorem ipsum'])
+      expect(result).toBe((data.opaque as any).plugins['lorem ipsum'])
     })
   })
 
   describe('#extend', () => {
     afterEach(() => {
-      SpriteSpin.Instance.prototype = {} as any
+      delete (SpriteSpin.Instance.prototype as any).a
+      delete (SpriteSpin.Instance.prototype as any).b
     })
-    it ('adds methods to SpriteSpin.Api.prototype', () => {
+    it ('adds methods to SpriteSpin.Instance.prototype', () => {
       function a() { /*noop*/ }
       function b() { /*noop*/ }
       const proto = SpriteSpin.Instance.prototype as any

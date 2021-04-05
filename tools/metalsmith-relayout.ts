@@ -5,7 +5,7 @@ import { MetalsmithFileMeta } from "./metalsmith-metadata"
 import minimatch from 'minimatch'
 
 export default (options: {
-  match: string | string[],
+  match: string,
   template: string
 }) => {
   return (files: Record<string, MetalsmithFileMeta>, smith: Metalsmith, done: Function) => {

@@ -9,7 +9,9 @@ const log = wplog({
 })
 
 const isWatchmode = process.argv.includes('-w') || process.argv.includes('--watch')
-process.env.METALSMITH_WATCH = isWatchmode ? 'true' : null
+if (isWatchmode) {
+  process.env.METALSMITH_WATCH = 'yes'
+}
 
 export default (options: { pattern: string | string[] }) =>{
   let isWatching: boolean

@@ -83,11 +83,9 @@ export function loop(update: (this: Loop, timestamp?: number, dt?: number) => an
     }
   }
   looper.kill = () => {
-    if (requestId != null) {
-      cancelAnimationFrame(requestId)
-      requestId = null
-      looper.isRunning = false
-    }
+    cancelAnimationFrame(requestId)
+    requestId = null
+    looper.isRunning = false
   }
   looper.isRunning = false
   looper()

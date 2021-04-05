@@ -1,7 +1,8 @@
 {
   "name": "spritespin",
   "description": "Javascript library for creating flipbook animations",
-  "version": "5.0.0",
+  "private": true,
+  "version": "5.0.0.preview",
   "author": "Alexander Graefenstein",
   "license": "MIT",
   "keywords": [
@@ -12,16 +13,6 @@
     "panorama",
     "jquery-plugin",
     "ecosystem:jquery"
-  ],
-  "main": "release/spritespin.js",
-  "module": "release/src/index.js",
-  "typings": "release/src/index.d.ts",
-  "es2015": "release/esm2015/index.js",
-  "files": [
-    "release",
-    "README.md",
-    "LICENSE",
-    "package.json"
   ],
   "repository": {
     "type": "git",
@@ -37,14 +28,9 @@
     "lint": "eslint -c .eslintrc.js",
     "lint:silent": "eslint -c .eslintrc.js || true",
     "build": "yarn build:rollup && yarn build:api && yarn build:docs && yarn build:page",
-
     "build:es5": "tsc --project lib/tsconfig.json",
     "build:api": "api-extractor run --local --verbose",
-    "build:cjs": "tsc --project lib/tsconfig.cjs.json",
-    "build:tsc": "tsc --project lib/tsconfig.json",
-    "build:esm2015": "tsc --project tsconfig.esm2015.json",
     "build:watch": "yarn build -w",
-
     "build:rollup": "rollup -c rollup.config.js",
     "build:rollup:watch": "yarn build:rollup -w",
     "build:page": "ts-node pages.ts",
@@ -99,6 +85,8 @@
     "pug": "^3.0.2",
     "pug-cli": "^1.0.0-alpha6",
     "rollup": "^2.44.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",

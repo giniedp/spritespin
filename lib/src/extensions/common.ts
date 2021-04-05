@@ -59,7 +59,7 @@ export interface CommonApiFunctions extends InstanceExtension {
 
 extend<CommonApiFunctions>({
   isPlaying: function (this: CommonApi) {
-    return getPlaybackState(this.state).looper?.isRunning != null
+    return !!getPlaybackState(this.state).looper?.isRunning
   },
   isLooping: function (this: CommonApi) {
     return this.state.loop

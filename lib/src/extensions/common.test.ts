@@ -11,8 +11,6 @@ describe('SpriteSpin.Api#common', () => {
     api = SpriteSpin.spritespin(t.getEl(), {
       source: source,
       frames: source.length,
-      width: 40,
-      height: 30,
       frameTime: 16,
 
       animate: false,
@@ -27,12 +25,12 @@ describe('SpriteSpin.Api#common', () => {
 
   describe('#isPlaying', () => {
     it ('detects if animation is running', () => {
-      expect(api.isPlaying()).toBe(false)
+      expect(api.isPlaying()).toBe(false, 'a')
       data.animate = true
       SpriteSpin.usePlayback(data)
-      expect(api.isPlaying()).toBe(true)
+      expect(api.isPlaying()).toBe(true, 'b')
       SpriteSpin.stopAnimation(data)
-      expect(api.isPlaying()).toBe(false)
+      expect(api.isPlaying()).toBe(false, 'c')
     })
   })
 
@@ -48,10 +46,10 @@ describe('SpriteSpin.Api#common', () => {
   describe('#toggleAnimation', () => {
     it ('starts/stops the animation', () => {
       api.toggleAnimation()
-      expect(api.isPlaying()).toBe(true, 'started')
+      expect(api.isPlaying()).toBe(true)
 
       api.toggleAnimation()
-      expect(api.isPlaying()).toBe(false, 'stopped')
+      expect(api.isPlaying()).toBe(false)
     })
   })
 
