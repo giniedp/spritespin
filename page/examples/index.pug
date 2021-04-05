@@ -4,7 +4,7 @@ mixin tree(list)
     each child, i in list
       - var hasChildren = child.children && child.children.length
       li.list-group-item.bg-dark(class={ "list-group-item-header": hasChildren})
-        a.example-link(href=child.urlPath)= child.title || child.slug || child.urlPath
+        a(class={ "example-link": !hasChildren }, href=child.urlPath)= child.title || child.slug || child.urlPath
         if hasChildren
           +tree(child.children)
 block content

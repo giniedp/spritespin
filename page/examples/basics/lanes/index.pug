@@ -15,9 +15,9 @@ block content
           frame: [0,23],
           digits: 2
         }),
-        // width and height of the display
-        //- width: 400,
-        //- height: 225,
+        // avoids layout shift before/after preload
+        frameWidth: 400,
+        frameHeight: 225,
         // the number of lanes (vertical angles)
         lanes: 12,
         // the number of frames per lane (per vertical angle)

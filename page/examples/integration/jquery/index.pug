@@ -1,0 +1,20 @@
+---
+title: jQuery
+weight: 3
+---
+extends /_layouts/_example
+block content
+  :markdown-it
+    Make sure jQuery is loaded before the SpriteSpin script. SpriteSpin will then register the `spritespin` function
+    on the existing `jQuery` object.
+  +example
+    #spritespin-example-2
+    script(type='text/javascript' src="https://code.jquery.com/jquery-3.6.0.js" crossorigin="anonymous")
+    script(type='text/javascript' src=spritespinSrc)
+    script(type='text/javascript').
+      $('#spritespin-example-2').spritespin({
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', {
+          frame: [1,34], digits: 3
+        }),
+        sense: -1
+      })

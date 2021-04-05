@@ -160,7 +160,8 @@ block content
     include ./_snippets/_plugin-invoke-options.js
   .container
     p To access options for a specific plugin use
-  +snippet('javascript')="let options = SpriteSpin.getPluginOptions('my-plugin')"
+  +snippet('javascript')
+    include ./_snippets/_plugin-options.js
   .container
     :markdown-it
       To attach the plugin to the SpriteSpin lifecycle it may implement any method of the lifecycle interface.

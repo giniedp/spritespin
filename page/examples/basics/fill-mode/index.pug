@@ -4,14 +4,35 @@ weight: 3
 ---
 extends /_layouts/_example
 block content
+  script(type='text/javascript' src=spritespinSrc)
+  :markdown-it
+    For the following examples we constrain the spritespin container to a fixed size of `200x200` pixel to
+    demonstrate the difference between different `fillMode`'s.
   +example
-    script(type='text/javascript' src=spritespinSrc)
     style.
       .spritespin-instance {
         width: 200px;
         height: 200px;
         background: black;
       }
+  :markdown-it
+    ### fillMode: `none`
+    No scaling is aplied. The frames are displayed in original size.
+  +example
+    #spritespin-example-none
+    script(type='text/javascript').
+      SpriteSpin.create({
+        target: '#spritespin-example-none',
+        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', {
+          frame: [1,34],
+          digits: 3
+        }),
+        sense: -1,
+        fillMode: 'none'
+      })
+  :markdown-it
+    ### fillMode: `fill`
+    The aspect ratio of the frame is ignored and the image is stretched to fill the container.
   +example
     #spritespin-example-fill
     script(type='text/javascript').
@@ -24,6 +45,9 @@ block content
         sense: -1,
         fillMode: 'fill'
       })
+  :markdown-it
+    ### fillMode: `contain`
+    The aspect ratio of the frame preserved and the image is scaled up or down to fit into the container as best as possible.
   +example
     #spritespin-example-contain
     script(type='text/javascript').
@@ -36,6 +60,9 @@ block content
         sense: -1,
         fillMode: 'contain'
       })
+  :markdown-it
+    ### fillMode: `cover`
+    The aspect ratio of the frame preserved and the image is scaled up or down to cover the entire area of the container
   +example
     #spritespin-example-cover
     script(type='text/javascript').
@@ -48,6 +75,10 @@ block content
         sense: -1,
         fillMode: 'cover'
       })
+  :markdown-it
+    ### fillMode: `scale-down`
+    The aspect ratio of the frame preserved and the image is scaled down only if neccessary so that the container boundaries are not exceeded.
+    This is a mix of `fillMode: 'none'` and `fillMode: 'contain'`
   +example
     #spritespin-example-scale-down
     script(type='text/javascript').
@@ -59,16 +90,4 @@ block content
         }),
         sense: -1,
         fillMode: 'scale-down'
-      })
-  +example
-    #spritespin-example-none
-    script(type='text/javascript').
-      SpriteSpin.create({
-        target: '#spritespin-example-none',
-        source: SpriteSpin.source('http://spritespin.ginie.eu/images/rad_zoom_{frame}.jpg', {
-          frame: [1,34],
-          digits: 3
-        }),
-        sense: -1,
-        fillMode: 'none'
       })

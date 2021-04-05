@@ -4,22 +4,27 @@ weight: 2
 ---
 extends /_layouts/_example
 block content
+  :markdown-it
+    It is more performant to use a sprite sheet instead of an array of images.
+    Here is an example with `34` frames stitched into a single image
+  p: a(href="http://spritespin.ginie.eu/images/bike6x6_big.jpg", target="_blank")
+    img(src="http://spritespin.ginie.eu/images/bike6x6_big.jpg" width=320)
+  :markdown-it
+    SpriteSpin needs to know how the frames are stitched together. The options
+    `frame` and `framesX` are crucial
   +example
     #spritespin-example
     script(type='text/javascript' src=spritespinSrc)
     script(type='text/javascript').
       SpriteSpin.create({
         target: '#spritespin-example',
-        // Set a single image url as source
         source: 'http://spritespin.ginie.eu/images/bike6x6_big.jpg',
-        // Define the size of the display.
-        width: 480,
-        height: 327,
+        frameWidth: 640,
+        frameHeight : 437,
+        sense: -1,
         // Set the total number of frames to show. The 6x6 sprite might contain 36 images
         // but it only has 34 frames, hence we set it to 34 here
         frames: 34,
         // The 6x6 sprite sheet contains 6 frames in one row.
-        framesX: 6,
-        // reverse interaction direction
-        sense: -1
+        framesX: 6
       })
