@@ -120,6 +120,7 @@ export function usePlayback(data: InstanceState) {
   state.frameTime = data.frameTime
   if (!data.animate) {
     state.looper?.kill()
+    state.lastTime = null
   } else if (state.looper) {
     state.looper()
   } else {
