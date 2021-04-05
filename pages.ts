@@ -37,7 +37,12 @@ Metalsmith(__dirname)
     template: '_layouts/_docs.pug'
   }))
   .use(msPug({
-
+    locals: () => {
+      return {
+        spritespinCdn: 'https://unpkg.com/spritespin@beta/release/spritespin.js',
+        spritespinSrc: '/release/spritespin.js',
+      }
+    }
   }))
   .use(msTypescript({ keepOriginal: true }))
   .use(msBrowserSync({ name: 'spritespin', config: require(`${__dirname}/browser-sync`) }))

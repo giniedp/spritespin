@@ -20,7 +20,7 @@ $ yarn add spritespin
 ## CDN
 
 ```html
-<script src='https://unpkg.com/spritespin@x.x.x/release/spritespin.js' type='text/javascript'></script>
+<script src='https://unpkg.com/spritespin@beta/release/spritespin.js' type='text/javascript'></script>
 ```
 
 ## Usage

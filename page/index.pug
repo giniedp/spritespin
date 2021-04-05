@@ -10,7 +10,7 @@ block content
       p The library is built with extensibility in mind and comes with a plugin system to customize its behavior.
 
     #spritespin-preview
-    script(type='text/javascript' src='/release/spritespin.js')
+    script(type='text/javascript' src=spritespinSrc)
     script(type='text/javascript').
       SpriteSpin.create({
         target: '#spritespin-preview',
@@ -32,7 +32,7 @@ block content
   .container
     h2 CDN
   .mb-3.bg-dark: pre.container: code.language-html
-    ="<script src='https://unpkg.com/spritespin@x.x.x/release/spritespin.js' type='text/javascript'></script>"
+    ="<script src='https://unpkg.com/spritespin@beta/release/spritespin.js' type='text/javascript'></script>"
   .container
     h3 Usage
   .mb-3.bg-dark: pre.container: code.language-js.
