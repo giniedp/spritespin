@@ -13,7 +13,7 @@ function detectionContext() {
     return null
   }
 
-  context = canvas.getContext('2d')
+  context = canvas.getContext('2d', { willReadFrequently: true })
   return context
 }
 

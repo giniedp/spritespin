@@ -39,7 +39,7 @@ function init(e: Event, data: InstanceState) {
   if (!state.canvas || !state.canvas.parentElement) {
     state.canvas = state.canvas || document.createElement('canvas')
     state.canvas.classList.add('blur-layer')
-    state.context = state.context || state.canvas.getContext('2d')
+    state.context = state.context || state.canvas.getContext('2d', { willReadFrequently: true })
     css(state.canvas, {
       position: 'absolute',
       top: 0,
