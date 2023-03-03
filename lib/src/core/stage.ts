@@ -44,7 +44,7 @@ function grabCanvas(root: HTMLElement, parent: HTMLElement) {
 }
 
 function grabContext(canvas: HTMLCanvasElement) {
-  return canvas.getContext?.('2d')
+  return canvas.getContext?.('2d', { willReadFrequently: true })
 }
 
 function grabImages(parent: HTMLElement) {
